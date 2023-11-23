@@ -6,7 +6,17 @@ import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
 import Footer from '@/layouts/components/Footer.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
+const routeItem = computed(() => {
+  let routePath = router.currentRoute.value.path.split('/')
+    .map(item => item.charAt(0).toUpperCase() + item.slice(1))
+  routePath.shift()
+  if (routePath[1] == 0) {
+    routePath[1] = "Add"
+  }
+  return routePath
+})
 </script>
 
 <template>
@@ -22,14 +32,25 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         <!-- 👉 Search -->
         <div class="d-flex align-center cursor-pointer" style="user-select: none;">
           <!-- 👉 Search Trigger button -->
-          <IconBtn>
+          <!-- <IconBtn>
             <VIcon icon="bx-search" />
           </IconBtn>
 
           <span class="d-none d-md-flex align-center text-disabled">
             <span class="me-3">Search</span>
 
-          </span>
+          </span> -->
+          <v-breadcrumbs class="px-0">
+            <v-breadcrumbs-item>
+              Home
+            </v-breadcrumbs-item>/
+            <template v-for="(item, index) in routeItem" :key="'route' + index">
+              <v-breadcrumbs-item>
+                {{ item }}
+              </v-breadcrumbs-item>
+              <span v-if="index < routeItem.length - 1">/</span>
+            </template>
+          </v-breadcrumbs>
         </div>
 
         <VSpacer />
