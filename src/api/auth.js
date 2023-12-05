@@ -2,7 +2,7 @@ import axios from 'axios';
 const auth = {
     login(email, password) {
         return axios.post('/login', {
-            email, password
+            company_email: email, password
         })
     }
 }

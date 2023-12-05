@@ -1,7 +1,13 @@
 import auth from "@/api/auth";
 import axios from "axios";
 import { createStore } from "vuex";
+import customersModule from "./customers.module";
+import invoiceModule from "./invoices.module";
 export default createStore({
+    modules: {
+        customers: customersModule,
+        invoices: invoiceModule
+    },
     state: {
         user: {},
         token: {},
@@ -14,15 +20,16 @@ export default createStore({
         },
         AUTHENTICATE(
             state,
-            { token, user, role }
+            { user_token, userdata, roleData }
         ) {
-            state.token = token
-            state.user = user
-            state.role = role
+            state.token = user_token
+            state.user = userdata
+            state.role = roleData
             state.isAuthenticate = true
         },
 
         UNAUTHENTICATE(state) {
+            localStorage.removeItem('accessToken')
             state.token = {}
             state.user = {}
             state.role = {}
@@ -34,30 +41,34 @@ export default createStore({
             try {
                 const { email, password } = payload
                 const response = await auth.login(email, password)
+                axios.defaults.user = response.data.userdata
+                axios.defaults.role = response.data.roleData
+                axios.defaults.headers.common['x-access-token'] = response.data.user_token
                 localStorage.setItem('accessToken', JSON.stringify(response.data))
                 commit('AUTHENTICATE', response.data)
-                console.log('AUTHENTICATE', response.data)
-
             } catch (error) {
-                console.log(error, "Login_done?");
+                throw error
             }
         },
         getToken({ commit }) {
             try {
                 const accessToken = localStorage.getItem('accessToken')
                 if (!accessToken) throw new Error('No Token Found')
-                const { token, user, role } = JSON.parse(accessToken)
+                const { user_token, userdata, roleData } = JSON.parse(accessToken)
 
-                axios.defaults.user = user
-                axios.defaults.role = role
-                axios.defaults.headers.common['Authorization'] =
-                    'Bearer ' + token
+                axios.defaults.user = userdata
+                axios.defaults.role = roleData
+                axios.defaults.headers.common['x-access-token'] = user_token
 
-                commit('AUTHENTICATE', { token, user, role })
+                commit('AUTHENTICATE', { user_token, userdata, roleData })
             } catch (err) {
                 console.log('getToken', err)
             }
         },
+        logout({ commit }) {
+            commit('UNAUTHENTICATE')
+            console.log('UNAUTHENTICATE')
+        }
 
     },
 })

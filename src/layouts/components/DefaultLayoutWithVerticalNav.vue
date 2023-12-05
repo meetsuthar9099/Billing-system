@@ -1,22 +1,25 @@
 <script setup>
-import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
-import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
+import VerticalNavLayout from "@layouts/components/VerticalNavLayout.vue";
+import VerticalNavLink from "@layouts/components/VerticalNavLink.vue";
+import snackbar from "@/components/snackbar.vue";
 
 // Components
-import Footer from '@/layouts/components/Footer.vue'
-import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
-import UserProfile from '@/layouts/components/UserProfile.vue'
-import { useRouter } from 'vue-router'
-const router = useRouter()
+import Footer from "@/layouts/components/Footer.vue";
+import NavbarThemeSwitcher from "@/layouts/components/NavbarThemeSwitcher.vue";
+import UserProfile from "@/layouts/components/UserProfile.vue";
+import { useRouter } from "vue-router";
+const router = useRouter();
+const showSnackbar = ref(false)
 const routeItem = computed(() => {
-  let routePath = router.currentRoute.value.path.split('/')
-    .map(item => item.charAt(0).toUpperCase() + item.slice(1))
-  routePath.shift()
+  let routePath = router.currentRoute.value.path
+    .split("/")
+    .map((item) => item.charAt(0).toUpperCase() + item.slice(1));
+  routePath.shift();
   if (routePath[1] == 0) {
-    routePath[1] = "Add"
+    routePath[1] = "Add";
   }
-  return routePath
-})
+  return routePath;
+});
 </script>
 
 <template>
@@ -30,7 +33,7 @@ const routeItem = computed(() => {
         </IconBtn>
 
         <!-- 👉 Search -->
-        <div class="d-flex align-center cursor-pointer" style="user-select: none;">
+        <div class="d-flex align-center cursor-pointer" style="user-select: none">
           <!-- 👉 Search Trigger button -->
           <!-- <IconBtn>
             <VIcon icon="bx-search" />
@@ -41,11 +44,9 @@ const routeItem = computed(() => {
 
           </span> -->
           <v-breadcrumbs class="px-0">
-            <v-breadcrumbs-item>
-              Home
-            </v-breadcrumbs-item>/
+            <v-breadcrumbs-item :to="'/dashboard'"> Home </v-breadcrumbs-item>/
             <template v-for="(item, index) in routeItem" :key="'route' + index">
-              <v-breadcrumbs-item>
+              <v-breadcrumbs-item :to="item">
                 {{ item }}
               </v-breadcrumbs-item>
               <span v-if="index < routeItem.length - 1">/</span>
@@ -54,11 +55,6 @@ const routeItem = computed(() => {
         </div>
 
         <VSpacer />
-
-        <IconBtn class="me-2" href="https://github.com/themeselection/sneat-vuetify-vuejs-admin-template-free"
-          target="_blank" rel="noopener noreferrer">
-          <VIcon icon="bxl-github" />
-        </IconBtn>
 
         <IconBtn class="me-2">
           <VIcon icon="bx-bell" />
@@ -75,11 +71,20 @@ const routeItem = computed(() => {
         title: 'Dashboard',
         icon: 'bx-home',
         to: '/dashboard',
+        group: 'Dashboard',
       }" />
-      <VerticalNavLink :item="{
+      <VerticalNavLink :active="true" :item="{
         title: 'Customer',
         icon: 'mdi-account-cog-outline',
         to: '/customer',
+        group: 'Customer',
+      }" />
+      <VDivider class="my-4"></VDivider>
+      <VerticalNavLink :item="{
+        title: 'Invoice',
+        icon: 'mdi-invoice',
+        to: '/invoice',
+        group: 'Invoice',
       }" />
       <!-- 
       <VerticalNavSectionTitle :item="{

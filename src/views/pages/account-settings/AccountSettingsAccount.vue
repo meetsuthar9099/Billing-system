@@ -1,6 +1,10 @@
 <script setup>
-import avatar1 from '@images/avatars/avatar-1.png'
-
+import avatar1 from '@images/avatars/avatar-1.png';
+const store = inject('store');
+const imageUrl = inject('imageUrl');
+const user = computed(() => { return store.state.user })
+const userImage = computed(() => { return imageUrl + user.value.photo })
+const roleName = computed(() => { return store.state.role.role_name })
 const accountData = {
   avatarImg: avatar1,
   firstName: 'john',
@@ -106,52 +110,17 @@ const currencies = [
       <VCard title="Account Details">
         <VCardText class="d-flex">
           <!-- 👉 Avatar -->
-          <VAvatar
-            rounded="lg"
-            size="100"
-            class="me-6"
-            :image="accountDataLocal.avatarImg"
-          />
+          <VAvatar rounded="lg" size="100" class="me-6" :image="userImage" />
 
           <!-- 👉 Upload Photo -->
           <form class="d-flex flex-column justify-center gap-5">
             <div class="d-flex flex-wrap gap-2">
-              <VBtn
-                color="primary"
-                @click="refInputEl?.click()"
-              >
-                <VIcon
-                  icon="bx-cloud-upload"
-                  class="d-sm-none"
-                />
-                <span class="d-none d-sm-block">Upload new photo</span>
-              </VBtn>
-
-              <input
-                ref="refInputEl"
-                type="file"
-                name="file"
-                accept=".jpeg,.png,.jpg,GIF"
-                hidden
-                @input="changeAvatar"
-              >
-
-              <VBtn
-                type="reset"
-                color="error"
-                variant="tonal"
-                @click="resetAvatar"
-              >
-                <span class="d-none d-sm-block">Reset</span>
-                <VIcon
-                  icon="bx-refresh"
-                  class="d-sm-none"
-                />
-              </VBtn>
+              <h1>{{ user.firstname }} {{ user.last_name }}</h1>
+              <p>( {{ user.emp_code }} )</p>
             </div>
 
             <p class="text-body-1 mb-0">
-              Allowed JPG, GIF or PNG. Max size of 800K
+              {{ roleName }}
             </p>
           </form>
         </VCardText>
@@ -163,198 +132,82 @@ const currencies = [
           <VForm class="mt-6">
             <VRow>
               <!-- 👉 First Name -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="accountDataLocal.firstName"
-                  placeholder="John"
-                  label="First Name"
-                />
+              <VCol md="4" cols="12">
+                <VTextField v-model="user.firstname" readonly label="First Name" />
+              </VCol>
+              <VCol md="4" cols="12">
+                <VTextField v-model="user.middle_name" readonly label="Middle Name" />
               </VCol>
 
               <!-- 👉 Last Name -->
-              <VCol
-                md="6"
-                cols="12"
-              >
-                <VTextField
-                  v-model="accountDataLocal.lastName"
-                  placeholder="Doe"
-                  label="Last Name"
-                />
+              <VCol md="4" cols="12">
+                <VTextField v-model="user.last_name" readonly label="Last Name" />
               </VCol>
 
               <!-- 👉 Email -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.email"
-                  label="E-mail"
-                  placeholder="johndoe@gmail.com"
-                  type="email"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.company_email" label="Company E-mail" readonly type="email" />
               </VCol>
 
               <!-- 👉 Organization -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.org"
-                  label="Organization"
-                  placeholder="ThemeSelection"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.personal_email" label="Personal E-mail" readonly />
               </VCol>
-
               <!-- 👉 Phone -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.phone"
-                  label="Phone Number"
-                  placeholder="+1 (917) 543-9876"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.mo_number" label="Phone Number" readonly />
               </VCol>
 
               <!-- 👉 Address -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.address"
-                  label="Address"
-                  placeholder="123 Main St, New York, NY 10001"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.dob" readonly label="Date of birth" />
               </VCol>
 
               <!-- 👉 State -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.state"
-                  label="State"
-                  placeholder="New York"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.add_1" readonly label="Address" />
               </VCol>
 
               <!-- 👉 Zip Code -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VTextField
-                  v-model="accountDataLocal.zip"
-                  label="Zip Code"
-                  placeholder="10001"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.add_2" readonly label="Address 2" />
               </VCol>
-
-              <!-- 👉 Country -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.country"
-                  label="Country"
-                  :items="['USA', 'Canada', 'UK', 'India', 'Australia']"
-                  placeholder="Select Country"
-                />
-              </VCol>
-
-              <!-- 👉 Language -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.language"
-                  label="Language"
-                  placeholder="Select Language"
-                  :items="['English', 'Spanish', 'Arabic', 'Hindi', 'Urdu']"
-                />
-              </VCol>
-
-              <!-- 👉 Timezone -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.timezone"
-                  label="Timezone"
-                  placeholder="Select Timezone"
-                  :items="timezones"
-                  :menu-props="{ maxHeight: 200 }"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.city" readonly label="City" />
               </VCol>
 
               <!-- 👉 Currency -->
-              <VCol
-                cols="12"
-                md="6"
-              >
-                <VSelect
-                  v-model="accountDataLocal.currency"
-                  label="Currency"
-                  placeholder="Select Currency"
-                  :items="currencies"
-                  :menu-props="{ maxHeight: 200 }"
-                />
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.state" readonly label="State" />
+              </VCol>
+              <!-- 👉 Country -->
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.aadhar_number" readonly label="Aadhar Number" />
               </VCol>
 
-              <!-- 👉 Form Actions -->
-              <VCol
-                cols="12"
-                class="d-flex flex-wrap gap-4"
-              >
-                <VBtn>Save changes</VBtn>
-
-                <VBtn
-                  color="secondary"
-                  variant="tonal"
-                  type="reset"
-                  @click.prevent="resetForm"
-                >
-                  Reset
-                </VBtn>
+              <!-- 👉 Language -->
+              <VCol cols="12" md="6">
+                <VTextField v-model="user.pan_number" readonly label="Pan Number" />
               </VCol>
+
             </VRow>
           </VForm>
         </VCardText>
       </VCard>
     </VCol>
-
+    <!-- 
     <VCol cols="12">
-      <!-- 👉 Deactivate Account -->
-      <VCard title="Deactivate Account">
-        <VCardText>
-          <div>
-            <VCheckbox
-              v-model="isAccountDeactivated"
-              label="I confirm my account deactivation"
-            />
-          </div>
+    <VCard title="Deactivate Account">
+      <VCardText>
+        <div>
+          <VCheckbox v-model="isAccountDeactivated" label="I confirm my account deactivation" />
+        </div>
 
-          <VBtn
-            :disabled="!isAccountDeactivated"
-            color="error"
-            class="mt-3"
-          >
-            Deactivate Account
-          </VBtn>
-        </VCardText>
-      </VCard>
-    </VCol>
+        <VBtn :disabled="!isAccountDeactivated" color="error" class="mt-3">
+          Deactivate Account
+        </VBtn>
+      </VCardText>
+    </VCard>
+    </VCol> -->
   </VRow>
 </template>

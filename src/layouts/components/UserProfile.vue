@@ -1,12 +1,20 @@
 <script setup>
-import avatar1 from '@images/avatars/avatar-1.png';
+import router from '@/router';
+const store = inject('store');
+const imageUrl = inject('imageUrl');
+const user = computed(() => { return store.state.user })
+const userImage = computed(() => { return imageUrl + user.value.photo })
+const roleName = computed(() => { return store.state.role.role_name })
+const logout = () => {
+  store.dispatch('logout')
+  router.push({ name: 'Login' })
+}
 </script>
 
 <template>
   <VBadge dot location="bottom right" offset-x="3" offset-y="3" color="success" bordered>
     <VAvatar class="cursor-pointer" color="primary" variant="tonal">
-      <VImg :src="avatar1" />
-
+      <VImg :src="userImage" />
       <!-- SECTION Menu -->
       <VMenu activator="parent" width="230" location="bottom end" offset="14px">
         <VList>
@@ -16,16 +24,16 @@ import avatar1 from '@images/avatars/avatar-1.png';
               <VListItemAction start>
                 <VBadge dot location="bottom right" offset-x="3" offset-y="3" color="success">
                   <VAvatar color="primary" variant="tonal">
-                    <VImg :src="avatar1" />
+                    <VImg :src="userImage" />
                   </VAvatar>
                 </VBadge>
               </VListItemAction>
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{ user.firstname }} {{ user.last_name }}
             </VListItemTitle>
-            <VListItemSubtitle>Admin</VListItemSubtitle>
+            <VListItemSubtitle>{{ roleName }}</VListItemSubtitle>
           </VListItem>
           <VDivider class="my-2" />
 
@@ -69,7 +77,7 @@ import avatar1 from '@images/avatars/avatar-1.png';
           <VDivider class="my-2" />
 
           <!-- 👉 Logout -->
-          <VListItem to="/login">
+          <VListItem @click="logout">
             <template #prepend>
               <VIcon class="me-2" icon="bx-log-out" size="22" />
             </template>

@@ -8,7 +8,7 @@ import '@core/scss/template/index.scss'
 import '@layouts/styles/index.scss'
 import '@styles/styles.scss'
 import axios from 'axios'
-import { createPinia } from 'pinia'
+// import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import store from './store'
 loadFonts()
@@ -16,15 +16,28 @@ loadFonts()
 
 // Create vue app
 const app = createApp(App)
-axios.defaults.baseURL = "http://192.168.1.45:8000/api/";
+const url = 'http://192.168.1.10:44000'
+axios.defaults.baseURL = `${url}/api/billing`;
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
+axios.defaults.headers.common['x-api-key'] = 'vu1R)?xwy_o8Yy=X_^_L';
+const imageUrl = `${url}/public/images/`
 // Use plugins
+axios.interceptors.response.use(
+    response => response,
+    error => {
+        if (error.response && error.response.status === 401) {
+            store.commit('UNAUTHENTICATE')
+            router.push({ name: 'Login' })
+        }
+        return Promise.reject(error);
+    }
+);
 store.dispatch('getToken')
-console.log(store.state.token, "store.state.user");
 app.use(vuetify)
-app.use(createPinia())
+// app.use(createPinia())
 app.use(router)
 app.use(store)
 app.provide('store', store);
+app.provide('imageUrl', imageUrl);
 // Mount vue app
 app.mount('#app')

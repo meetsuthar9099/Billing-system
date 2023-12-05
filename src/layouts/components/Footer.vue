@@ -6,8 +6,8 @@
       {{ new Date().getFullYear() }}
       Made With
       <VIcon icon="bx-heart" color="error" size="1.25rem" class="mx-1" />
-      By <a href="https://themeselection.com" target="_blank" rel="noopener noreferrer"
-        class="text-primary ms-1">Codecrew</a>
+      By <a href="https://codecrewinfotech.com" target="_blank" rel="noopener noreferrer"
+        class="text-primary ms-1">CodeCrew</a>
     </span>
     <!-- 👉 Footer: right content -->
     <span class="d-md-flex gap-x-4 text-primary d-none">

@@ -1,4 +1,5 @@
 <script setup>
+import router from '@/router';
 import logo from '@images/logo.svg?raw';
 
 const form = ref({
@@ -7,11 +8,14 @@ const form = ref({
   remember: false,
 })
 const store = inject('store');
+const InvalidCredentials = ref(false)
+
 const onSubmit = async () => {
   try {
-    console.log(form.value);
     await store.dispatch('login', form.value)
+    router.push({ path: "/dashboard" })
   } catch (error) {
+    InvalidCredentials.value = true
     console.log(error, "LoginFail");
   }
 }
@@ -20,6 +24,16 @@ const isPasswordVisible = ref(false)
 </script>
 
 <template>
+  <v-snackbar position="relative" color="#EF5350" location="top right" v-model="InvalidCredentials">
+    <span style="color: white;">
+      <VIcon icon="bx-error" class="me-2" />Invalid Credentials
+    </span>
+    <template #actions>
+      <v-btn color="red" style="color: white;" variant="text" @click="InvalidCredentials = false">
+        Close
+      </v-btn>
+    </template>
+  </v-snackbar>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
     <VCard class="auth-card pa-4 pt-7" max-width="448">
       <VCardItem class="justify-center">
@@ -35,9 +49,6 @@ const isPasswordVisible = ref(false)
       </VCardItem>
 
       <VCardText class="pt-2">
-        <h5 class="text-h5 mb-1">
-          Welcome to sneat!
-        </h5>
         <p class="mb-0">
           Please sign-in to your account and start the adventure
         </p>
@@ -48,20 +59,19 @@ const isPasswordVisible = ref(false)
           <VRow>
             <!-- email -->
             <VCol cols="12">
-              <VTextField v-model="form.email" autofocus placeholder="johndoe@email.com" label="Email" type="email" />
+              <VTextField v-model="form.email" required autofocus placeholder="johndoe@email.com" label="Email"
+                type="email" />
             </VCol>
 
             <!-- password -->
             <VCol cols="12">
-              <VTextField v-model="form.password" label="Password" placeholder="············"
+              <VTextField v-model="form.password" required label="Password" placeholder="············"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible" />
 
               <!-- remember me checkbox -->
-              <div class="d-flex align-center justify-space-between flex-wrap mt-1 mb-4">
-                <VCheckbox v-model="form.remember" label="Remember me" />
-
+              <div class="d-flex align-center justify-end flex-wrap mt-2 mb-4">
                 <RouterLink class="text-primary ms-2 mb-1" to="javascript:void(0)">
                   Forgot Password?
                 </RouterLink>
@@ -71,14 +81,6 @@ const isPasswordVisible = ref(false)
               <VBtn block type="submit">
                 Login
               </VBtn>
-            </VCol>
-
-            <!-- create account -->
-            <VCol cols="12" class="text-center text-base">
-              <span>New on our platform?</span>
-              <RouterLink class="text-primary ms-2" to="/register">
-                Create an account
-              </RouterLink>
             </VCol>
           </VRow>
         </VForm>
