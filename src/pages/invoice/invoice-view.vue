@@ -291,16 +291,20 @@ const filteredProjects = (currentIndex) => {
 let getId = route.params.id;
 onMounted(async () => {
   await store.dispatch("invoices/fetchAllCustomers");
+  await store.dispatch("company/fetch");
   if (getId != 0) {
     await store.dispatch("invoices/fetch", { id: getId });
     model.value = { ...invoice.value }
     model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD')
     model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD')
   }
-
 });
 
+const company = computed(()=>{return store.state.company.settings})
+
+
 const gstValue = computed(() => {
+  console.log(company,"company");
   const isIndia = (customer.value.billing.country_id == "IN")
   const isState = (customer.value.billing.state == 'Gujarat')
 
@@ -338,12 +342,12 @@ watchEffect(async () => {
       project.total = totalWithoutTax + taxFactor;
     });
   }
-  model.value.total_without_discount = totalWithoutDiscount
-  model.value.total_without_tax = totalWithoutTax
-  model.value.discount = discountFactor
-  model.value.total_tax = taxFactor
-  model.value.total_cost = totalCost.value ? totalCost.value : 0
-  model.value.grand_total = model.value.total_cost
+  // model.value.total_without_discount = totalWithoutDiscount
+  // model.value.total_without_tax = totalWithoutTax
+  // model.value.discount = discountFactor
+  // model.value.total_tax = taxFactor
+  // model.value.total_cost = totalCost.value ? totalCost.value : 0
+  // model.value.grand_total = model.value.total_cost
 })
 
 watchEffect(async () => {

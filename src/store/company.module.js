@@ -16,9 +16,7 @@ const actions = {
   async fetch({ commit }) {
     try {
       const result = await api.fetch();
-      console.log("fetch company data-new", result);
       const data = result.data.settingData;
-      console.log("fetch company data", data);
       commit("SET_SETTINGS", data);
     } catch (err) {
       throw err;

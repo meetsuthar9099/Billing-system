@@ -10,7 +10,7 @@ export default createStore({
     modules: {
         customers: customersModule,
         invoices: invoiceModule,
-        company:companyModule
+        company: companyModule
     },
     state: {
         user: {},

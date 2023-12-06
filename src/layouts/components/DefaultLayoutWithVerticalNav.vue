@@ -9,6 +9,7 @@ import NavbarThemeSwitcher from "@/layouts/components/NavbarThemeSwitcher.vue";
 import UserProfile from "@/layouts/components/UserProfile.vue";
 import { useRouter } from "vue-router";
 const router = useRouter();
+
 const showSnackbar = ref(false)
 const routeItem = computed(() => {
   let routePath = router.currentRoute.value.path
