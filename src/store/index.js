@@ -3,10 +3,12 @@ import axios from "axios";
 import { createStore } from "vuex";
 import customersModule from "./customers.module";
 import invoiceModule from "./invoices.module";
+import companyModule from "./company.module";
 export default createStore({
     modules: {
         customers: customersModule,
-        invoices: invoiceModule
+        invoices: invoiceModule,
+        company:companyModule
     },
     state: {
         user: {},
