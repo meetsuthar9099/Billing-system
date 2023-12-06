@@ -16,7 +16,7 @@ loadFonts()
 
 // Create vue app
 const app = createApp(App)
-const url = 'http://192.168.1.10:44000'
+const url = 'http://192.168.1.5:44000'
 axios.defaults.baseURL = `${url}/api/billing`;
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.common['x-api-key'] = 'vu1R)?xwy_o8Yy=X_^_L';
@@ -33,6 +33,11 @@ axios.interceptors.response.use(
     }
 );
 store.dispatch('getToken')
+store.dispatch('setLogo').then(()=>{
+    app.provide('logo', imageUrl + store.state.logo);
+})
+
+
 app.use(vuetify)
 // app.use(createPinia())
 app.use(router)

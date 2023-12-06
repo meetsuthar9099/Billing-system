@@ -62,6 +62,14 @@ export default {
                 throw error
             }
         },
+        async deleteInvoice({ }, payload) {
+            try {
+                const { id } = payload
+                await api.deleteInvoice(id)
+            } catch (error) {
+                throw error
+            }
+        },
         async fetchAllCustomers({ commit }) {
             const storageCache = new StorageCache(storageKey)
             try {
@@ -87,6 +95,15 @@ export default {
         async addInvoice({ }, payload) {
             try {
                 await api.addInvoice(payload)
+            } catch (error) {
+                throw error
+            }
+        },
+        async invoiceGenerate({commit},id){
+            try {
+                const response = await api.invoiceGenerate(id)
+                console.log('SET_INVOICEPDF',response.data)
+                // commit('SET_INVOICEPDF',response.data)
             } catch (error) {
                 throw error
             }

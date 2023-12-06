@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite --host",
+    "dev": "vite --port 3000 --host",
     "build": "vite build",
     "preview": "vite preview --port 5050",
     "lint": "eslint . -c .eslintrc.js --fix --ext .ts,.js,.vue,.tsx,.jsx",
@@ -33,6 +33,7 @@
     "vue-chartjs": "^5.2.0",
     "vue-flatpickr-component": "11.0.3",
     "vue-i18n": "^9.2.2",
+    "vue-pdf": "^4.3.0",
     "vue-prism-component": "^2.0.0",
     "vue-router": "^4.2.1",
     "vue3-apexcharts": "^1.4.1",

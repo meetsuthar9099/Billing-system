@@ -3,6 +3,8 @@ import axios from "axios";
 import { createStore } from "vuex";
 import customersModule from "./customers.module";
 import invoiceModule from "./invoices.module";
+import { StorageCache } from "@/exports/dataStorage";
+const logoKey = 'logo-key'
 export default createStore({
     modules: {
         customers: customersModule,
@@ -12,11 +14,15 @@ export default createStore({
         user: {},
         token: {},
         role: {},
+        logo: null,
         isAuthenticate: false
     },
     mutations: {
         SET_USER(state, payload) {
             state.user = payload
+        },
+        SET_LOGO(state, payload) {
+            state.logo = payload
         },
         AUTHENTICATE(
             state,
@@ -63,6 +69,22 @@ export default createStore({
                 commit('AUTHENTICATE', { user_token, userdata, roleData })
             } catch (err) {
                 console.log('getToken', err)
+            }
+        },
+        async setLogo({ commit }) {
+            const storageCache = new StorageCache(logoKey)
+            try {
+                let { is_valid, value } = storageCache.getArray()
+                if (!is_valid) {
+                    const response = await auth.getLogo()
+                    const data = response.data
+                    storageCache.set(data)
+                    value.length = 0
+                    value.push(...data)
+                }
+                commit('SET_LOGO', value[0])
+            } catch (error) {
+                throw error
             }
         },
         logout({ commit }) {

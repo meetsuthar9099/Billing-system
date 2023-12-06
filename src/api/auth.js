@@ -4,6 +4,11 @@ const auth = {
         return axios.post('/login', {
             company_email: email, password
         })
-    }
+    },
+    getLogo() {
+        return axios.post('/getSettingData', {
+            key: 'logo'
+        })
+    },
 }
 export default auth

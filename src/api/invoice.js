@@ -17,6 +17,12 @@ const api = {
     },
     editInvoice(id, model){
         return axios.post(`/editInvoice/${id}`, model)
+    },
+    deleteInvoice(id){
+        return axios.delete(`/deleteInvoice/${id}`)
+    },
+    invoiceGenerate(id){
+        return axios.get(`/invoiceGenerate/${id}`)
     }
 }
 export default api

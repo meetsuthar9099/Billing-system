@@ -1,7 +1,7 @@
 <script setup>
 import router from '@/router';
-import logo from '@images/logo.svg?raw';
-
+// import logo from '@images/logo.svg?raw';
+const logo = inject('logo')
 const form = ref({
   email: '',
   password: '',
@@ -35,24 +35,14 @@ const isPasswordVisible = ref(false)
     </template>
   </v-snackbar>
   <div class="auth-wrapper d-flex align-center justify-center pa-4">
-    <VCard class="auth-card pa-4 pt-7" max-width="448">
+    <VCard class="auth-card pa-4 pt-7" width="448" max-width="448">
       <VCardItem class="justify-center">
         <template #prepend>
           <div class="d-flex">
-            <div class="d-flex text-primary" v-html="logo" />
+            <img :src="logo" width="300" />
           </div>
         </template>
-
-        <VCardTitle class="text-2xl font-weight-bold">
-          sneat
-        </VCardTitle>
       </VCardItem>
-
-      <VCardText class="pt-2">
-        <p class="mb-0">
-          Please sign-in to your account and start the adventure
-        </p>
-      </VCardText>
 
       <VCardText>
         <VForm validate-on="true" @submit.prevent="onSubmit">
@@ -72,9 +62,10 @@ const isPasswordVisible = ref(false)
 
               <!-- remember me checkbox -->
               <div class="d-flex align-center justify-end flex-wrap mt-2 mb-4">
-                <RouterLink class="text-primary ms-2 mb-1" to="javascript:void(0)">
+                <a class="text-primary ms-2 mb-1" target="_blank"
+                  href="https://backoffice.codecrewinfotech.com/forgot-password">
                   Forgot Password?
-                </RouterLink>
+                </a>
               </div>
 
               <!-- login button -->

@@ -31,8 +31,7 @@
                 </v-col>
                 <v-col cols="6" class="d-flex justify-end align-stretch">
                     <v-btn class="me-2" variant="outlined" v-if="bulkDeleteId.length > 1"
-                        @click="bulkDeleteModel = true">Bulk
-                        Delete</v-btn>
+                        @click="bulkDeleteModel = true">Bulk Delete</v-btn>
 
                     <v-btn class="me-2" variant="outlined" @click="isFilterVisible = !isFilterVisible">
                         <span>filter</span>
@@ -122,7 +121,7 @@ const defaultFilter = Object.freeze({
     invoice_date_to: null,
     due_date_from: null,
     due_date_to: null,
-    limit: 1
+    limit: 10
 })
 let deleteInvoiceId = null
 const store = inject('store');
@@ -151,8 +150,8 @@ const deleteConfirm = async (id) => {
 const doSearch = async () => {
     const query = {
         page: filter.value.currentPage,
-        invoice_date_from: filter.value.invoice_date_from?moment(filter.value.invoice_date_from).startOf('day') : '',
-        invoice_date_to: filter.value.invoice_date_to?moment(filter.value.invoice_date_to).endOf('day') : '',
+        invoice_date_from: filter.value.invoice_date_from ? moment(filter.value.invoice_date_from).startOf('day') : '',
+        invoice_date_to: filter.value.invoice_date_to ? moment(filter.value.invoice_date_to).endOf('day') : '',
         due_date_from: filter.value.due_date_from ?
             moment(filter.value.due_date_from).startOf('day') : '',
         due_date_to: filter.value.due_date_to ?
@@ -163,12 +162,30 @@ const doSearch = async () => {
 }
 
 const deleteInvoices = async () => {
-    if (deleteInvoiceId) {
-        await store.dispatch('invoices/deleteCustomer', deleteCustomerId);
+    if (!!deleteInvoiceId) {
+        await store.dispatch('invoices/deleteInvoice', { id: deleteInvoiceId });
         deleteModel.value = false
         doSearch()
     }
 }
+
+const invoiceGenerate = (id) => {
+    store.dispatch('invoices/invoiceGenerate', id)
+
+}
+// const convertToPDF = () => {
+//     const byteData = new Uint8Array(buffer);
+//     const blob = new Blob([byteData], { type: 'application/image' });
+//     const url = URL.createObjectURL(blob);
+
+//     const link = document.createElement('a');
+//     link.href = url;
+//     link.download = 'output.jpg';
+//     link.click();
+
+//     // Clean up by revoking the object URL
+//     URL.revokeObjectURL(url);
+// }
 const bulkDeleteInvoice = async () => {
     if (!!bulkDeleteId.value.length) {
         await store.dispatch('invoices/bulkDeleteInvoices', bulkDeleteId.value);

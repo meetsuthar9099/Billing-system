@@ -11,6 +11,18 @@
             </v-card>
         </v-dialog>
         <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form">
+            <VCard class="pa-4 sticky-element" v-if="getId != 0 && !isEdit" >
+                <VRow>
+                    <VCol>
+                        <VCol class="d-flex align-center" cols="12">
+                            <p class="ma-0">
+                                <VIcon class="me-2">mdi-warning</VIcon>You are in View Mode switch to <span
+                                    class="text-error ms-1 pointer-cursor" @click="isEdit = true">Edit Mode</span>
+                            </p>
+                        </VCol>
+                    </VCol>
+                </VRow>
+            </VCard>
             <VCard class="pa-8">
                 <VRow>
                     <VCol cols="12">
@@ -202,15 +214,9 @@
                     </VCol>
                 </VRow>
             </VCard>
-            <VCard class="pa-6 sticky-element">
+            <VCard class="pa-6">
                 <VRow>
-                    <VCol class="d-flex align-center" cols="12" md="6">
-                        <p class="ma-0" v-if="getId != 0 && !isEdit">
-                            <VIcon class="me-2">mdi-warning</VIcon>You are in View Mode switch to <span
-                                class="text-error ms-1 pointer-cursor" @click="isEdit = true">Edit Mode</span>
-                        </p>
-                    </VCol>
-                    <VCol class="d-flex justify-end gap-2" cols="12" md="6">
+                    <VCol class="d-flex justify-end gap-2" cols="12">
                         <VBtn size="large" color="primary" v-if="getId != 0" @click="isEdit = !isEdit">{{ isEdit ? "View" :
                             "Edit" }}</VBtn>
                         <VBtn size="large" type="submit" color="success" :disabled="!isEdit && getId != 0">{{
@@ -317,9 +323,6 @@ onMounted(async () => {
     }
     await store.dispatch("customers/fetchProjects");
 });
-// onBeforeUnmount(() => {
-//     confirm('heyyyy')
-// });
 
 const rules = {
     text: [(v) => !!v || "This Field is Required"],
@@ -362,8 +365,5 @@ const copyBilling = (val) => {
 .sticky-element {
     position: sticky;
     z-index: 999;
-    bottom: 5px;
-    opacity: 0.850;
-    backdrop-filter: blur(10px);
-}
-</style>
+    top: 0px;
+}</style>

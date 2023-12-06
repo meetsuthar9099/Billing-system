@@ -20,9 +20,9 @@
             <VCol cols="12">
               <VRow>
                 <VCol cols="12">
-                  <VSelect density="comfortable" item-title="name" item-value="_id" :hide-selected="true"
-                    label="Add Customer" name="display_name" :rules="rules.date" :items="allCustomers"
-                    v-model="model.customer_id" prepend-inner-icon="bx-user" />
+                  <VSelect item-title="name" item-value="_id" :hide-selected="true" label="Add Customer"
+                    name="display_name" :rules="rules.date" :items="allCustomers" v-model="model.customer_id"
+                    prepend-inner-icon="bx-user" />
                   <div v-if="!!customer" class="mt-5">
                     <VRow>
                       <VCol cols="6" md="2">
@@ -72,41 +72,56 @@
               <th>UOM</th>
               <th>Quantity</th>
               <th>Discount</th>
-              <th>Taxable Value</th>
+              <th>cgst</th>
+              <th>sgst</th>
+              <th>igst</th>
               <th>Rate</th>
               <th>Total</th>
               <th v-if="showDelete">Action</th>
             </thead>
             <tbody>
               <tr v-for="(item, i) in model.projects">
-                <td><v-select :items="filteredProjects(i)" item-value="_id" :rules="rules.project" :open-on-clear="true"
-                    density="compact" v-model="model.projects[i].id" label="Projects" /></td>
+                <td width="300"><v-select :items="filteredProjects(i)" item-value="_id" :rules="rules.project"
+                    :open-on-clear="true" density="compact" v-model="model.projects[i].id" label="Projects" /></td>
                 <td width="150">
-                  <VTextField type="number" density="compact" v-model="model.projects[i].hsa"></VTextField>
+                  <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
+                    v-model="model.projects[i].hsa"></VTextField>
                 </td>
                 <td width="150">
-                  <VTextField type="number" min="0" :rules="rules.amount" density="compact"
-                    v-model="model.projects[i].amount"></VTextField>
+                  <VTextField :disabled="!model.projects[i].id" type="number" min="0" :rules="rules.amount"
+                    density="compact" v-model="model.projects[i].amount"></VTextField>
                 </td>
                 <td width="150">
-                  <VTextField density="compact" v-model="model.projects[i].uom"></VTextField>
-                </td>
-                <td width="150">
-                  <VTextField type="number" :rules="rules.qty" min="0" density="compact"
-                    v-model="model.projects[i].quantity"></VTextField>
-                </td>
-                <td width="150">
-                  <VTextField type="number" density="compact" max="100" min="0" v-model="model.projects[i].discount">
+                  <VTextField :disabled="!model.projects[i].id" density="compact" v-model="model.projects[i].uom">
                   </VTextField>
                 </td>
                 <td width="150">
-                  <VTextField type="number" density="compact" v-model="model.projects[i].taxable_value"></VTextField>
+                  <VTextField :disabled="!model.projects[i].id" type="number" :rules="rules.qty" min="0" density="compact"
+                    v-model="model.projects[i].quantity"></VTextField>
                 </td>
                 <td width="150">
-                  <VTextField type="number" density="compact" v-model="model.projects[i].rate"></VTextField>
+                  <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
+                    prepend-inner-icon="mdi-percent" max="100" min="0" v-model="model.projects[i].discount">
+                  </VTextField>
+                </td>
+                <td width="150">
+                  <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
+                    v-model="model.projects[i].cgst.rate" min="0" max="100"></VTextField>
+                </td>
+                <td width="150">
+                  <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
+                    v-model="model.projects[i].sgst.rate" min="0" max="100"></VTextField>
+                </td>
+                <td width="150">
+                  <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
+                    v-model="model.projects[i].igst.rate" min="0" max="100"></VTextField>
+                </td>
+                <td width="150">
+                  <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
+                    v-model="model.projects[i].rate"></VTextField>
                 </td>
 
-                <td>&#x20B9; {{ item.total }}</td>
+                <td>&#x20B9;&nbsp;{{ item.total }}</td>
                 <td v-if="showDelete" @click="deleteRow(i)"><v-icon>mdi-delete</v-icon></td>
               </tr>
             </tbody>
@@ -146,7 +161,7 @@
           </VRow>
           <VRow class="align-center">
             <VCol cols="6">
-              <span>Tax:</span>
+              Total Tax
             </VCol>
             <VCol cols="6">
               <div class="d-flex">
@@ -176,6 +191,7 @@
   <div></div>
 </template>
 <script setup>
+import moment from "moment";
 import { ref, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const store = inject("store");
@@ -197,11 +213,21 @@ const model = ref({
       amount: null,
       uom: '',
       quantity: null,
-      discount: null,
-      taxable_value: null,
+      discount: 0,
       rate: null,
-      total: null
+      total: 0,
+      cgst: {
+        rate: 0, amount: 0
+      },
+      sgst: {
+        rate: 0, amount: 0
+      },
+      igst: {
+        rate: 0, amount: 0
+      }
     }],
+  total_without_discount: 0,
+  total_without_tax: 0,
   total_cost: 0,
   total_tax: 0,
   grand_total: 0
@@ -239,13 +265,9 @@ const totalCost = computed(() => {
   }, 0);
 });
 
-
-
 const user = computed(() => {
   return store.state.user
 })
-
-
 
 const deleteRow = (id) => {
   model.value.projects.splice(id, 1)
@@ -272,10 +294,24 @@ onMounted(async () => {
   if (getId != 0) {
     await store.dispatch("invoices/fetch", { id: getId });
     model.value = { ...invoice.value }
-    console.log(invoice.value, "model.value");
+    model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD')
+    model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD')
   }
 
 });
+
+const gstValue = computed(() => {
+  const isIndia = (customer.value.billing.country_id == "IN")
+  const isState = (customer.value.billing.state == 'Gujarat')
+
+  let gst = isIndia
+    ? isState
+      ? { cgst: 9, sgst: 9, igst: 0 }
+      : { cgst: 0, sgst: 0, igst: 18 }
+    : { cgst: 0, sgst: 0, igst: 0 };
+  return gst
+})
+
 
 watchEffect(async () => {
   if (model.value.projects.length > 1) {
@@ -288,11 +324,24 @@ watchEffect(async () => {
 watchEffect(async () => {
   let hasValue = model.value.projects.some(item => (!!item.amount))
   if (hasValue) {
+    let totalWithoutDiscount = 0;
+    let totalWithoutTax = 0;
+    let discountFactor = 0;
+    let taxFactor = 0;
     model.value.projects.forEach(project => {
-      let discountFactor = 1 - (project.discount / 100 || 0);
-      project.total = (project.amount * project.quantity) * discountFactor;
+      let tax = project.cgst.rate + project.sgst.rate + project.igst.rate
+      let discount = project.discount
+      taxFactor = (totalWithoutTax * tax / 100);
+      discountFactor = 1 - (discount / 100 || 0);
+      totalWithoutDiscount = (project.amount * project.quantity);
+      totalWithoutTax = (project.amount * project.quantity) * discountFactor;
+      project.total = totalWithoutTax + taxFactor;
     });
   }
+  model.value.total_without_discount = totalWithoutDiscount
+  model.value.total_without_tax = totalWithoutTax
+  model.value.discount = discountFactor
+  model.value.total_tax = taxFactor
   model.value.total_cost = totalCost.value ? totalCost.value : 0
   model.value.grand_total = model.value.total_cost
 })
@@ -301,7 +350,28 @@ watchEffect(async () => {
   try {
     if (model.value.customer_id) {
       await store.dispatch("invoices/fetchProjects", model.value.customer_id);
-      model.value.projects = [{ id: null, hsa: 0, amount: 0, uom: '', quantity: 0, discount: 0, taxable_value: 0, rate: 0, total: 0 }]
+      getId == 0 && (
+        model.value.projects = [
+          {
+            id: null,
+            hsa: null,
+            amount: null,
+            uom: '',
+            quantity: null,
+            discount: 0,
+            rate: null,
+            total: 0,
+            cgst: {
+              rate: gstValue.value.cgst, amount: 0
+            },
+            sgst: {
+              rate: gstValue.value.sgst, amount: 0
+            },
+            igst: {
+              rate: gstValue.value.igst, amount: 0
+            }
+          }]
+      )
     }
   } catch (error) {
     console.log("ErrorInLoop", error);
@@ -324,7 +394,7 @@ const onSubmit = async () => {
   try {
     const { valid } = await form.value.validate();
     if (valid) {
-      if (route.params.id != 0) {
+      if (route.params.id == 0) {
         await store.dispatch("invoices/addInvoice", model.value);
       } else {
         await store.dispatch("invoices/editInvoice", { id: model.value._id, model: model.value });
@@ -345,7 +415,27 @@ const addProjectField = () => {
     const project = model.value.projects.some(item => item.id == null)
     if (!project) {
       if (!isProject.value) throw new Error('No Project available')
-      model.value.projects.push({ id: null, hsa: null, amount: null, uom: '', quantity: null, discount: null, taxable_value: null, rate: null, total: null })
+      model.value.projects.push(
+        {
+          id: null,
+          hsa: null,
+          amount: null,
+          uom: '',
+          quantity: null,
+          discount: 0,
+          rate: null,
+          total: 0,
+          cgst: {
+            rate: gstValue.value.cgst, amount: 0
+          },
+          sgst: {
+            rate: gstValue.value.sgst, amount: 0
+          },
+          igst: {
+            rate: gstValue.value.igst, amount: 0
+          }
+        }
+      )
     } else {
       throw new Error('Please select a project to add a new project')
     }
