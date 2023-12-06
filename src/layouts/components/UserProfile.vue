@@ -47,12 +47,12 @@ const logout = () => {
           </VListItem>
 
           <!-- 👉 Settings -->
-          <VListItem link>
+          <VListItem link to="/company-settings">
             <template #prepend>
               <VIcon class="me-2" icon="bx-cog" size="22" />
             </template>
 
-            <VListItemTitle>Settings</VListItemTitle>
+            <VListItemTitle>Company Settings</VListItemTitle>
           </VListItem>
 
           <!-- 👉 Pricing -->

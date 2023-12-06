@@ -5,10 +5,12 @@ import customersModule from "./customers.module";
 import invoiceModule from "./invoices.module";
 import { StorageCache } from "@/exports/dataStorage";
 const logoKey = 'logo-key'
+import companyModule from "./company.module";
 export default createStore({
     modules: {
         customers: customersModule,
-        invoices: invoiceModule
+        invoices: invoiceModule,
+        company:companyModule
     },
     state: {
         user: {},

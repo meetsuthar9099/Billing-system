@@ -53,6 +53,12 @@ const router = createRouter({
           meta: { requiresAuth: true, group: 'Account Settings' }
         },
         {
+          name: 'company_settings',
+          path: 'company-settings',
+          component: () => import('../pages/company-settings.vue'),
+          meta: { requiresAuth: true, group: 'Company Settings' }
+        },
+        {
           name: 'typography',
           path: 'typography',
           component: () => import('../pages/typography.vue'),
