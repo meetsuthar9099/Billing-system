@@ -9,11 +9,15 @@ export default {
         customerUsers: [],
         totalPage: null,
         limit: null,
-        projects: []
+        projects: [],
+        currencies: []
     },
     mutations: {
         SET_CUSTOMER(state, payload) {
             state.customerUser = payload
+        },
+        SET_CURRENCIES(state, payload) {
+            state.currencies = payload
         },
         SET_CUSTOMERS(state, payload) {
             state.customerUsers = payload
@@ -87,6 +91,25 @@ export default {
         async editCustomer({ }, payload) {
             try {
                 await api.editCustomer(payload.id, payload.model)
+            } catch (error) {
+                throw error
+            }
+        },
+        async fetchCurrencies({ commit }) {
+            // const storageCache = new StorageCache(storageKeyCustomerProject)
+            try {
+                // let { is_valid, value } = storageCache.getArray()
+                // if (is_valid) {
+                    const response = await api.fetchCurrencies()
+                    console.log("response",response)
+                    const data = response.data.data
+                    commit('SET_CURRENCIES', data)
+                    // storageCache.set(data)
+                    // value.length = 0
+                    // console.log({...data},"ValuePush")
+                    // value.push({...data})
+                // }
+                // console.log('SET_PROJECTS', value)
             } catch (error) {
                 throw error
             }

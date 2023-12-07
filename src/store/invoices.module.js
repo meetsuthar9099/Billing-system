@@ -70,6 +70,16 @@ export default {
                 throw error
             }
         },
+        async getInvoiceNumber({ }, payload) {
+            console.log("payLoad",payload)
+            try {
+                const { country_code } = payload
+                console.log("country_code",country_code)
+                await api.getInvoiceNumber(country_code)
+            } catch (error) {
+                throw error
+            }
+        },
         async fetchAllCustomers({ commit }) {
             const storageCache = new StorageCache(storageKey)
             try {

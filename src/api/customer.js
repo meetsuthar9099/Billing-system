@@ -20,6 +20,9 @@ const api = {
     },
     fetchProjects() {
         return axios.get(`/projects`)
+    },
+    fetchCurrencies() {
+        return axios.get(`/currencies`)
     }
 }
 export default api

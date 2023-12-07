@@ -46,14 +46,18 @@
           <VRow>
             <VCol cols="12">
               <VRow>
-                <VCol cols="12">
+                <VCol cols="6">
                   <VTextField type="date" v-model="model.invoice_date" :rules="rules.date" density="comfortable"
                     label="Invoice Date">
                   </VTextField>
                 </VCol>
-                <VCol cols="12">
+                <VCol cols="6">
                   <VTextField type="date" v-model="model.due_date" :rules="rules.date" density="comfortable"
                     label="Due Date"></VTextField>
+                </VCol>
+                <VCol cols="6">
+                  <VTextField type="text" v-model="model.invoice_number" density="comfortable" label="Invoice Number">
+                  </VTextField>
                 </VCol>
               </VRow>
             </VCol>
@@ -291,6 +295,7 @@ const filteredProjects = (currentIndex) => {
 let getId = route.params.id;
 onMounted(async () => {
   await store.dispatch("invoices/fetchAllCustomers");
+  await store.dispatch("invoices/getInvoiceNumber");
   await store.dispatch("company/fetch");
   if (getId != 0) {
     await store.dispatch("invoices/fetch", { id: getId });
@@ -300,11 +305,11 @@ onMounted(async () => {
   }
 });
 
-const company = computed(()=>{return store.state.company.settings})
+const company = computed(() => { return store.state.company.settings })
 
 
 const gstValue = computed(() => {
-  console.log(company,"company");
+  console.log(company, "company");
   const isIndia = (customer.value.billing.country_id == "IN")
   const isState = (customer.value.billing.state == 'Gujarat')
 
@@ -324,6 +329,8 @@ watchEffect(async () => {
     showDelete.value = false
   }
 })
+
+
 
 watchEffect(async () => {
   let hasValue = model.value.projects.some(item => (!!item.amount))
@@ -354,6 +361,7 @@ watchEffect(async () => {
   try {
     if (model.value.customer_id) {
       await store.dispatch("invoices/fetchProjects", model.value.customer_id);
+      await store.dispatch("invoices/getInvoiceNumber", {country_code:customer.value.billing.country_id});
       getId == 0 && (
         model.value.projects = [
           {
@@ -376,6 +384,11 @@ watchEffect(async () => {
             }
           }]
       )
+    }
+    if (model.value.customer_id && getId == 0) {
+      // const customerCountry = customer.value.billing.country_id
+      // console.log("model.value", customer.value.billing.country_id)
+      // getInvoiceNumber(customerCountry)
     }
   } catch (error) {
     console.log("ErrorInLoop", error);
@@ -453,6 +466,26 @@ const addProjectField = () => {
 }
 const openModel = () => {
   confirmationDialog.value = true;
+};
+const getInvoiceNumber = (country_id) => {
+  const currentDate = moment();
+  const startMonth = 3; // March is 3 (0-indexed)
+  const endMonth = 4;   // April is 4 (0-indexed)
+  const academicYearStart = currentDate.month() + 1 >= startMonth
+    ? currentDate.year()
+    : currentDate.year() - 1;
+  const academicYearEnd = academicYearStart + 1;
+  const academicYear = `${String(academicYearStart).slice(2)}-${String(academicYearEnd).slice(2)}`;
+  console.log(academicYear);
+  const getCurrentMonth = moment().month()+1
+  const company_name = 'CC'
+  let invoiceLocation
+  if (country_id == "IN") {
+    invoiceLocation = 'D'
+  } else {
+    invoiceLocation = 'EXPO'
+  }
+  model.value.invoice_number = company_name + '/' + academicYear + '/' + getCurrentMonth + '/' + invoiceLocation + '/' + invoice_number
 };
 const copyBilling = (val) => {
   if (val) {

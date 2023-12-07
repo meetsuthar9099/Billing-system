@@ -59,7 +59,7 @@
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VSelect item-title="text" :readonly="getId != 0 && !isEdit" item-value="value"
+                                <VSelect item-title="currency" :readonly="getId != 0 && !isEdit" item-value="code"
                                     density="comfortable" label="Primary Currency" v-model="model.primary_currency"
                                     :items="currencies" />
                             </VCol>
@@ -268,23 +268,23 @@ const model = ref({
         gstin: null,
     },
 });
-const currencies = [
-    { text: "United States Dollar", value: "USD" },
-    { text: "Euro", value: "EUR" },
-    { text: "Japanese Yen", value: "JPY" },
-    { text: "British Pound Sterling", value: "GBP" },
-    { text: "Australian Dollar", value: "AUD" },
-    { text: "Canadian Dollar", value: "CAD" },
-    { text: "Swiss Franc", value: "CHF" },
-    { text: "Chinese Yuan", value: "CNY" },
-    { text: "Swedish Krona", value: "SEK" },
-    { text: "New Zealand Dollar", value: "NZD" },
-    { text: "Indian Rupee", value: "INR" },
-    { text: "Brazilian Real", value: "BRL" },
-    { text: "South African Rand", value: "ZAR" },
-    { text: "Russian Ruble", value: "RUB" },
-    { text: "Turkish Lira", value: "TRY" },
-];
+// const currencies = [
+//     { text: "United States Dollar", value: "USD" },
+//     { text: "Euro", value: "EUR" },
+//     { text: "Japanese Yen", value: "JPY" },
+//     { text: "British Pound Sterling", value: "GBP" },
+//     { text: "Australian Dollar", value: "AUD" },
+//     { text: "Canadian Dollar", value: "CAD" },
+//     { text: "Swiss Franc", value: "CHF" },
+//     { text: "Chinese Yuan", value: "CNY" },
+//     { text: "Swedish Krona", value: "SEK" },
+//     { text: "New Zealand Dollar", value: "NZD" },
+//     { text: "Indian Rupee", value: "INR" },
+//     { text: "Brazilian Real", value: "BRL" },
+//     { text: "South African Rand", value: "ZAR" },
+//     { text: "Russian Ruble", value: "RUB" },
+//     { text: "Turkish Lira", value: "TRY" },
+// ];
 const countries = [
     { name: "United States", code: "US" },
     { name: "Canada", code: "CA" },
@@ -311,8 +311,12 @@ const customer = computed(() => {
 const projects = computed(() => {
     return store.state.customers.projects;
 });
+const currencies = computed(() => {
+    return store.state.customers.currencies;
+});
 let getId = route.params.id;
 onMounted(async () => {
+    await store.dispatch("customers/fetchCurrencies");
     if (getId != 0) {
         try {
             await store.dispatch("customers/fetchCustomer", getId);

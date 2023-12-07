@@ -23,6 +23,9 @@ const api = {
     },
     invoiceGenerate(id){
         return axios.get(`/invoiceGenerate/${id}`)
-    }
+    },
+    getInvoiceNumber(country_code) {
+        return axios.get(`/getInvoiceNumber/?coutry_code=${country_code}`)
+    },
 }
 export default api
