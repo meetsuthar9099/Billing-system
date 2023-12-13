@@ -87,6 +87,13 @@ const routeItem = computed(() => {
         to: '/invoice',
         group: 'Invoice',
       }" />
+      <VDivider class="my-4"></VDivider>
+      <VerticalNavLink :item="{
+        title: 'Payment',
+        icon: 'mdi-payment',
+        to: '/payment',
+        group: 'Payment',
+      }" />
       <!-- 
       <VerticalNavSectionTitle :item="{
         heading: 'Pages',

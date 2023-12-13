@@ -7,16 +7,20 @@ const form = ref({
   password: '',
   remember: false,
 })
+const isLoading = ref(false)
 const store = inject('store');
 const InvalidCredentials = ref(false)
 
 const onSubmit = async () => {
   try {
+    isLoading.value = true
     await store.dispatch('login', form.value)
-    router.push({ path: "/dashboard" })
+    router.push({ name: "/" })
   } catch (error) {
     InvalidCredentials.value = true
     console.log(error, "LoginFail");
+  } finally {
+    isLoading.value = false
   }
 }
 
@@ -69,7 +73,7 @@ const isPasswordVisible = ref(false)
               </div>
 
               <!-- login button -->
-              <VBtn block type="submit">
+              <VBtn block type="submit" :disabled="isLoading">
                 Login
               </VBtn>
             </VCol>

@@ -1,7 +1,10 @@
 import axios from 'axios';
 const api = {
-    invoices({ page, invoice_date_from, limit, invoice_date_to, due_date_from, due_date_to }) {
-        return axios.get(`/invoices?page=${page ? page : 1}&limit=${limit ? limit : ''}&invoice_date_from=${invoice_date_from ? invoice_date_from : ''}&invoice_date_to=${invoice_date_to ? invoice_date_to : ''}&due_date_from=${due_date_from ? due_date_from : ''}&due_date_to=${due_date_to ? due_date_to : ''}`)
+    invoices({ page, invoice_date_from, limit, invoice_date_to, status, customer_id,invoice_number }) {
+        return axios.get(`/invoices?page=${page ? page : 1}&limit=${limit ? limit : '10'}&invoice_date_from=${invoice_date_from ? invoice_date_from : ''}&invoice_date_to=${invoice_date_to ? invoice_date_to : ''}&customer_id=${customer_id ? customer_id :''}&status=${status ? status : ''}&invoice_number=${invoice_number ? invoice_number : ''} `)
+    },
+    fetchAllCustomerInvoice(customer_id){
+        return axios.get(`/invoices/${customer_id}`)
     },
     invoice(id){
         return axios.get(`/invoice/${id}`)
@@ -9,8 +12,12 @@ const api = {
     allCustomers() {
         return axios.get(`/customers`)
     },
-    customerProject(id) {
-        return axios.get(`/customerProject/${id}`)
+    customerProject({customer_id,invoice_id}) {
+        console.log("invoice_id",invoice_id)
+        return axios.get(`/customerProject/${customer_id}/${invoice_id}`)
+    },
+    customerProjectTasks(id) {
+        return axios.get(`/customerProjectTasks/${id}`)
     },
     addInvoice(model) {
         return axios.post(`/addInvoice`, model)
@@ -21,11 +28,14 @@ const api = {
     deleteInvoice(id){
         return axios.delete(`/deleteInvoice/${id}`)
     },
+    sentInvoice(id){
+        return axios.get(`/sentInvoice/${id}`)
+    },
     invoiceGenerate(id){
         return axios.get(`/invoiceGenerate/${id}`)
     },
     getInvoiceNumber(country_code) {
-        return axios.get(`/getInvoiceNumber/?coutry_code=${country_code}`)
+        return axios.get(`/getInvoiceNumber/?country_code=${country_code}`)
     },
 }
 export default api

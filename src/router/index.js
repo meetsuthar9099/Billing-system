@@ -41,6 +41,24 @@ const router = createRouter({
           meta: { requiresAuth: true, group: 'Invoice' }
         },
         {
+          name: 'payment',
+          path: 'payment',
+          component: () => import('../pages/payment/payment-list.vue'),
+          meta: { requiresAuth: true, group: 'Payment' }
+        },
+        {
+          name: 'payment_view',
+          path: 'payment/:id',
+          component: () => import('../pages/payment/payment-view.vue'),
+          meta: { requiresAuth: true ,group: 'Payment' }
+        },
+        {
+          name: 'invoice_payment_view',
+          path: 'payment/:invoice_id/:id',
+          component: () => import('../pages/payment/payment-view.vue'),
+          meta: { requiresAuth: true ,group: 'Payment' }
+        },
+        {
           name: 'customer_view',
           path: 'customer/:id',
           component: () => import('../pages/customer/customer-view.vue'),

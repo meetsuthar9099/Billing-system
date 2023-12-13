@@ -23,6 +23,19 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <v-dialog v-model="sentModel" max-width="400">
+        <v-card>
+            <v-card-title>Are you sure?</v-card-title>
+            <v-card-text>
+                This invoice will be marked as sent
+            </v-card-text>
+            <v-card-actions>
+                <v-btn @click="sentInvoice()">Yes</v-btn>
+                <v-btn @click="deleteModel = false">No</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
+    <h1>Invoices</h1>
     <div>
         <div class="mb-2">
             <v-row>
@@ -52,20 +65,26 @@
                 </v-col>
                 <v-col cols="12">
                     <v-row>
-                        <v-col cols="6">
+                        <v-col cols="3">
+                            <VSelect item-title="name" item-value="_id" :hide-selected="true" label="Select Customer"
+                                density="compact" name="display_name" :items="allCustomers" v-model="filter.customer_id"
+                                prepend-inner-icon="bx-user" />
+                        </v-col>
+                        <v-col cols="2">
+                            <VSelect item-value="id" item-title="title" :hide-selected="true" label="Select Status"
+                                density="compact" name="display_name" :items="allStatus" v-model="filter.status"
+                                prepend-inner-icon="bx-user" />
+                        </v-col>
+                        <v-col cols="2">
                             <VTextField label="Invoice Date From" v-model="filter.invoice_date_from" type="date"
                                 density="compact"></VTextField>
                         </v-col>
-                        <v-col cols="6">
+                        <v-col cols="2">
                             <VTextField label="Invoice Date To" v-model="filter.invoice_date_to" type="date"
                                 density="compact"></VTextField>
                         </v-col>
-                        <v-col cols="6">
-                            <VTextField label="Due Date From" v-model="filter.due_date_from" type="date" density="compact">
-                            </VTextField>
-                        </v-col>
-                        <v-col cols="6">
-                            <VTextField label="Due Date To" v-model="filter.due_date_to" type="date" density="compact">
+                        <v-col cols="3">
+                            <VTextField label="Invoice Number" v-model="filter.invoice_number" density="compact">
                             </VTextField>
                         </v-col>
                     </v-row>
@@ -73,17 +92,25 @@
             </v-row>
 
         </v-card>
+        <v-tabs v-model="filter.status">
+            <v-tab :value="null" selected>All</v-tab>
+            <v-tab value="1">Draft</v-tab>
+            <v-tab value="2">Sent</v-tab>
+        </v-tabs>
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
                     <th>
-                        <!-- <v-checkbox v-model="checkAll" ref="myCheckbox"></v-checkbox> -->
+                        <v-checkbox v-model="checkAll" ref="myCheckbox"></v-checkbox>
                     </th>
-                    <th>Actions</th>
-                    <th>Customer</th>
                     <th>Invoice Number</th>
+                    <th>Customer</th>
                     <th>Invoice Date</th>
                     <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Amount Due</th>
+                    <th>Payment status</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -91,18 +118,58 @@
                     <td width="100">
                         <v-checkbox :value="item._id" @click="bulkDelete"></v-checkbox>
                     </td>
+
+                    <td><span class="text-primary">{{ item.invoice_number ? item.invoice_number : '-' }}</span></td>
+                    <td>{{ item.customer ? item.customer.contact_name : '-' }}</td>
+                    <td>{{ item.invoice_date ? moment(item.invoice_date).format('YYYY-MM-DD') : '-' }}</td>
+                    <td>{{ item.due_date ? moment(item.due_date).format('YYYY-MM-DD') : '-' }}</td>
+                    <td>
+                        <VBadge :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#fef7d1' : '#c3ecd5'"
+                            :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">
+                        </VBadge>
+                    </td>
+                    <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
+                    <td>
+                        <VBadge class="payment-status"
+                            :color="item.payment_status == 1 ? '#fef7d1' : item.payment_status == 2 ? '#fef7d1' : '#c3ecd5'"
+                            :content="item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID'">
+                        </VBadge>
+                    </td>
                     <td width="200">
+                        <v-menu>
+                            <template v-slot:activator="{ props }">
+                                <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                            </template>
+
+                            <v-list>
+                                <v-list-item :to="'invoice/' + item._id">
+                                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
+                                </v-list-item>
+                                <!-- <v-list-item :to="'invoice/' + item._id">
+                                    <v-list-item-title><v-icon>mdi-send</v-icon> Send Invoice</v-list-item-title>
+                                </v-list-item> -->
+                                <v-list-item v-if="item.status == 1 || item.status == 2"
+                                    @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
+                                    <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status
+                                        == 2 ? 'mdi-payment' : '' }}</v-icon>{{ item.status == 1 ? ' Mark As Sent' :
+        item.status
+            == 2 ? ' Record Payment' : '' }}</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item @click="deleteConfirm(item._id)">
+                                    <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </td>
+
+                    <!-- <td width="200">
                         <v-btn class="me-2" color="#03A9F4" :to="'invoice/' + item._id" variant="tonal">
                             <v-icon>mdi-eye</v-icon>
                         </v-btn>
                         <v-btn color="error" @click="deleteConfirm(item._id)" variant="tonal">
                             <v-icon>mdi-delete</v-icon>
                         </v-btn>
-                    </td>
-                    <td>{{ item.customer ? item.customer.contact_name : '-' }}</td>
-                    <td>{{ item.invoice_number ? item.invoice_number : '-' }}</td>
-                    <td>{{ item.invoice_date ? moment(item.invoice_date).format('llll') : '-' }}</td>
-                    <td>{{ item.due_date ? moment(item.due_date).format('llll') : '-' }}</td>
+                    </td> -->
                 </tr>
             </tbody>
         </v-table>
@@ -114,26 +181,41 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
+import { useRoute, useRouter } from "vue-router";
 import moment from 'moment'
 const defaultFilter = Object.freeze({
     page: 2,
-    invoice_date_from: null,
-    invoice_date_to: null,
+    status: 0,
+    customer_id: null,
+    invoice_number: null,
     due_date_from: null,
     due_date_to: null,
-    limit: 10
+    limit: 1
 })
+const router = useRouter();
 let deleteInvoiceId = null
+let sentInvoiceId = null
 const store = inject('store');
 const isFilterVisible = ref(false)
+const allStatus = ref([
+    { id: 0, title: "Select Status" },
+    { id: 1, title: "Draft" },
+    { id: 2, title: "Sent" },
+    { id: 3, title: "Completed" }
+])
 const bulkDeleteModel = ref(false)
 const deleteModel = ref(false)
+const sentModel = ref(false)
 let bulkDeleteId = ref([])
 let checkAll = ref(false)
 const filter = ref({})
 // const myCheckbox = ref(null);
 //computed
 const invoices = computed(() => { return store.state.invoices.items })
+const allCustomers = computed(() => {
+    return store.state.invoices.allCustomers;
+});
+
 const pagination = computed(() => {
     return {
         totalPage: store.state.invoices.totalPage,
@@ -147,17 +229,33 @@ const deleteConfirm = async (id) => {
     deleteModel.value = true
     deleteInvoiceId = id
 }
+const sentPayment = async (id) => {
+    const invoiceData = store.state.invoices.items && store.state.invoices.items.find(x => x._id == id)
+    const invoice = {
+        date:moment().format('YYYY-MM-DD'),
+        customer_id: invoiceData.customer_id,
+         invoice_id: invoiceData._id
+    }
+    store.commit('payment/SET_PAYMENT', invoice)
+    router.push({ path: `payment/${id}/0` })
+
+}
+const sentConfirm = async (id) => {
+
+    // sentModel.value = true
+    // sentInvoiceId = id
+}
 const doSearch = async () => {
     const query = {
         page: filter.value.currentPage,
-        invoice_date_from: filter.value.invoice_date_from ? moment(filter.value.invoice_date_from).startOf('day') : '',
-        invoice_date_to: filter.value.invoice_date_to ? moment(filter.value.invoice_date_to).endOf('day') : '',
-        due_date_from: filter.value.due_date_from ?
-            moment(filter.value.due_date_from).startOf('day') : '',
-        due_date_to: filter.value.due_date_to ?
-            moment(filter.value.due_date_to).endOf('day') : '',
+        customer_id: filter.value.customer_id ? filter.value.customer_id : '',
+        status: filter.value.status ? filter.value.status : '',
+        invoice_number: filter.value.invoice_number,
+        invoice_date_from: filter.value.invoice_date_from ? moment(filter.value.invoice_date_from).format('YYYY-MM-DD') : '',
+        invoice_date_to: filter.value.invoice_date_to ? moment(filter.value.invoice_date_to).format('YYYY-MM-DD') : '',
         limit: filter.value.limit
     }
+    console.log("Queryyy", query)
     await store.dispatch('invoices/fetchAll', { query });
 }
 
@@ -168,10 +266,15 @@ const deleteInvoices = async () => {
         doSearch()
     }
 }
-
+const sentInvoice = async () => {
+    if (!!sentInvoiceId) {
+        await store.dispatch('invoices/sentInvoice', { id: sentInvoiceId });
+        sentModel.value = false
+        doSearch()
+    }
+}
 const invoiceGenerate = (id) => {
     store.dispatch('invoices/invoiceGenerate', id)
-
 }
 // const convertToPDF = () => {
 //     const byteData = new Uint8Array(buffer);
@@ -203,8 +306,12 @@ const bulkDelete = (val) => {
 
 }
 const resetFilter = () => {
-    if (invoices.value.length == 0 || (!!filter.value.invoice_date_from || !!filter.value.invoice_date_to || !!filter.value.due_date_from || !!filter.value.due_date_to)) {
-        filter.value = { ...defaultFilter }
+    filter.value = {
+        status: 0,
+        customer_id: null,
+        invoice_number: null,
+        due_date_from: null,
+        due_date_to: null,
     }
 }
 //watcher
@@ -217,7 +324,15 @@ watch(bulkDeleteId, async (val) => {
 }, { deep: true })
 
 onMounted(async () => {
+    await store.dispatch("invoices/fetchAllCustomers");
     resetFilter()
+    doSearch()
 });
 
 </script>
+<style>
+.v-badge__badge {
+    bottom: calc(100% - 5px) !important;
+    left: calc(100% - 28px) !important;
+}
+</style>

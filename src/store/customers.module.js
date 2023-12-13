@@ -118,13 +118,13 @@ export default {
             const storageCache = new StorageCache(storageKeyCustomerProject)
             try {
                 let { is_valid, value } = storageCache.getArray()
-                if (is_valid) {
+                if (!is_valid) {
                     const response = await api.fetchProjects()
                     const data = response.data.projectData
                     storageCache.set(data)
                     value.length = 0
                     console.log({...data},"ValuePush")
-                    value.push({...data})
+                    value.push(...data)
                 }
                 console.log('SET_PROJECTS', value)
                 commit('SET_PROJECTS', value)

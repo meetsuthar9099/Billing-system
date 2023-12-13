@@ -11,69 +11,68 @@
             </v-card>
         </v-dialog>
         <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form">
-            <VCard class="pa-4 sticky-element" v-if="getId != 0 && !isEdit" >
-                <VRow>
-                    <VCol>
-                        <VCol class="d-flex align-center" cols="12">
-                            <p class="ma-0">
-                                <VIcon class="me-2">mdi-warning</VIcon>You are in View Mode switch to <span
-                                    class="text-error ms-1 pointer-cursor" @click="isEdit = true">Edit Mode</span>
-                            </p>
-                        </VCol>
-                    </VCol>
-                </VRow>
-            </VCard>
             <VCard class="pa-8">
                 <VRow>
+                    <div>
+                        <v-row align="center" justify="center">
+                            <v-col>
+                                <div class="text-right">Export</div>
+                            </v-col>
+                            <v-col>
+                                <v-switch v-model="model.is_local" color="primary" hide-details></v-switch>
+                            </v-col>
+                            <v-col>
+                                <div class="text-left">Local</div>
+                            </v-col>
+                        </v-row>
+                    </div>
                     <VCol cols="12">
                         <h3>Basic info</h3>
                     </VCol>
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Display Name"
-                                    name="display_name" :rules="rules.text" v-model="model.name"
-                                    prepend-inner-icon="bx-user" placeholder="John" />
+                                <VTextField density="comfortable" label="Display Name" name="display_name"
+                                    :rules="rules.text" v-model="model.name" prepend-inner-icon="bx-user"
+                                    placeholder="John" />
                             </VCol>
 
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Contect Name"
-                                    v-model="model.contact_name" placeholder="John Doe" />
+                                <VTextField density="comfortable" label="Contect Name" v-model="model.contact_name"
+                                    placeholder="John Doe" />
                             </VCol>
                         </VRow>
                     </VCol>
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Email"
-                                    v-model="model.email" prepend-inner-icon="bx-envelope" type="email" :rules="rules.email"
+                                <VTextField density="comfortable" label="Email" v-model="model.email"
+                                    prepend-inner-icon="bx-envelope" type="email" :rules="rules.email"
                                     placeholder="johndoe@email.com" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Mobile"
-                                    v-model="model.phone" type="number" prepend-inner-icon="bx-mobile"
+                                <VTextField density="comfortable" label="Mobile" v-model="model.phone" type="number"
+                                    prepend-inner-icon="bx-mobile" placeholder="+1 123 456 7890" />
+                            </VCol>
+                        </VRow>
+                    </VCol>
+                    <VCol cols="12">
+                        <VRow>
+                            <VCol cols="6">
+                                <VSelect item-title="currency" item-value="_id" density="comfortable"
+                                    label="Primary Currency" v-model="model.primary_currency" :items="currencies" />
+                            </VCol>
+                            <VCol cols="6">
+                                <VTextField density="comfortable" label="Website" v-model="model.website" type="text"
+                                    placeholder="www.johndoe.com" />
+                            </VCol>
+                        </VRow>
+                    </VCol>
+                    <VCol cols="12">
+                        <VRow>
+                            <VCol cols="6">
+                                <VTextField density="comfortable" label="Prefix" v-model="model.prefix" type="text"
                                     placeholder="+1 123 456 7890" />
-                            </VCol>
-                        </VRow>
-                    </VCol>
-                    <VCol cols="12">
-                        <VRow>
-                            <VCol cols="6">
-                                <VSelect item-title="currency" :readonly="getId != 0 && !isEdit" item-value="code"
-                                    density="comfortable" label="Primary Currency" v-model="model.primary_currency"
-                                    :items="currencies" />
-                            </VCol>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Website"
-                                    v-model="model.website" type="text" placeholder="www.johndoe.com" />
-                            </VCol>
-                        </VRow>
-                    </VCol>
-                    <VCol cols="12">
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Prefix"
-                                    v-model="model.prefix" type="text" placeholder="+1 123 456 7890" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -87,114 +86,47 @@
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Name"
-                                    v-model="model.billing.name" type="text" prepend-inner-icon="bx-user"
-                                    placeholder="John" />
+                                <VTextField density="comfortable" label="Name" v-model="model.billing.name" type="text"
+                                    prepend-inner-icon="bx-user" placeholder="John" />
                             </VCol>
                             <VCol cols="6">
-                                <VSelect item-title="name" :readonly="getId != 0 && !isEdit" item-value="code"
-                                    density="comfortable" label="Countries" v-model="model.billing.country_id"
-                                    :items="countries" />
+                                <VSelect item-title="name" item-value="code" density="comfortable" label="Countries"
+                                    v-model="model.billing.country_id" :items="countries" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="State"
-                                    v-model="model.billing.state" type="text" placeholder="Gujarat" />
+                                <VTextField density="comfortable" label="State" v-model="model.billing.state" type="text"
+                                    placeholder="Gujarat" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="City"
-                                    v-model="model.billing.city" type="text" placeholder="Ahmedabad" />
-                            </VCol>
-                        </VRow>
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextarea label="Address" :readonly="getId != 0 && !isEdit" :auto-grow="true"
-                                    v-model="model.billing.address_street_1" rows="2" :max-rows="6" type="text"
-                                    placeholder="" />
-                            </VCol>
-                            <VCol cols="6">
-                                <VTextarea :auto-grow="true" :readonly="getId != 0 && !isEdit" label="Address2"
-                                    v-model="model.billing.address_street_2" rows="2" :max-rows="6" type="text"
-                                    placeholder="" />
+                                <VTextField density="comfortable" label="City" v-model="model.billing.city" type="text"
+                                    placeholder="Ahmedabad" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Phone"
-                                    v-model="model.billing.phone" prepend-inner-icon="bx-mobile" type="number"
-                                    placeholder="" />
+                                <VTextarea label="Address" :auto-grow="true" v-model="model.billing.address_street_1"
+                                    rows="2" :max-rows="6" type="text" placeholder="" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Zip Code"
-                                    v-model="model.billing.zip" type="number" placeholder="382443" />
+                                <VTextarea :auto-grow="true" label="Address2" v-model="model.billing.address_street_2"
+                                    rows="2" :max-rows="6" type="text" placeholder="" />
+                            </VCol>
+                        </VRow>
+                        <VRow>
+                            <VCol cols="6">
+                                <VTextField density="comfortable" label="Phone" v-model="model.billing.phone"
+                                    prepend-inner-icon="bx-mobile" type="number" placeholder="" />
+                            </VCol>
+                            <VCol cols="6">
+                                <VTextField density="comfortable" label="Zip Code" v-model="model.billing.zip" type="number"
+                                    placeholder="382443" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="12">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="GSTIN"
-                                    v-model="model.billing.gstin" />
-                            </VCol>
-                        </VRow>
-                    </VCol>
-                </VRow>
-            </VCard>
-            <VCard class="pa-8">
-                <VRow>
-                    <VCol cols="12" class="d-flex justify-space-between">
-                        <h3>Shipping Address</h3>
-                        <v-btn variant="outlined" color="primary" v-if="getId == 0 || isEdit" @click="openModel">
-                            <VIcon icon="bx-copy" class="me-2" /><span>Copy from billing</span>
-                        </v-btn>
-                    </VCol>
-                    <VCol cols="12">
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Name"
-                                    v-model="model.shipping.name" type="text" prepend-inner-icon="bx-user"
-                                    placeholder="John" />
-                            </VCol>
-                            <VCol cols="6">
-                                <VSelect item-title="name" :readonly="getId != 0 && !isEdit" item-value="code"
-                                    density="comfortable" label="Countries" v-model="model.shipping.country_id"
-                                    :items="countries" />
-                            </VCol>
-                        </VRow>
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="State"
-                                    v-model="model.shipping.state" type="text" placeholder="Gujarat" />
-                            </VCol>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="City"
-                                    v-model="model.shipping.city" type="text" placeholder="Ahmedabad" />
-                            </VCol>
-                        </VRow>
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextarea label="Address" :readonly="getId != 0 && !isEdit" :auto-grow="true"
-                                    v-model="model.shipping.address_street_1" rows="2" type="text" placeholder="" />
-                            </VCol>
-                            <VCol cols="6">
-                                <VTextarea :auto-grow="true" :readonly="getId != 0 && !isEdit" label="Address2"
-                                    v-model="model.shipping.address_street_2" rows="2" type="text" placeholder="" />
-                            </VCol>
-                        </VRow>
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Phone"
-                                    v-model="model.shipping.phone" prepend-inner-icon="bx-mobile" type="number"
-                                    placeholder="" />
-                            </VCol>
-                            <VCol cols="6">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="Zip Code"
-                                    v-model="model.shipping.zip" type="number" placeholder="382443" />
-                            </VCol>
-                        </VRow>
-                        <VRow>
-                            <VCol cols="12">
-                                <VTextField :readonly="getId != 0 && !isEdit" density="comfortable" label="GSTIN"
-                                    v-model="model.shipping.gstin" type="text" />
+                                <VTextField density="comfortable" label="GSTIN" v-model="model.billing.gstin" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -203,8 +135,8 @@
             <VCard class="pa-6">
                 <VRow>
                     <VCol>
-                        <v-select :readonly="getId != 0 && !isEdit" :items="projects" item-value="_id" density="comfortable"
-                            v-model="model.project_id" label="Projects" multiple>
+                        <v-select :items="projects" item-value="_id" density="comfortable" v-model="model.project_id"
+                            label="Projects" multiple>
                             <template v-slot:selection="{ item }">
                                 <v-chip class="me-3">
                                     <span>{{ item.title }}</span>
@@ -217,9 +149,7 @@
             <VCard class="pa-6">
                 <VRow>
                     <VCol class="d-flex justify-end gap-2" cols="12">
-                        <VBtn size="large" color="primary" v-if="getId != 0" @click="isEdit = !isEdit">{{ isEdit ? "View" :
-                            "Edit" }}</VBtn>
-                        <VBtn size="large" type="submit" color="success" :disabled="!isEdit && getId != 0">{{
+                        <VBtn size="large" type="submit" color="success">{{
                             getId == 0 ? "Create" : "Update" }} Customer</VBtn>
                         <VBtn size="large" @click="router.back()" color="error">Back</VBtn>
                     </VCol>
@@ -237,6 +167,7 @@ const confirmationDialog = ref(false);
 const router = useRouter();
 const route = useRoute();
 const model = ref({
+    is_local:false,
     name: "",
     project_id: [],
     contact_name: "",
@@ -256,35 +187,18 @@ const model = ref({
         zip: null,
         gstin: null,
     },
-    shipping: {
-        name: "",
-        country_id: "IN",
-        state: "",
-        city: "",
-        address_street_1: "",
-        phone: null,
-        address_street_2: "",
-        zip: null,
-        gstin: null,
-    },
+    // shipping: {
+    //     name: "",
+    //     country_id: "IN",
+    //     state: "",
+    //     city: "",
+    //     address_street_1: "",
+    //     phone: null,
+    //     address_street_2: "",
+    //     zip: null,
+    //     gstin: null,
+    // },
 });
-// const currencies = [
-//     { text: "United States Dollar", value: "USD" },
-//     { text: "Euro", value: "EUR" },
-//     { text: "Japanese Yen", value: "JPY" },
-//     { text: "British Pound Sterling", value: "GBP" },
-//     { text: "Australian Dollar", value: "AUD" },
-//     { text: "Canadian Dollar", value: "CAD" },
-//     { text: "Swiss Franc", value: "CHF" },
-//     { text: "Chinese Yuan", value: "CNY" },
-//     { text: "Swedish Krona", value: "SEK" },
-//     { text: "New Zealand Dollar", value: "NZD" },
-//     { text: "Indian Rupee", value: "INR" },
-//     { text: "Brazilian Real", value: "BRL" },
-//     { text: "South African Rand", value: "ZAR" },
-//     { text: "Russian Ruble", value: "RUB" },
-//     { text: "Turkish Lira", value: "TRY" },
-// ];
 const countries = [
     { name: "United States", code: "US" },
     { name: "Canada", code: "CA" },
@@ -370,4 +284,5 @@ const copyBilling = (val) => {
     position: sticky;
     z-index: 999;
     top: 0px;
-}</style>
+}
+</style>
