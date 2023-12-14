@@ -153,17 +153,19 @@
                         <v-checkbox :value="item._id" @click="bulkDelete"></v-checkbox>
                     </td>
 
-                    <td><span class="text-primary">{{ item.invoice_number ? item.invoice_number : '-' }}</span></td>
+                    <td>
+                        <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ? item.invoice_number : '-' }}</span></router-link>
+                    </td>
                     <td>{{ item.customer ? item.customer.contact_name : '-' }}</td>
                     <td>{{ item.invoice_date ? moment(item.invoice_date).format('YYYY-MM-DD') : '-' }}</td>
                     <td>{{ item.due_date ? moment(item.due_date).format('YYYY-MM-DD') : '-' }}</td>
-                    <td>
+                    <td class="badge-align">
                         <VBadge :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#fef7d1' : '#c3ecd5'"
                             :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">
                         </VBadge>
                     </td>
                     <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
-                    <td>
+                    <td class="badge-align">
                         <VBadge class="payment-status"
                             :color="item.payment_status == 1 ? '#fef7d1' : item.payment_status == 2 ? '#fef7d1' : '#c3ecd5'"
                             :content="item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID'">
@@ -172,10 +174,13 @@
                     <td width="200">
                         <v-menu>
                             <template v-slot:activator="{ props }">
-                                <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                                <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
 
                             <v-list>
+                                <v-list-item :to="'invoice/pdf/' + item._id">
+                                    <v-list-item-title><v-icon>mdi-eye</v-icon> View</v-list-item-title>
+                                </v-list-item>
                                 <v-list-item :to="'invoice/' + item._id">
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
@@ -397,7 +402,7 @@ onMounted(async () => {
 
 </script>
 <style>
-.v-badge__badge {
+.badge-align .v-badge__badge {
     bottom: calc(100% - 5px) !important;
     left: calc(100% - 28px) !important;
 }

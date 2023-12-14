@@ -17,7 +17,8 @@ loadFonts()
 // Create vue app
 const app = createApp(App)
 const url = 'http://192.168.1.3:44000'
-axios.defaults.baseURL = `${url}/api/billing`;
+const baseURL = `${url}/api/billing`;
+axios.defaults.baseURL = baseURL;
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
 axios.defaults.headers.common['x-api-key'] = 'vu1R)?xwy_o8Yy=X_^_L';
 const imageUrl = `${url}/public/images/`
@@ -44,5 +45,6 @@ app.use(router)
 app.use(store)
 app.provide('store', store);
 app.provide('imageUrl', imageUrl);
+app.provide('baseUrl', baseURL);
 // Mount vue app
 app.mount('#app')
