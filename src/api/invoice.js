@@ -31,11 +31,14 @@ const api = {
     sentInvoice(id){
         return axios.get(`/sentInvoice/${id}`)
     },
+    sendInvoice(model){
+        return axios.post(`/sendInvoice`,model)
+    },
     invoiceGenerate(id){
         return axios.get(`/invoiceGenerate/${id}`)
     },
-    getInvoiceNumber(country_code) {
-        return axios.get(`/getInvoiceNumber/?country_code=${country_code}`)
+    getInvoiceNumber(is_local) {
+        return axios.get(`/getInvoiceNumber/?is_local=${is_local}`)
     },
 }
 export default api

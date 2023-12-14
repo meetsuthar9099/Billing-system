@@ -18,8 +18,8 @@ const api = {
     editCustomer(id, payload) {
         return axios.post(`/editCustomers/${id}`, payload)
     },
-    fetchProjects() {
-        return axios.get(`/projects`)
+    fetchProjects(id) {
+        return axios.get(`/projects/${id}`)
     },
     fetchCurrencies() {
         return axios.get(`/currencies`)

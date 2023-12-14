@@ -11,6 +11,40 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <v-dialog v-model="sendInvoiceModal" max-width="1000">
+        <v-card>
+            <v-card-title>Send Invoice</v-card-title>
+            <v-divider></v-divider>
+            <v-form @submit.prevent="submitForm" ref="form" style="padding: 20px;">
+                <v-row>
+                    <v-col cols="12" md="12">
+                        <v-text-field v-model="model.from" label="From" required></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="12">
+                        <v-text-field v-model="model.to" label="To" required></v-text-field>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col cols="12">
+                        <v-text-field v-model="model.subject" label="Subject" required></v-text-field>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col cols="12">
+                        <v-textarea v-model="model.body" label="Body" required></v-textarea>
+                    </v-col>
+                </v-row>
+
+                <v-row>
+                    <v-col cols="12">
+                        <v-btn type="submit" color="primary">Submit</v-btn>
+                    </v-col>
+                </v-row>
+            </v-form>
+        </v-card>
+    </v-dialog>
     <v-dialog v-model="deleteModel" max-width="400">
         <v-card>
             <v-card-title>Confirmation</v-card-title>
@@ -150,9 +184,9 @@
                                 <v-list-item :to="'invoice/' + item._id">
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
-                                <!-- <v-list-item :to="'invoice/' + item._id">
+                                <v-list-item @click="sendInvoice(item._id)">
                                     <v-list-item-title><v-icon>mdi-send</v-icon> Send Invoice</v-list-item-title>
-                                </v-list-item> -->
+                                </v-list-item>
                                 <v-list-item v-if="item.status == 1 || item.status == 2"
                                     @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
                                     <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status
@@ -197,6 +231,14 @@ const defaultFilter = Object.freeze({
     due_date_to: null,
     limit: 1
 })
+const model = ref({
+    customer_id: null,
+    form: null,
+    to: null,
+    subject: null,
+    body: null,
+});
+const form = ref(null);
 const router = useRouter();
 let deleteInvoiceId = null
 let sentInvoiceId = null
@@ -210,6 +252,7 @@ const allStatus = ref([
 ])
 const bulkDeleteModel = ref(false)
 const deleteModel = ref(false)
+const sendInvoiceModal = ref(false)
 const sentModel = ref(false)
 let bulkDeleteId = ref([])
 let checkAll = ref(false)
@@ -234,12 +277,35 @@ const deleteConfirm = async (id) => {
     deleteModel.value = true
     deleteInvoiceId = id
 }
+const sendInvoice = async (id) => {
+    sendInvoiceModal.value = true
+    console.log("model.customer_id.value",model.value.customer_id)
+    model.value.customer_id = id
+    // deleteInvoiceId = id
+}
+const submitForm = async () => {
+    try {
+        const { valid } = await form.value.validate();
+        if (valid) {
+            console.log("model.value", model.value)
+            await store.dispatch("invoices/sendInvoice",model.value );
+            router.push({ path: "/invoice" });
+        }
+    } catch (error) {
+        console.log("error",error)
+        // projectError.value.isError = true
+        // projectError.value.message = error?.message
+        // setTimeout(() => {
+        //     projectError.value.isError = false
+        // }, 4000)
+    }
+};
 const sentPayment = async (id) => {
     const invoiceData = store.state.invoices.items && store.state.invoices.items.find(x => x._id == id)
     const invoice = {
-        date:moment().format('YYYY-MM-DD'),
+        date: moment().format('YYYY-MM-DD'),
         customer_id: invoiceData.customer_id,
-         invoice_id: invoiceData._id
+        invoice_id: invoiceData._id
     }
     store.commit('payment/SET_PAYMENT', invoice)
     router.push({ path: `payment/${id}/0` })
@@ -247,8 +313,8 @@ const sentPayment = async (id) => {
 }
 const sentConfirm = async (id) => {
 
-    // sentModel.value = true
-    // sentInvoiceId = id
+    sentModel.value = true
+    sentInvoiceId = id
 }
 const doSearch = async () => {
     const query = {

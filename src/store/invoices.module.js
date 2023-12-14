@@ -98,12 +98,18 @@ export default {
         throw error;
       }
     },
-    async getInvoiceNumber({ commit }, payload) {
-      console.log("payLoad", payload);
+    async sendInvoice({}, payload) {
       try {
-        const { country_code } = payload;
-        console.log("country_code", country_code);
-        const response = await api.getInvoiceNumber(country_code);
+        // const { id } = payload;
+        await api.sendInvoice(payload);
+      } catch (error) {
+        throw error;
+      }
+    },
+    async getInvoiceNumber({ commit }, payload) {
+      try {
+        const { is_local } = payload;
+        const response = await api.getInvoiceNumber(is_local);
         let data = response.data.invoice_number;
         commit("SET_INVOICENUMBER", data);
       } catch (error) {
