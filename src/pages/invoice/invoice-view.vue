@@ -72,24 +72,24 @@
         <VCard class="pa-8">
           <VTable>
             <thead>
-              <th>Project/Service</th>
+              <th>Particulars</th>
               <!-- <th>tasks</th> -->
               <th>HSN/SAC</th>
               <th>Rate</th>
               <th>UOM</th>
               <th>Quantity</th>
-              <th>cgst</th>
-              <th>sgst</th>
-              <th>igst</th>
+              <th v-if="isLocal">cgst</th>
+              <th v-if="isLocal">sgst</th>
+              <th v-if="isLocal">igst</th>
               <th>Amount</th>
-              <th>Tax</th>
+              <th v-if="isLocal">Tax</th>
               <th>Total</th>
               <th v-if="showDelete">Action</th>
             </thead>
             <tbody>
               <tr v-for="(item, i) in model.projects">
                 <td width="300"><v-select :items="filteredProjects(i)" item-value="value" :rules="rules.project"
-                    :open-on-clear="true" density="compact" v-model="model.projects[i].id" label="Projects" /></td>
+                    :open-on-clear="true" density="compact" v-model="model.projects[i].id" label="Particulars" /></td>
 
                 <!-- <td width="300"><v-select :items="model.projects[i].tasks" v-model="model.projects[i].assigned_tasks" multiple item-value="_id" :rules="rules.project" :open-on-clear="true"
                     density="compact" label="tasks" /></td> -->
@@ -110,15 +110,15 @@
                   <VTextField :disabled="!model.projects[i].id" type="number" :rules="rules.qty" min="0" density="compact"
                     v-model="model.projects[i].quantity"></VTextField>
                 </td>
-                <td width="150">
+                <td width="150" v-if="isLocal">
                   <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
                     v-model="model.projects[i].cgst" min="0" max="100"></VTextField>
                 </td>
-                <td width="150">
+                <td width="150" v-if="isLocal">
                   <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
                     v-model="model.projects[i].sgst" min="0" max="100"></VTextField>
                 </td>
-                <td width="150">
+                <td width="150" v-if="isLocal">
                   <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
                     v-model="model.projects[i].igst" min="0" max="100">
                   </VTextField>
@@ -126,7 +126,7 @@
                 <td width="150">
                   <VTextField disabled type="number" density="compact" v-model="model.projects[i].amount"></VTextField>
                 </td>
-                <td width="150">
+                <td width="150" v-if="isLocal">
                   <VTextField disabled type="number" density="compact"
                     v-model="model.projects[i].taxable_value"></VTextField>
                 </td>
@@ -221,6 +221,7 @@ import { ref, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const store = inject("store");
 const confirmationDialog = ref(false);
+const isLocal = ref(true);
 const router = useRouter();
 const route = useRoute();
 const isProject = ref(null);
@@ -420,8 +421,9 @@ watchEffect(async () => {
       )
     }
     if (model.value.customer_id && getId == 0) {
-      await store.dispatch("invoices/getInvoiceNumber", { country_code: customer.value.billing.country_id });
+      await store.dispatch("invoices/getInvoiceNumber", { is_local: customer.value.is_local });
       currencySymbol.value = customer.value.primary_currency.symbol
+      isLocal.value = customer.value.is_local
       model.value.invoice_number = store.state.invoices.invoiceNumber
     }
   } catch (error) {

@@ -13,6 +13,9 @@
   "dependencies": {
     "@casl/ability": "^6.2.0",
     "@casl/vue": "^2.2.0",
+    "@ckeditor/ckeditor5-build-classic": "^40.2.0",
+    "@ckeditor/ckeditor5-upload": "^40.2.0",
+    "@ckeditor/ckeditor5-vue": "^5.1.0",
     "@floating-ui/dom": "1.2.8",
     "@vueuse/core": "^10.1.2",
     "@vueuse/math": "^10.1.2",

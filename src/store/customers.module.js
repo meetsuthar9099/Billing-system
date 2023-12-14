@@ -114,20 +114,19 @@ export default {
                 throw error
             }
         },
-        async fetchProjects({ commit }) {
-            const storageCache = new StorageCache(storageKeyCustomerProject)
+        async fetchProjects({ commit },id) {
+            // const storageCache = new StorageCache(storageKeyCustomerProject)
             try {
-                let { is_valid, value } = storageCache.getArray()
-                if (!is_valid) {
-                    const response = await api.fetchProjects()
+                // let { is_valid, value } = storageCache.getArray()
+                // if (!is_valid) {
+                    const response = await api.fetchProjects(id)
                     const data = response.data.projectData
-                    storageCache.set(data)
-                    value.length = 0
-                    console.log({...data},"ValuePush")
-                    value.push(...data)
-                }
-                console.log('SET_PROJECTS', value)
-                commit('SET_PROJECTS', value)
+                //     storageCache.set(data)
+                //     value.length = 0
+                //     console.log({...data},"ValuePush")
+                //     value.push(...data)
+                // }
+                commit('SET_PROJECTS', data)
             } catch (error) {
                 throw error
             }

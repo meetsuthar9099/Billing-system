@@ -12,15 +12,23 @@
                 <VTextField density="comfortable" label="Company Name" name="display_name" :rules="rules.text"
                   v-model="model.company_name" placeholder="Enter Company Name" />
               </VCol>
-
               <VCol cols="4">
                 <VTextField v-model="model.company_email" density="comfortable" label="Company Email "
                   placeholder="Enter Company Email" :rules="rules.email" />
               </VCol>
-
               <VCol cols="4">
                 <VTextField v-model="model.company_telephone" density="comfortable" label="Company Telephone "
                   placeholder="Enter Company Number" />
+              </VCol>
+              <VCol cols="4">
+                <VTextField density="comfortable" label="PAN Number" type="text" v-model="model.pan_no"
+                  placeholder="Enter Your PAN Number" />
+              </VCol>
+              <VCol cols="4">
+                <VTextField density="comfortable" label="GSTIN" v-model="model.gstin" />
+              </VCol>
+              <VCol cols="4">
+                <VTextField density="comfortable" v-model="model.cin" label="CIN" />
               </VCol>
             </VRow>
           </VCol>
@@ -38,7 +46,8 @@
                   v-model="model.country_code" :items="countries" />
               </VCol>
               <VCol cols="6">
-                <VTextField density="comfortable" label="State" v-model="model.state" type="text" placeholder="Enter Your State" />
+                <VTextField density="comfortable" label="State" v-model="model.state" type="text"
+                  placeholder="Enter Your State" />
               </VCol>
             </VRow>
             <VRow>
@@ -53,21 +62,14 @@
             </VRow>
             <VRow>
               <VCol cols="6">
-                <VTextField density="comfortable" label="City" v-model="model.city" type="text" placeholder="Enter Your City" />
+                <VTextField density="comfortable" label="City" v-model="model.city" type="text"
+                  placeholder="Enter Your City" />
               </VCol>
               <VCol cols="6">
                 <VTextField density="comfortable" label="Zip Code" v-model="model.zip" type="number"
                   placeholder="Enter Your Zip Code" />
               </VCol>
-            </VRow>
-            <VRow>
-              <VCol cols="6">
-                <VTextField density="comfortable" label="GSTIN" v-model="model.gstin" />
-              </VCol>
-              <VCol cols="6">
-                <VTextField density="comfortable" v-model="model.cin" label="CIN" />
-              </VCol>
-            </VRow>
+            </VRow> 
           </VCol>
         </VRow>
       </VCard>
@@ -79,12 +81,12 @@
           <VCol cols="12">
             <VRow>
               <VCol cols="6">
-                <VTextField density="comfortable" label="Account Number" type="text" v-model="model.ac_no"
-                  placeholder="Enter Your Account Number" />
+                <VTextField density="comfortable" label="Bank Name" type="text" v-model="model.bank_name"
+                  placeholder="Enter Your Bank Name" />
               </VCol>
               <VCol cols="6">
-                <VTextField density="comfortable" label="PAN Number" type="text" v-model="model.pan_no"
-                  placeholder="Enter Your PAN Number" />
+                <VTextField density="comfortable" label="Account Number" type="text" v-model="model.ac_no"
+                  placeholder="Enter Your Account Number" />
               </VCol>
               <VCol cols="6">
                 <VTextField density="comfortable" label="IFSC Code" type="text" v-model="model.ifsc_code"
@@ -151,6 +153,7 @@ const model = ref({
   gstin: "",
   cin: "",
   ac_no: null,
+  bank_name:'', 
   pan_no: "",
   ifsc_code: "",
   swift_code: "",

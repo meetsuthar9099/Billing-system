@@ -239,7 +239,7 @@ onMounted(async () => {
             router.push({ name: '404' })
         }
     }
-    await store.dispatch("customers/fetchProjects");
+    await store.dispatch("customers/fetchProjects",getId);
 });
 
 const rules = {
