@@ -34,6 +34,7 @@ export default {
       state.limit = payload;
     },
     SET_INVOICES(state, payload) {
+      console.log("SET_INVOICES",payload);
       state.items = payload;
     },
     SET_CUSTOMER_INVOICES(state, payload) {
@@ -48,16 +49,16 @@ export default {
   },
   actions: {
     async fetchAll({ commit }, payload) {
-      const { query } = payload;
+      const query = payload?.query ? payload?.query : "";
       const response = await api.invoices(query);
       let data = response.data;
-      console.log("datadata",data)
+      console.log("datadata", data)
       commit("SET_INVOICES", data.invoiceData);
       commit("SET_TOTALPAGES", data.totalPages);
       commit("SET_CURRENTPAGE", data.page);
       commit("SET_LIMIT", data.limit);
     },
-    async fetchAllCustomerInvoice({ commit },payload) {
+    async fetchAllCustomerInvoice({ commit }, payload) {
       const { customer_id } = payload;
       const response = await api.fetchAllCustomerInvoice(customer_id);
       let data = response.data.invoiceData;
@@ -73,7 +74,7 @@ export default {
         throw error;
       }
     },
-    async editInvoice({}, payload) {
+    async editInvoice({ }, payload) {
       try {
         const { id, model } = payload;
         await api.editInvoice(id, model);
@@ -81,7 +82,7 @@ export default {
         throw error;
       }
     },
-    async deleteInvoice({}, payload) {
+    async deleteInvoice({ }, payload) {
       try {
         const { id } = payload;
         await api.deleteInvoice(id);
@@ -89,7 +90,7 @@ export default {
         throw error;
       }
     },
-    async sentInvoice({}, payload) {
+    async sentInvoice({ }, payload) {
       try {
         const { id } = payload;
         await api.sentInvoice(id);
@@ -131,7 +132,7 @@ export default {
       const data = response.data.tasks;
       commit("SET_TASKS", data);
     },
-    async addInvoice({}, payload) {
+    async addInvoice({ }, payload) {
       try {
         await api.addInvoice(payload);
       } catch (error) {
