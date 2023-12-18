@@ -154,7 +154,8 @@
                     </td>
 
                     <td>
-                        <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ? item.invoice_number : '-' }}</span></router-link>
+                        <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ?
+                            item.invoice_number : '-' }}</span></router-link>
                     </td>
                     <td>{{ item.customer ? item.customer.contact_name : '-' }}</td>
                     <td>{{ item.invoice_date ? moment(item.invoice_date).format('YYYY-MM-DD') : '-' }}</td>
@@ -164,6 +165,7 @@
                             :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">
                         </VBadge>
                     </td>
+                    <!-- {{ item }} -->
                     <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
                     <td class="badge-align">
                         <VBadge class="payment-status"
@@ -185,7 +187,7 @@
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="sendInvoice(item._id)">
-                                    <v-list-item-title><v-icon>mdi-send</v-icon> Send Invoice</v-list-item-title>
+                                    <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' : 'Resend invoice'}}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item v-if="item.status == 1 || item.status == 2"
                                     @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
@@ -280,7 +282,6 @@ const deleteConfirm = async (id) => {
 }
 const sendInvoice = async (id) => {
     sendInvoiceModal.value = true
-    console.log("model.customer_id.value",model.value.customer_id)
     model.value.customer_id = id
     // deleteInvoiceId = id
 }
@@ -289,12 +290,13 @@ const submitForm = async () => {
         const { valid } = await form.value.validate();
         if (valid) {
             console.log("model.value", model.value)
-            // model.value.invoice_id = 
-            await store.dispatch("invoices/sendInvoice",model.value );
-            router.push({ path: "/invoice" });
+            await store.dispatch("invoices/sendInvoice", model.value);
+            sendInvoiceModal.value = false
+            doSearch()
+
         }
     } catch (error) {
-        console.log("error",error)
+        console.log("error", error)
         // projectError.value.isError = true
         // projectError.value.message = error?.message
         // setTimeout(() => {
@@ -314,7 +316,6 @@ const sentPayment = async (id) => {
 
 }
 const sentConfirm = async (id) => {
-
     sentModel.value = true
     sentInvoiceId = id
 }

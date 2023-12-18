@@ -1,13 +1,5 @@
 <template>
-  <h2 class="mb-3">{{ model._id ?'Edit Invoice':'New Invoice'}}</h2>
-  <v-dialog v-model="addCustomerDialog" max-width="1000">
-    <v-card>
-      <v-card-title primary-title>
-        title
-      </v-card-title>
-      
-    </v-card>
-  </v-dialog>
+  <h2 class="mb-3">{{ model._id ? 'Edit Invoice' : 'New Invoice' }}</h2>
   <v-dialog v-model="confirmationDialog" max-width="400">
     <v-card>
       <v-card-title>Confirmation</v-card-title>
@@ -31,11 +23,13 @@
                 <VCol cols="12">
                   <VSelect item-title="name" item-value="_id" :hide-selected="true" density="comfortable" label="Add Customer"
                     name="display_name" :rules="rules.date" :items="allCustomers" v-model="model.customer_id"
-                    prepend-inner-icon="bx-user" >
-                    <template #append>
-                      <v-btn class="h-100" @click="addCustomerDialog = true"><v-icon>bx-plus</v-icon></v-btn>                        
-                    </template>
-                    </VSelect>
+                    prepend-inner-icon="bx-user" />
+                  <VCol v-if="!customer" class="text-right">
+                    <RouterLink class="text-primary ms-2" to="/customer/0">
+                      <v-icon>mdi-plus</v-icon>
+                      <span>Add Customer</span>
+                    </RouterLink>
+                  </vcol>
                   <div v-if="!!customer" class="mt-5">
                     <VRow>
                       <VCol cols="6" md="2">
@@ -123,24 +117,24 @@
                     v-model="model.projects[i].quantity"></VTextField>
                 </td>
                 <td width="150" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
+                  <VTextField  type="number" density="compact" prepend-inner-icon="mdi-percent"
                     v-model="model.projects[i].cgst" min="0" max="100"></VTextField>
                 </td>
                 <td width="150" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
+                  <VTextField  type="number" density="compact" prepend-inner-icon="mdi-percent"
                     v-model="model.projects[i].sgst" min="0" max="100"></VTextField>
                 </td>
                 <td width="150" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact" prepend-inner-icon="mdi-percent"
+                  <VTextField  type="number" density="compact" prepend-inner-icon="mdi-percent"
                     v-model="model.projects[i].igst" min="0" max="100">
                   </VTextField>
                 </td>
                 <td width="150">
-                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].amount"></VTextField>
+                  <VTextField  type="number" density="compact" v-model="model.projects[i].amount"></VTextField>
                 </td>
                 <td width="150" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact"
-                    v-model="model.projects[i].taxable_value"></VTextField>
+                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].taxable_value">
+                  </VTextField>
                 </td>
                 <!-- {{ item }} -->
                 <td>{{ currencySymbol }}&nbsp;{{ item.total }}</td>
@@ -258,8 +252,8 @@ const model = ref({
       quantity: 1,
       taxable_value: 0,
       rate: null,
-      tasks:[],
-      assigned_tasks:[],
+      tasks: [],
+      assigned_tasks: [],
       total: 0,
       cgst: 0,
       sgst: 0,
@@ -285,6 +279,8 @@ const customerProject = computed(() => {
 const allCustomers = computed(() => {
   return store.state.invoices.allCustomers;
 });
+
+
 
 const invoice = computed(() => { return store.state.invoices.item })
 const customer = computed(() => {
@@ -329,7 +325,7 @@ const filteredProjects = (currentIndex) => {
     (project) => !otherSelectedProjects.includes(project._id)
   );
   const selelectedProjectId = selectedProject.find(project => project._id == model.value.projects[currentIndex].id)
-  console.log("selelectedProjectId",selelectedProjectId)
+  console.log("selelectedProjectId", selelectedProjectId)
   if (selelectedProjectId?._id) {
     model.value.projects[currentIndex].tasks = selelectedProjectId.tasks
   }
@@ -345,19 +341,21 @@ const filteredProjects = (currentIndex) => {
 
 let getId = route.params.id;
 onMounted(async () => {
-  console.log("getttt",model)
+  console.log("getttt", model)
   await store.dispatch("invoices/fetchAllCustomers");
   await store.dispatch("company/fetch");
   // console.log("store.state.invoices", store.state.invoices)
-  if (getId != 0) {
-    await store.dispatch("invoices/fetch", { id: getId });
-    model.value = { ...invoice.value }
-    model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD')
-    model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD')
-    currencySymbol.value = customer.value.primary_currency.symbol
-    await store.dispatch("invoices/fetchProjects",{customer_id:model.value.customer_id,invoice_id:model.value._id});
+  if (getId != 0) {    await store.dispatch("invoices/fetch", { id: getId });
+  model.value = { ...invoice.value }
+  model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD')
+  model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD')
+  currencySymbol.value = customer.value.primary_currency.symbol
+  await store.dispatch("invoices/fetchProjects", { customer_id: model.value.customer_id, invoice_id: model.value._id });
   }
-
+if(getId==0){
+  model.value.customer_id = store.state.customers.customer_id
+}
+  
 });
 
 const company = computed(() => { return store.state.company.settings })
@@ -392,7 +390,8 @@ watchEffect(async () => {
     let totalWithoutDiscount = 0;
     let taxFactor = 0;
     model.value.projects.forEach(project => {
-      let tax = project.cgst + project.sgst + project.igst
+      console.log("typeOF",typeof project.cgst , typeof project.sgst ,typeof project.igst )
+      let tax = parseInt(project.cgst) + parseInt(project.sgst) + parseInt(project.igst)
       totalWithoutDiscount = (project.rate * project.quantity);
       taxFactor = (totalWithoutDiscount * tax / 100);
       project.total = totalWithoutDiscount + taxFactor;
@@ -407,14 +406,14 @@ watchEffect(async () => {
     (model.value.discount_type == "Fixed" ? totalCost.value - model.value.total_discount : totalCost.value - totalCost.value * model.value.total_discount / 100)
     : 0;
   // model.value.discount_type = discount_type.value
-  const totalTax = model.value.total_cost * model.value.total_tax / 100
+  const totalTax = totalWithDiscount * model.value.total_tax / 100
   model.value.grand_total = totalWithDiscount + totalTax
 })
 watchEffect(async () => {
   try {
     if (model.value.customer_id) {
       console.log("currency", customer.value.billing)
-      await store.dispatch("invoices/fetchProjects", {customer_id:model.value.customer_id,invoice_id:model.value._id});
+      await store.dispatch("invoices/fetchProjects", { customer_id: model.value.customer_id, invoice_id: model.value._id });
       getId == 0 && (
         model.value.projects = [
           {
@@ -422,8 +421,8 @@ watchEffect(async () => {
             hsa: null,
             amount: null,
             uom: '',
-            tasks:[],
-            assigned_tasks:[],
+            tasks: [],
+            assigned_tasks: [],
             quantity: 1,
             rate: null,
             total: 0,
@@ -433,6 +432,7 @@ watchEffect(async () => {
           }]
       )
     }
+    console.log("gettt")
     if (model.value.customer_id && getId == 0) {
       await store.dispatch("invoices/getInvoiceNumber", { is_local: customer.value.is_local });
       currencySymbol.value = customer.value.primary_currency.symbol
@@ -459,7 +459,7 @@ const onSubmit = async () => {
   try {
     const { valid } = await form.value.validate();
     if (valid) {
-      console.log("model.value",model.value)
+      console.log("model.value", model.value)
       if (route.params.id == 0) {
         await store.dispatch("invoices/addInvoice", model.value);
       } else {
@@ -489,7 +489,7 @@ const addProjectField = () => {
           quantity: null,
           discount: 0,
           rate: null,
-          tasks:[],
+          tasks: [],
           total: 0,
           cgst: gstValue.value.cgst,
           sgst: gstValue.value.sgst,
@@ -524,7 +524,8 @@ const copyBilling = (val) => {
 .v-table th:first-child {
   text-align: center !important;
 }
-.v-table > .v-table__wrapper > table > tbody > tr > td{
+
+.v-table>.v-table__wrapper>table>tbody>tr>td {
   padding: 0px 3px !important;
 }
 </style>

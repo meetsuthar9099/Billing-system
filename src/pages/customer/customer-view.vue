@@ -255,14 +255,14 @@ const onSubmit = async () => {
         const { valid } = await form.value.validate();
         if (valid) {
             if (route.params.id != 0) {
-                await store.dispatch("customers/editCustomer", {
+               await store.dispatch("customers/editCustomer", {
                     id: route.params.id,
                     model: model.value,
                 });
             } else {
                 await store.dispatch("customers/addCustomer", model.value);
             }
-            router.push({ path: "/customer" });
+            router.go(-1);
         }
     } catch (error) {
         console.log(error, "errorsss");

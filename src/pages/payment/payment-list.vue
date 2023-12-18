@@ -98,7 +98,7 @@
                     <td>{{ item.customer.contact_name ? item.customer.contact_name : '-' }}</td>
                     <td>{{ item.invoice.invoice_number }}</td>
                     <td>{{ item.paymentMode.name }}</td>
-                    <td>{{ item.currency.symbol }}&nbsp;{{ item.amount }}</td>
+                    <td>{{ item.currency.symbol }}&nbsp;{{ item.amount.toFixed(2) }}</td>
                     <td width="200">
                         <v-menu>
                             <template v-slot:activator="{ props }">
