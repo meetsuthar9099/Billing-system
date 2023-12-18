@@ -2,7 +2,7 @@
     <v-app>
         <v-row>
             <v-col cols="3">
-                <v-card rounded app :width="380" width="100%" height="100%">
+                <v-card rounded width="100%" height="100%">
                     <!-- Your sidebar content goes here -->
                     <v-list>
                         <v-list-item v-for="(item, index) in invoices" :key="index + 'invoices'">

@@ -16,7 +16,7 @@ loadFonts()
 
 // Create vue app
 const app = createApp(App)
-const url = 'http://192.168.1.3:44000'
+const url = 'http://192.168.1.80:44000'
 const baseURL = `${url}/api/billing`;
 axios.defaults.baseURL = baseURL;
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';
