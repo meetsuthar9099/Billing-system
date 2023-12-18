@@ -1,12 +1,10 @@
 <template>
     <v-app>
         <v-row>
-            <v-col cols="3">
-                <v-card rounded app :width="380" width="100%" height="100%">
+            <v-col cols="12" md="3" class="d-none d-md-block">
+                <v-card rounded width="100%" class="pa-3 overflow-auto h-100">
                     <!-- Your sidebar content goes here -->
-                    <v-list>
-                        <v-list-item v-for="(item, index) in invoices" :key="index + 'invoices'">
-                            <v-card class="pa-0 ma-0" max-width="344" :color="id == item._id ? 'primary' : ''"
+                            <v-card class="pa-0 ma-0" v-for="(item, index) in invoices" :key="index + 'invoices'" :color="id == item._id ? 'primary' : ''"
                                 @click="changeInvoice(item._id)" link>
                                 <template #title>
                                     <v-row>
@@ -27,12 +25,9 @@
                                     </v-row>
                                 </template>
                             </v-card>
-                        </v-list-item>
-                        <!-- Add more menu items as needed -->
-                    </v-list>
                 </v-card>
             </v-col>
-            <v-col cols="9">
+            <v-col cols="12" md="9">
                 <v-card width="100%" height="100%" >
                     <v-progress-linear indeterminate v-if="loading"></v-progress-linear>
                     <embed :src="url" v-show="!loading" width="100%" height="100%" zoom="100%">

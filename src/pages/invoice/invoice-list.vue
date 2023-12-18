@@ -210,6 +210,7 @@
                         </v-btn>
                     </td> -->
                 </tr>
+                <tr><td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td></tr>
             </tbody>
         </v-table>
         <div class="mt-2">
@@ -288,6 +289,7 @@ const submitForm = async () => {
         const { valid } = await form.value.validate();
         if (valid) {
             console.log("model.value", model.value)
+            // model.value.invoice_id = 
             await store.dispatch("invoices/sendInvoice",model.value );
             router.push({ path: "/invoice" });
         }

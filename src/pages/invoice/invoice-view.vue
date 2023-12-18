@@ -1,5 +1,13 @@
 <template>
   <h2 class="mb-3">{{ model._id ?'Edit Invoice':'New Invoice'}}</h2>
+  <v-dialog v-model="addCustomerDialog" max-width="1000">
+    <v-card>
+      <v-card-title primary-title>
+        title
+      </v-card-title>
+      
+    </v-card>
+  </v-dialog>
   <v-dialog v-model="confirmationDialog" max-width="400">
     <v-card>
       <v-card-title>Confirmation</v-card-title>
@@ -21,9 +29,13 @@
             <VCol cols="12">
               <VRow>
                 <VCol cols="12">
-                  <VSelect item-title="name" item-value="_id" :hide-selected="true" label="Add Customer"
+                  <VSelect item-title="name" item-value="_id" :hide-selected="true" density="comfortable" label="Add Customer"
                     name="display_name" :rules="rules.date" :items="allCustomers" v-model="model.customer_id"
-                    prepend-inner-icon="bx-user" />
+                    prepend-inner-icon="bx-user" >
+                    <template #append>
+                      <v-btn class="h-100" @click="addCustomerDialog = true"><v-icon>bx-plus</v-icon></v-btn>                        
+                    </template>
+                    </VSelect>
                   <div v-if="!!customer" class="mt-5">
                     <VRow>
                       <VCol cols="6" md="2">
@@ -226,6 +238,7 @@ const router = useRouter();
 const route = useRoute();
 const isProject = ref(null);
 const submiting = ref(false);
+const addCustomerDialog = ref(false);
 const showDelete = ref([])
 const currencySymbol = ref('₹')
 // const discount_type = ref('Fixed')

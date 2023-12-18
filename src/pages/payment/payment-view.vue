@@ -141,7 +141,6 @@ onMounted(async () => {
     await store.dispatch('payment/fetchAllPayments')
     await store.dispatch("invoices/fetchAllCustomers");
     await store.dispatch("payment/fetchPaymentModes");
-    model.value = { ...payment.value }
     // await store.dispatch("invoices/fetchAllInvoice");
     await store.dispatch("payment/getPaymentNumber");
     model.value.payment_number = store.state.payment.payment_number

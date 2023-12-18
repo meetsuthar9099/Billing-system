@@ -34,7 +34,7 @@ const routeItem = computed(() => {
         </IconBtn>
 
         <!-- 👉 Search -->
-        <div class="d-flex align-center cursor-pointer" style="user-select: none">
+        <div class="d-flex align-center cursor-pointer" style="width: 100%">
           <!-- 👉 Search Trigger button -->
           <!-- <IconBtn>
             <VIcon icon="bx-search" />
