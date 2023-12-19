@@ -158,8 +158,8 @@
                             item.invoice_number : '-' }}</span></router-link>
                     </td>
                     <td>{{ item.customer ? item.customer.contact_name : '-' }}</td>
-                    <td>{{ item.invoice_date ? moment(item.invoice_date).format('YYYY-MM-DD') : '-' }}</td>
-                    <td>{{ item.due_date ? moment(item.due_date).format('YYYY-MM-DD') : '-' }}</td>
+                    <td>{{ item.invoice_date ? moment(item.invoice_date).format('DD-MM-YYYY') : '-' }}</td>
+                    <td>{{ item.due_date ? moment(item.due_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td class="badge-align">
                         <VBadge :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#fef7d1' : '#c3ecd5'"
                             :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">

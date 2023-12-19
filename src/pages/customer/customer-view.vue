@@ -32,13 +32,13 @@
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Display Name" name="display_name"
+                                <VTextField density="comfortable" label="Company Name" name="display_name"
                                     :rules="rules.text" v-model="model.name" prepend-inner-icon="bx-user"
                                     placeholder="John" />
                             </VCol>
 
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Contect Name" v-model="model.contact_name"
+                                <VTextField density="comfortable" label="Contact Name" v-model="model.contact_name"
                                     placeholder="John Doe" />
                             </VCol>
                         </VRow>
