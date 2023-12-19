@@ -94,7 +94,7 @@
                         <span>filter</span>
                         <v-icon>{{ isFilterVisible ? 'mdi-close' : 'mdi-filter' }}</v-icon>
                     </v-btn>
-                    <v-btn :to="{ path: 'invoice/0' }">
+                    <v-btn v-if="checkPermission('Add Invoice')" :to="{ path: 'invoice/0' }">
                         <v-icon>mdi-plus</v-icon>
                         <span>Add Invoice</span>
                     </v-btn>
@@ -193,7 +193,7 @@
                                 <v-list-item :to="'invoice/pdf/' + item._id">
                                     <v-list-item-title><v-icon>mdi-eye</v-icon> View</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item :to="'invoice/' + item._id">
+                                <v-list-item v-if="checkPermission('Update Invoice')" :to="'invoice/' + item._id">
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="sendInvoice(item._id)">
@@ -207,7 +207,7 @@
         item.status
             == 2 ? ' Record Payment' : '' }}</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item @click="deleteConfirm(item._id)">
+                                <v-list-item v-if="checkPermission('Delete Invoice')" @click="deleteConfirm(item._id)">
                                     <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
                                 </v-list-item>
                             </v-list>
@@ -236,6 +236,7 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
+import {checkPermission}  from '@/mixins/permissionMixin'
 import { useRoute, useRouter } from "vue-router";
 import moment from 'moment'
 const defaultFilter = Object.freeze({

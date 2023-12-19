@@ -38,7 +38,7 @@
                         <span>filter</span>
                         <v-icon>{{ isFilterVisible ? 'mdi-close' : 'mdi-filter' }}</v-icon>
                     </v-btn>
-                    <v-btn :to="{ path: 'customer/0' }">
+                    <v-btn v-if="checkPermission('Add Customer')" :to="{ path: 'customer/0' }">
                         <v-icon>mdi-plus</v-icon>
                         <span>Add Customer</span>
                     </v-btn>
@@ -74,11 +74,11 @@
                         <v-checkbox v-model="checkAll" :value="true" @click="checkAllCustomer"
                             ref="myCheckbox"></v-checkbox>
                     </th>
-                    <th>Actions</th>
                     <th>Name</th>
                     <th>Contact Name</th>
                     <th>Email</th>
                     <th>phone</th>
+                    <th v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -86,18 +86,25 @@
                     <td width="100">
                         <v-checkbox :value="item._id" v-model="selectCustomer"></v-checkbox>
                     </td>
-                    <td width="200">
-                        <v-btn class="me-2" color="#03A9F4" :to="'customer/' + item._id" variant="tonal">
-                            <v-icon>mdi-eye</v-icon>
-                        </v-btn>
-                        <v-btn color="error" @click="deleteConfirm(item._id)" variant="tonal">
-                            <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                    </td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.contact_name ? item.contact_name : '-' }}</td>
                     <td>{{ item.email ? item.email : '-' }}</td>
                     <td>{{ item.phone ? item.phone : '-' }}</td>
+                    <td width="200" v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">
+                        <v-menu>
+                            <template v-slot:activator="{ props }">
+                                <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                            </template>
+                            <v-list>
+                                <v-list-item v-if="checkPermission('Update Customer')" :to="'customer/' + item._id">
+                                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item v-if="checkPermission('Delete Customer')" @click="deleteConfirm(item._id)">
+                                    <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                    </td>
                 </tr>
             </tbody>
         </v-table>
@@ -109,6 +116,8 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
+import {checkPermission}  from '@/mixins/permissionMixin'
+
 const defaultFilter = Object.freeze({
     currentPage: 1,
     name: '',

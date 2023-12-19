@@ -154,6 +154,9 @@
       <VCol cols="6">
         <VCard class="pa-8">
           <VRow>
+            <VCol cols="12">
+              <h3>Bank Details</h3>
+          </VCol>
             <VCol cols="6"><span>Bank Account:</span></VCol>
             <VCol cols="6"><strong>{{ company.ac_no }}</strong></VCol>
             <VCol cols="6"><span>Bank Name:</span></VCol>

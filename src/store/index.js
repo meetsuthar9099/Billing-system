@@ -18,6 +18,7 @@ export default createStore({
         user: {},
         token: {},
         role: {},
+        permissions: [],
         logo: null,
         isAuthenticate: false
     },
@@ -25,16 +26,20 @@ export default createStore({
         SET_USER(state, payload) {
             state.user = payload
         },
+        // SET_PERMISSIONS(state, payload) {
+        //     state.permissions = payload
+        // },
         SET_LOGO(state, payload) {
             state.logo = payload
         },
         AUTHENTICATE(
             state,
-            { user_token, userdata, roleData }
+            { user_token, userdata,permissions,roleData }
         ) {
             state.token = user_token
             state.user = userdata
             state.role = roleData
+            state.permissions = permissions
             state.isAuthenticate = true
         },
 
@@ -51,6 +56,7 @@ export default createStore({
             try {
                 const { email, password } = payload
                 const response = await auth.login(email, password)
+                console.log("response",response)
                 axios.defaults.user = response.data.userdata
                 axios.defaults.role = response.data.roleData
                 axios.defaults.headers.common['x-access-token'] = response.data.user_token
@@ -64,13 +70,13 @@ export default createStore({
             try {
                 const accessToken = localStorage.getItem('accessToken')
                 if (!accessToken) throw new Error('No Token Found')
-                const { user_token, userdata, roleData } = JSON.parse(accessToken)
+                const { user_token, userdata, roleData,permissions } = JSON.parse(accessToken)
 
                 axios.defaults.user = userdata
                 axios.defaults.role = roleData
                 axios.defaults.headers.common['x-access-token'] = user_token
 
-                commit('AUTHENTICATE', { user_token, userdata, roleData })
+                commit('AUTHENTICATE', { user_token, userdata, roleData,permissions })
             } catch (err) {
                 console.log('getToken', err)
             }
