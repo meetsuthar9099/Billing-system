@@ -25,19 +25,19 @@
 
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Payment Number" v-model="model.payment_number"
-                                    placeholder="PAY-002" />
+                                    placeholder="PAY-XXXX" />
                             </VCol>
                         </VRow>
                     </VCol>
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VSelect item-title="name" item-value="_id" :hide-selected="true" label="Select Customer"
+                                <VSelect density="comfortable" item-title="name" item-value="_id" :hide-selected="true" label="Select Customer"
                                     name="customer_name" :rules="rules.date" :items="allCustomers"
                                     v-model="model.customer_id" prepend-inner-icon="bx-user" />
                             </VCol>
                             <VCol cols="6">
-                                <VSelect
+                                <VSelect density="comfortable"
                                     :item-title="item => `${item.invoice_number} (${item.currency && item.currency.symbol} ${item.grand_total})`"
                                     item-value="_id" :hide-selected="true" label="Select Invoice" name="currency"
                                     :rules="rules.date" :items="invoices" v-model="model.invoice_id"
@@ -51,21 +51,18 @@
                         <VRow>
                             <VCol cols="6">
                                 <v-row>
-                                    <v-col cols="2">
-                                        <VTextField density="comfortable" :value="currency_symbol" type="text" />
+                                    <v-col cols="1" class="pe-0">
+                                        <VTextField density="comfortable" :value="currency_symbol" type="text" readonly />
                                     </v-col>
-                                    <v-col cols="10">
+                                    <v-col cols="11">
                                         <VTextField density="comfortable" label="Amount"
-                                            :class="{ 'red-border': amountError }" v-model="model.amount" type="number"
-                                            placeholder="www.johndoe.com" />
+                                            :class="{ 'red-border': amountError }" v-model="model.amount" type="number" :min="0" :max="amount_due" />
                                     </v-col>
                                 </v-row>
-                                <span class="amountError" v-if="amountError"> Entered Payment is more than due amount of
-                                    this
-                                    invoice.</span>
+                                <span class="amountError" v-if="amountError"> Entered Payment is more than due amount of this invoice.</span>
                             </VCol>
                             <VCol cols="6">
-                                <VSelect item-title="name" item-value="value" :hide-selected="true"
+                                <VSelect item-title="name" density="comfortable" item-value="value" :hide-selected="true"
                                     label="Select Payment Mode" name="payment_mode" :items="paymentModes"
                                     v-model="model.payment_mode" prepend-inner-icon="bx-user" />
                             </VCol>
@@ -109,17 +106,17 @@ const model = ref({
     invoice_id: null,
     amount: [],
     payment_mode: [],
-    notes: 1,
+    notes: "",
 
 });
 
-const isEdit = ref(false);
-const customer = computed(() => {
-    return store.state.customers.customerUser;
-});
-const projects = computed(() => {
-    return store.state.customers.projects;
-});
+// const isEdit = ref(false);
+// const customer = computed(() => {
+//     return store.state.customers.customerUser;
+// });
+// const projects = computed(() => {
+//     return store.state.customers.projects;
+// });
 const paymentModes = computed(() => {
     console.log("store.state.payment.paymentModes", store.state.payment.paymentModes)
     return store.state.payment.paymentModes;

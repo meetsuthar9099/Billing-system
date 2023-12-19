@@ -87,7 +87,7 @@ export default {
         const { id } = payload;
         await api.deleteInvoice(id);
       } catch (error) {
-        throw error;
+        throw error.response.data;
       }
     },
     async sentInvoice({ }, payload) {

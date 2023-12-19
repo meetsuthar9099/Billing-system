@@ -69,6 +69,16 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <v-snackbar position="relative" color="#EF5350" location="top right" v-model="InvalidCredentials.show">
+        <span style="color: white;">
+            <VIcon icon="bx-error" class="me-2" />{{ InvalidCredentials.message }}
+        </span>
+        <template #actions>
+            <v-btn color="red" style="color: white;" variant="text" @click="InvalidCredentials.show = false">
+                Close
+            </v-btn>
+        </template>
+    </v-snackbar>
     <h1>Invoices</h1>
     <div>
         <div class="mb-2">
@@ -158,8 +168,8 @@
                             item.invoice_number : '-' }}</span></router-link>
                     </td>
                     <td>{{ item.customer ? item.customer.contact_name : '-' }}</td>
-                    <td>{{ item.invoice_date ? moment(item.invoice_date).format('YYYY-MM-DD') : '-' }}</td>
-                    <td>{{ item.due_date ? moment(item.due_date).format('YYYY-MM-DD') : '-' }}</td>
+                    <td>{{ item.invoice_date ? moment(item.invoice_date).format('DD-MM-YYYY') : '-' }}</td>
+                    <td>{{ item.due_date ? moment(item.due_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td class="badge-align">
                         <VBadge :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#fef7d1' : '#c3ecd5'"
                             :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">
@@ -187,7 +197,8 @@
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item @click="sendInvoice(item._id)">
-                                    <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' : 'Resend invoice'}}</v-list-item-title>
+                                    <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' :
+                                        'Resend invoice' }}</v-list-item-title>
                                 </v-list-item>
                                 <v-list-item v-if="item.status == 1 || item.status == 2"
                                     @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
@@ -212,7 +223,9 @@
                         </v-btn>
                     </td> -->
                 </tr>
-                <tr><td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td></tr>
+                <tr v-if="!invoices.length > 0">
+                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                </tr>
             </tbody>
         </v-table>
         <div class="mt-2">
@@ -260,6 +273,7 @@ const sentModel = ref(false)
 let bulkDeleteId = ref([])
 let checkAll = ref(false)
 const filter = ref({})
+const InvalidCredentials = ref({ show: false, message: '' })
 // const myCheckbox = ref(null);
 //computed
 const invoices = computed(() => { return store.state.invoices.items })
@@ -307,7 +321,7 @@ const submitForm = async () => {
 const sentPayment = async (id) => {
     const invoiceData = store.state.invoices.items && store.state.invoices.items.find(x => x._id == id)
     const invoice = {
-        date: moment().format('YYYY-MM-DD'),
+        date: moment().format('DD-MM-YYYY'),
         customer_id: invoiceData.customer_id,
         invoice_id: invoiceData._id
     }
@@ -325,8 +339,8 @@ const doSearch = async () => {
         customer_id: filter.value.customer_id ? filter.value.customer_id : '',
         status: filter.value.status ? filter.value.status : '',
         invoice_number: filter.value.invoice_number,
-        invoice_date_from: filter.value.invoice_date_from ? moment(filter.value.invoice_date_from).format('YYYY-MM-DD') : '',
-        invoice_date_to: filter.value.invoice_date_to ? moment(filter.value.invoice_date_to).format('YYYY-MM-DD') : '',
+        invoice_date_from: filter.value.invoice_date_from ? moment(filter.value.invoice_date_from).format('DD-MM-YYYY') : '',
+        invoice_date_to: filter.value.invoice_date_to ? moment(filter.value.invoice_date_to).format('DD-MM-YYYY') : '',
         limit: filter.value.limit
     }
     console.log("Queryyy", query)
@@ -334,11 +348,22 @@ const doSearch = async () => {
 }
 
 const deleteInvoices = async () => {
-    if (!!deleteInvoiceId) {
-        await store.dispatch('invoices/deleteInvoice', { id: deleteInvoiceId });
+    try {
+        if (!!deleteInvoiceId) {
+            await store.dispatch('invoices/deleteInvoice', { id: deleteInvoiceId });
+            deleteModel.value = false
+            doSearch()
+        }
+    } catch (error) {
         deleteModel.value = false
-        doSearch()
+        InvalidCredentials.value.show = true
+        InvalidCredentials.value.message = error.message
+        setTimeout(() => {
+            InvalidCredentials.value.show = false
+            InvalidCredentials.value.message = ''
+        }, 2000);
     }
+
 }
 const sentInvoice = async () => {
     if (!!sentInvoiceId) {
@@ -347,29 +372,25 @@ const sentInvoice = async () => {
         doSearch()
     }
 }
-const invoiceGenerate = (id) => {
-    store.dispatch('invoices/invoiceGenerate', id)
-}
-// const convertToPDF = () => {
-//     const byteData = new Uint8Array(buffer);
-//     const blob = new Blob([byteData], { type: 'application/image' });
-//     const url = URL.createObjectURL(blob);
 
-//     const link = document.createElement('a');
-//     link.href = url;
-//     link.download = 'output.jpg';
-//     link.click();
-
-//     // Clean up by revoking the object URL
-//     URL.revokeObjectURL(url);
-// }
 const bulkDeleteInvoice = async () => {
-    if (!!bulkDeleteId.value.length) {
-        await store.dispatch('invoices/bulkDeleteInvoices', bulkDeleteId.value);
+    try {
+        if (!!bulkDeleteId.value.length) {
+            await store.dispatch('invoices/bulkDeleteInvoices', bulkDeleteId.value);
+            bulkDeleteModel.value = false
+            bulkDeleteId.value = []
+            doSearch()
+        }
+    } catch (error) {
         bulkDeleteModel.value = false
-        bulkDeleteId.value = []
-        doSearch()
+        InvalidCredentials.value.show = true
+        InvalidCredentials.value.message = error.message
+        setTimeout(() => {
+            InvalidCredentials.value.show = false
+            InvalidCredentials.value.message = ''
+        }, 2000);
     }
+
 }
 const bulkDelete = (val) => {
     if (!!val.target.checked) {
