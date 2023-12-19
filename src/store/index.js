@@ -82,9 +82,11 @@ export default createStore({
                 if (!is_valid) {
                     const response = await auth.getLogo()
                     const data = response.data
-                    storageCache.set(data)
-                    value.length = 0
-                    value.push(...data)
+                    if(data){
+                        storageCache.set(data)
+                        value.length = 0
+                        value.push(...data)
+                    }
                 }
                 commit('SET_LOGO', value[0])
             } catch (error) {

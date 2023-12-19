@@ -1,5 +1,6 @@
 <script setup>
-import router from '@/router';
+//import router from '@/router';
+import { useRouter } from 'vue-router';
 // import logo from '@images/logo.svg?raw';
 const logo = inject('logo')
 const form = ref({
@@ -9,16 +10,20 @@ const form = ref({
 })
 const isLoading = ref(false)
 const store = inject('store');
-const InvalidCredentials = ref(false)
-
+const InvalidCredentials = ref({ show: false, message: '' })
+const router = useRouter()
 const onSubmit = async () => {
   try {
     isLoading.value = true
     await store.dispatch('login', form.value)
-    router.push({ name: "/" })
+    router.push({ path: "/" })
   } catch (error) {
-    InvalidCredentials.value = true
-    console.log(error, "LoginFail");
+    InvalidCredentials.value.show = true
+    InvalidCredentials.value.message = error.message
+    setTimeout(() => {
+      InvalidCredentials.value.show = false
+      InvalidCredentials.value.message = ''
+    }, 2000);
   } finally {
     isLoading.value = false
   }
@@ -28,12 +33,12 @@ const isPasswordVisible = ref(false)
 </script>
 
 <template>
-  <v-snackbar position="relative" color="#EF5350" location="top right" v-model="InvalidCredentials">
+  <v-snackbar position="relative" color="#EF5350" location="top right" v-model="InvalidCredentials.show">
     <span style="color: white;">
-      <VIcon icon="bx-error" class="me-2" />Invalid Credentials
+      <VIcon icon="bx-error" class="me-2" />{{InvalidCredentials.message}}
     </span>
     <template #actions>
-      <v-btn color="red" style="color: white;" variant="text" @click="InvalidCredentials = false">
+      <v-btn color="red" style="color: white;" variant="text" @click="InvalidCredentials.show = false">
         Close
       </v-btn>
     </template>
