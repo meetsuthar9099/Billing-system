@@ -8,6 +8,7 @@ import Footer from "@/layouts/components/Footer.vue";
 import NavbarThemeSwitcher from "@/layouts/components/NavbarThemeSwitcher.vue";
 import UserProfile from "@/layouts/components/UserProfile.vue";
 import { useRouter } from "vue-router";
+import { checkPermission } from '@/mixins/permissionMixin'
 const router = useRouter();
 
 const showSnackbar = ref(false)
@@ -74,20 +75,21 @@ const routeItem = computed(() => {
         to: '/dashboard',
         group: 'Dashboard',
       }" />
-        <VDivider class="my-4"></VDivider>
-      <VerticalNavLink :active="true" :item="{
+      <VerticalNavLink v-if="checkPermission('View Customer')" :active="true" :item="{
         title: 'Customer',
         icon: 'mdi-account-cog-outline',
         to: '/customer',
         group: 'Customer',
       }" />
-      <VerticalNavLink :item="{
+      <VDivider class="my-4"></VDivider>
+      <VerticalNavLink v-if="checkPermission('View Invoice')" :item="{
         title: 'Invoice',
         icon: 'mdi-invoice',
         to: '/invoice',
         group: 'Invoice',
       }" />
-      <VerticalNavLink :item="{
+      <VDivider class="my-4"></VDivider>
+      <VerticalNavLink v-if="checkPermission('View Payment')" :item="{
         title: 'Payment',
         icon: 'mdi-payment',
         to: '/payment',
@@ -99,6 +101,12 @@ const routeItem = computed(() => {
         icon: 'mdi-cog',
         to: '/settings',
         group: 'Setting',
+      }" />
+      <VerticalNavLink :item="{
+        title: 'AuditLogs',
+        icon: 'mdi-book',
+        to: '/auditLogs',
+        group: 'AuditLogs',
       }" />
       <!-- 
       <VerticalNavSectionTitle :item="{
@@ -156,7 +164,6 @@ const routeItem = computed(() => {
     </template>
   </VerticalNavLayout>
 </template>
-
 <style lang="scss" scoped>
 .meta-key {
   border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));

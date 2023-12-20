@@ -38,7 +38,7 @@
                         <span>filter</span>
                         <v-icon>{{ isFilterVisible ? 'mdi-close' : 'mdi-filter' }}</v-icon>
                     </v-btn>
-                    <v-btn :to="{ path: 'payment/0' }">
+                    <v-btn v-if="checkPermission('Add Payment')" :to="{ path: 'payment/0' }">
                         <v-icon>mdi-plus</v-icon>
                         <span>Add Payment</span>
                     </v-btn>
@@ -85,7 +85,7 @@
                     <th>Invoice Number</th>
                     <th>Payment Mode</th>
                     <th>Amount</th>
-                    <th>Actions</th>
+                    <th v-if="checkPermission('Update payment') || checkPermission('Delete Payment')">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -99,22 +99,25 @@
                     <td>{{ item.invoice.invoice_number }}</td>
                     <td>{{ item.paymentMode.name }}</td>
                     <td>{{ item.currency.symbol }}&nbsp;{{ item.amount.toFixed(2) }}</td>
-                    <td width="200">
+                    <td width="200" v-if="checkPermission('Update payment') || checkPermission('Delete Payment')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
                                 <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
 
                             <v-list>
-                                <v-list-item :to="'payment/' + item._id">
+                                <v-list-item v-if="checkPermission('Update Payment')" :to="'payment/' + item._id">
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item @click="deleteConfirm(item._id)">
+                                <v-list-item v-if="checkPermission('Delete Payment')" @click="deleteConfirm(item._id)">
                                     <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </td>
+                </tr>
+                <tr v-if="!payments.length > 0">
+                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>
@@ -126,6 +129,7 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
+import {checkPermission}  from '@/mixins/permissionMixin'
 const defaultFilter = Object.freeze({
     payment_mode: null,
     customer_id: null,
@@ -163,6 +167,7 @@ const deleteConfirm = async (id) => {
     deleteModel.value = true
     deleteCustomerId = id
 }
+
 const doSearch = async () => {
     const query = {
         page: filter.value.currentPage,

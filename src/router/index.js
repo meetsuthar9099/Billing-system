@@ -53,6 +53,12 @@ const router = createRouter({
           meta: { requiresAuth: true, group: 'Payment' }
         },
         {
+          name: 'auditLogs',
+          path: 'auditLogs',
+          component: () => import('../pages/AuditLogs/logs-list.vue'),
+          meta: { requiresAuth: true, group: 'AuditLogs' }
+        },
+        {
           name: 'payment_view',
           path: 'payment/:id',
           component: () => import('../pages/payment/payment-view.vue'),
