@@ -75,20 +75,19 @@ const routeItem = computed(() => {
         to: '/dashboard',
         group: 'Dashboard',
       }" />
+        <VDivider class="my-4"></VDivider>
       <VerticalNavLink v-if="checkPermission('View Customer')" :active="true" :item="{
         title: 'Customer',
         icon: 'mdi-account-cog-outline',
         to: '/customer',
         group: 'Customer',
       }" />
-      <VDivider class="my-4"></VDivider>
       <VerticalNavLink v-if="checkPermission('View Invoice')" :item="{
         title: 'Invoice',
         icon: 'mdi-invoice',
         to: '/invoice',
         group: 'Invoice',
       }" />
-      <VDivider class="my-4"></VDivider>
       <VerticalNavLink v-if="checkPermission('View Payment')" :item="{
         title: 'Payment',
         icon: 'mdi-payment',
