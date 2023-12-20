@@ -4,19 +4,19 @@ const api = {
         return axios.get(`/customers?page=${page ? page : 1}&limit=10&name=${name ? name : ''}&contact_name=${contact_name ? contact_name : ''}&phone=${phone ? phone : ''}`)
     },
     addCustomer(payload) {
-        return axios.post('/addCustomer', payload)
+        return axios.post('/customers', payload)
     },
     deleteCustomer(id) {
-        return axios.delete(`/deleteCustomers/${id}`)
+        return axios.delete(`/customers/${id}`)
     },
     bulkDeleteCustomer(customer_id) {
         return axios.post(`/deleteCustomers`, { customer_id })
     },
     fetchCustomer(id) {
-        return axios.get(`/viewCustomer/${id}`)
+        return axios.get(`/customers/${id}`)
     },
     editCustomer(id, payload) {
-        return axios.post(`/editCustomers/${id}`, payload)
+        return axios.put(`/customers/${id}`, payload)
     },
     fetchProjects(id) {
         return axios.get(`/projects/${id}`)

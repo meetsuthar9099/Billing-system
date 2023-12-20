@@ -69,7 +69,7 @@
                 <VTextField density="comfortable" label="Zip Code" v-model="model.zip" type="number"
                   placeholder="Enter Your Zip Code" />
               </VCol>
-            </VRow> 
+            </VRow>
           </VCol>
         </VRow>
       </VCard>
@@ -80,11 +80,15 @@
           </VCol>
           <VCol cols="12">
             <VRow>
-              <VCol cols="6">
+              <VCol cols="4">
                 <VTextField density="comfortable" label="Bank Name" type="text" v-model="model.bank_name"
                   placeholder="Enter Your Bank Name" />
               </VCol>
-              <VCol cols="6">
+              <VCol cols="4">
+                <VTextField density="comfortable" label="Account Holder Name" type="text" v-model="model.ac_holder_name"
+                  placeholder="Enter Account Holder Name" />
+              </VCol>
+              <VCol cols="4">
                 <VTextField density="comfortable" label="Account Number" type="text" v-model="model.ac_no"
                   placeholder="Enter Your Account Number" />
               </VCol>
@@ -125,9 +129,8 @@
       </VCard>
       <VCard class="pa-6 sticky-element">
         <VRow>
-
-          <VCol class="d-flex justify-end gap-2" cols="12" md="6">
-            <VBtn size="large" type="submit" color="primary">Update</VBtn>
+          <VCol class="d-flex justify-end gap-2" cols="12">
+            <VBtn size="large" type="submit" color="success">Update</VBtn>
             <VBtn size="large" @click="router.back()" color="error">Back</VBtn>
           </VCol>
         </VRow>
@@ -137,11 +140,11 @@
 </template>
 
 <script setup>
-import { useRoute } from 'vue-router';
+import { useRouter } from 'vue-router';
+const router = useRouter()
 const store = inject('store');
 const model = ref({
   company_name: "",
-  _id: null,
   company_email: "",
   company_telephone: null,
   country_code: "IN",
@@ -153,7 +156,8 @@ const model = ref({
   gstin: "",
   cin: "",
   ac_no: null,
-  bank_name:'', 
+  ac_holder_name: "",
+  bank_name: '',
   pan_no: "",
   ifsc_code: "",
   swift_code: "",
@@ -188,6 +192,14 @@ const rules = {
     (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
   ],
 };
+const settings = [
+  {
+    name: 'Basic Settings'
+  },
+  {
+    name: 'Company Settings'
+  }
+]
 onMounted(async () => {
   await store.dispatch("company/fetch");
   model.value = { ...companySettings.value };

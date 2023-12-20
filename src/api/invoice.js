@@ -13,20 +13,19 @@ const api = {
         return axios.get(`/customers`)
     },
     customerProject({customer_id,invoice_id}) {
-        console.log("invoice_id",invoice_id)
         return axios.get(`/customerProject/${customer_id}/${invoice_id}`)
     },
     customerProjectTasks(id) {
         return axios.get(`/customerProjectTasks/${id}`)
     },
     addInvoice(model) {
-        return axios.post(`/addInvoice`, model)
+        return axios.post(`/invoice`, model)
     },
     editInvoice(id, model){
-        return axios.post(`/editInvoice/${id}`, model)
+        return axios.put(`/invoice/${id}`, model)
     },
     deleteInvoice(id){
-        return axios.delete(`/deleteInvoice/${id}`)
+        return axios.delete(`/invoice/${id}`)
     },
     sentInvoice(id){
         return axios.get(`/sentInvoice/${id}`)

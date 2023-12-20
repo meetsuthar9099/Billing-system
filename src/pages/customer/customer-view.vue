@@ -238,6 +238,8 @@ onMounted(async () => {
         } catch (error) {
             router.push({ name: '404' })
         }
+    }else{
+        model.value.primary_currency = currencies.value.find(item=>item.is_default)?._id 
     }
     await store.dispatch("customers/fetchProjects",getId);
 });

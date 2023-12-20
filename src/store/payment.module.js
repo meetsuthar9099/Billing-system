@@ -120,7 +120,7 @@ export default {
     //         throw error
     //     }
     // },
-    async addPayment({ dispatch }, payload) {
+    async addPayment({ }, payload) {
       try {
         await api.addPayment(payload);
       } catch (error) {
@@ -138,7 +138,6 @@ export default {
     async fetchPaymentModes({ commit }) {
       try {
         const response = await api.fetchPaymentModes();
-        console.log("responseresponse", response);
         const data = response.data.paymentModes;
         commit("SET_PAYMENT_MODES", data);
       } catch (error) {

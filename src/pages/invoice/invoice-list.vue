@@ -162,7 +162,6 @@
                     <td width="100">
                         <v-checkbox :value="item._id" @click="bulkDelete"></v-checkbox>
                     </td>
-
                     <td>
                         <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ?
                             item.invoice_number : '-' }}</span></router-link>

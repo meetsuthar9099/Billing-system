@@ -34,10 +34,12 @@ axios.interceptors.response.use(
     }
 );
 store.dispatch('getToken')
-store.dispatch('setLogo').then(()=>{
+store.dispatch('setLogo').then(() => {
     app.provide('logo', imageUrl + store.state.logo);
 })
-
+app.config.errorHandler = (err, vm, info) => {
+    console.error('GLOBAL_ERROR_HANDLER:', err, vm, info);
+};
 
 app.use(vuetify)
 // app.use(createPinia())

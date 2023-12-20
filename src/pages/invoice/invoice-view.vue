@@ -13,10 +13,10 @@
   <v-snackbar location="top right" v-model="projectError.isError" color="error">
     <v-icon class="me-1">mdi-warning</v-icon><strong>{{ projectError.message }}</strong>
   </v-snackbar>
-  <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form">
+  <VForm class="d-flex flex-column" @submit.prevent="onSubmit" ref="form">
     <VRow>
       <VCol cols="12" md="6">
-        <VCard class="pa-8">
+        <VCard class="pa-8 h-100">
           <VRow>
             <VCol cols="12">
               <VRow>
@@ -29,8 +29,8 @@
                       <v-icon>mdi-plus</v-icon>
                       <span>Add Customer</span>
                     </RouterLink>
-                  </vcol>
-                  <div v-if="!!customer" class="mt-5">
+                  </VCol>
+                  <div v-else class="mt-5">
                     <VRow>
                       <VCol cols="6" md="2">
                         <div>Name:</div>
@@ -62,7 +62,7 @@
                   <VTextField type="date" v-model="model.due_date" :rules="rules.date" density="comfortable"
                     label="Due Date"></VTextField>
                 </VCol>
-                <VCol cols="6">
+                <VCol cols="12">
                   <VTextField type="text" readonly v-model="model.invoice_number" density="comfortable"
                     label="Invoice Number">
                   </VTextField>
@@ -90,7 +90,7 @@
               <th v-if="isLocal">igst({{ gstValue.igst }}%)</th>
               <th>Amount</th>
               <th v-if="isLocal">Tax</th>
-              <th>Total</th>
+              <th v-if="isLocal">Total</th>
               <th v-if="showDelete">Action</th>
             </thead>
             <tbody>
@@ -118,7 +118,7 @@
                   <VTextField :disabled="!model.projects[i].id" type="number" min="0" density="compact"
                     prepend-inner-icon="mdi-percent" v-model="model.projects[i].discount"></VTextField>
                 </td>
-                <td width="150" v-if="isLocal||model.projects[i]?.cgst.amount">
+                <td width="150" v-if="isLocal">
                   <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
                     v-model="model.projects[i].cgst.amount" min="0" max="100"></VTextField>
                 </td>
@@ -139,42 +139,59 @@
                   </VTextField>
                 </td>
                 <!-- {{ item }} -->
-                <td>{{ currencySymbol }}&nbsp;{{ item.total }}</td>
+                <td v-if="isLocal">{{ currencySymbol }}&nbsp;{{ item.total }}</td>
                 <td v-if="showDelete" @click="deleteRow(i)"><v-icon>mdi-delete</v-icon></td>
               </tr>
             </tbody>
           </VTable>
           <v-btn class="w-100 mt-4" color="grey-50 pointer-cursor" @click="addProjectField"><v-icon
               class="me-1">mdi-plus-circle</v-icon><span>Add New
-              Project</span></v-btn>
+              PARTICULARS</span></v-btn>
         </VCard>
       </VCol>
     </VRow>
     <VRow>
-      <VCol cols="6">
-        <VCard class="pa-8">
+      <VCol :cols="isLocal ? 6 : 9">
+        <VCard class="pa-8 h-100">
           <VRow>
-            <VCol cols="6"><span>Bank Account:</span></VCol>
-            <VCol cols="6"><strong>{{ company.ac_no }}</strong></VCol>
-            <VCol cols="6"><span>Bank Name:</span></VCol>
-            <VCol cols="6"><strong>{{ company.bank_name }}</strong></VCol>
-            <VCol cols="6"><span>Swift Number:</span></VCol>
-            <VCol cols="6"><strong>{{ company.swift_code }}</strong></VCol>
-            <VCol cols="6"><span>Bank IFSC:</span></VCol>
-            <VCol cols="6"><strong>{{ company.ifsc_code }}</strong></VCol>
-            <VCol cols="6"><span>Pan Number:</span></VCol>
-            <VCol cols="6"><strong>{{ company.pan_no }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><span>Bank Account:</span></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.ac_no }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><span>Acount Holder Name:</span></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.ac_holder_name }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><span>Bank Name:</span></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.bank_name }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><span>Swift Number:</span></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.swift_code }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><span>Bank IFSC:</span></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.ifsc_code }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><span>Pan Number:</span></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.pan_no }}</strong></VCol>
           </VRow>
         </VCard>
       </VCol>
-      <VCol cols="6">
-        <VCard class="pa-8">
-          <VRow class="align-center">
+      <VCol :cols="isLocal ? 6 : 3">
+        <VCard class="pa-8 h-100">
+          <VRow v-if="!isLocal" class="align-center">
             <VCol cols="6">
-              <span>Total Amount Before Tax:</span>
+              <span>Transaction fee:</span>
             </VCol>
             <VCol cols="6">
-              <div class="d-flex">
+              <VRow class="d-flex justify-end align-center">
+                <VCol cols="4" class="ma-0 pa-0">
+                  <VTextField v-model="currencySymbol" density="compact" readonly class="me-2"></VTextField>
+                </VCol>
+                <VCol cols="8" class="pa-0">
+                  <VTextField v-model="model.transaction_fee" type="number" density="compact"></VTextField>
+                </VCol>
+              </VRow>
+            </VCol>
+          </VRow>
+          <VRow class="align-center" v-if="isLocal">
+            <VCol cols="9">
+              <span>{{ isLocal ? 'Total Amount Before Tax' : 'Total Amount' }}:</span>
+            </VCol>
+            <VCol cols="3">
+              <div class="d-flex justify-end">
                 <h3>{{ currencySymbol }}&nbsp;{{ model.total_cost }}</h3>
               </div>
             </VCol>
@@ -184,7 +201,7 @@
               <span>Add CGST:</span>
             </VCol>
             <VCol cols="6">
-              <div class="d-flex">
+              <div class="d-flex justify-end">
                 <h3>{{ currencySymbol }}&nbsp;{{ addCGST }}</h3>
               </div>
             </VCol>
@@ -194,7 +211,7 @@
               <span>Add SGST:</span>
             </VCol>
             <VCol cols="6">
-              <div class="d-flex">
+              <div class="d-flex justify-end">
                 <h3>{{ currencySymbol }}&nbsp;{{ addSGST }}</h3>
               </div>
             </VCol>
@@ -204,7 +221,7 @@
               <span>Add IGST:</span>
             </VCol>
             <VCol cols="6">
-              <div class="d-flex">
+              <div class="d-flex justify-end">
                 <h3>{{ currencySymbol }}&nbsp;{{ addIGST }}</h3>
               </div>
             </VCol>
@@ -214,35 +231,39 @@
               Tax Amount GST
             </VCol>
             <VCol cols="6">
-              <div class="d-flex">
+              <div class="d-flex justify-end">
                 <h3>{{ currencySymbol }}&nbsp;{{ model.total_tax }}</h3>
               </div>
             </VCol>
             <v-divider></v-divider>
+          </VRow>
+          <VRow class="align-center">
             <VCol cols="6">
-              Total Amount After Tax:
+              {{ isLocal ? 'Total Amount After Tax:' : 'Total Amount:' }}
             </VCol>
             <VCol cols="6">
-              <h3>{{ currencySymbol }}&nbsp;{{ model.grand_total }}</h3>
+              <div class="d-flex justify-end">
+                <h3>{{ currencySymbol }}&nbsp;{{ model.grand_total }}</h3>
+              </div>
             </VCol>
           </VRow>
         </VCard>
       </VCol>
     </VRow>
-    <VCard class="pa-6">
-      <VRow>
-        <VCol class="d-flex justify-end gap-2">
+    <VRow>
+      <VCol>
+        <VCard class="pa-6 w-100 d-flex justify-end gap-2">
           <VBtn size="large" type="submit" color="success" :disabled="submiting">{{ labelSubmit }} Invoice</VBtn>
           <VBtn size="large" @click="router.back()" color="error">Back</VBtn>
-        </VCol>
-      </VRow>
-    </VCard>
+        </VCard>
+      </VCol>
+    </VRow>
   </VForm>
   <div></div>
 </template>
 <script setup>
 import moment from "moment";
-import { ref, watchEffect } from "vue";
+import { nextTick, ref, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const store = inject("store");
 const confirmationDialog = ref(false);
@@ -283,6 +304,7 @@ const model = ref({
   total_without_discount: 0,
   currency_symbol: "₹",
   total_without_tax: 0,
+  transaction_fee: 0,
   total_cost: 0,
   total_tax: 0,
   grand_total: 0
@@ -355,11 +377,13 @@ onMounted(async () => {
   if (getId != 0) {
     await store.dispatch("invoices/fetch", { id: getId });
     model.value = { ...invoice.value }
+    console.log(model.value.transaction_fee, "Transaction")
     model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD');
     model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD');
     currencySymbol.value = customer.value.primary_currency.symbol
     await store.dispatch("invoices/fetchProjects", { customer_id: model.value.customer_id, invoice_id: getId });
   }
+
   if (getId == 0) {
     model.value.customer_id = store.state.customers.customer_id
   }
@@ -376,10 +400,8 @@ const gstValue = computed(() => {
   const cgst = company.value.cgst ? parseInt(company.value.cgst) : 9
   const sgst = company.value.sgst ? parseInt(company.value.sgst) : 9
   const igst = company.value.igst ? parseInt(company.value.igst) : 18
-  let gst = isIndia
-    ? isState
-      ? { cgst, sgst, igst: 0 }
-      : { cgst: 0, sgst: 0, igst }
+  let gst = (isIndia && isLocal.value)
+    ? (isState ? { cgst, sgst, igst: 0 } : { cgst: 0, sgst: 0, igst })
     : { cgst: 0, sgst: 0, igst: 0 };
   return gst
 })
@@ -430,19 +452,34 @@ watchEffect(async () => {
   }
 
   model.value.total_cost = totalCost.value ? totalCost.value : 0;
-  const totalTax = (totalCost.value) * model.value.total_tax / 100;
+  // const totalTax = (totalCost.value) * model.value.total_tax / 100;
   model.value.total_tax = addCGST.value + addSGST.value + addIGST.value
   // model.value.grand_total = totalCost.value + totalTax;
 });
 watchEffect(() => {
-  model.value.grand_total = model.value.total_cost + model.value.total_tax
+  const transactionFee = model.value.transaction_fee;
+  const totalCost = model.value.total_cost;
+  if (!isLocal.value) {
+    model.value.grand_total = totalCost && transactionFee ? (+totalCost + +transactionFee) : totalCost;
+  }
+});
+
+watch(() => model.value.transaction_fee, (newTransactionFee) => {
+  const totalCost = model.value.total_cost;
+  model.value.grand_total = totalCost && newTransactionFee ?
+    (+totalCost + +newTransactionFee) : totalCost;
+});
+
+watchEffect(() => {
+  if (isLocal.value) {
+    model.value.grand_total = model.value.total_cost + model.value.total_tax
+  }
 });
 watchEffect(async () => {
   try {
     if (model.value.customer_id) {
-      console.log("currency", customer.value.billing)
       await store.dispatch("invoices/fetchProjects", { customer_id: model.value.customer_id, invoice_id: model.value._id });
-      getId == 0 && (
+      if (getId == 0) {
         model.value.projects = [
           {
             id: null,
@@ -459,13 +496,12 @@ watchEffect(async () => {
             sgst: { rate: gstValue.value.sgst, amount: 0 },
             igst: { rate: gstValue.value.igst, amount: 0 }
           }]
-      )
+      }
     }
-    console.log("gettt")
+    isLocal.value = customer.value.is_local
     if (model.value.customer_id && getId == 0) {
       await store.dispatch("invoices/getInvoiceNumber", { is_local: customer.value.is_local });
       currencySymbol.value = customer.value.primary_currency.symbol
-      isLocal.value = customer.value.is_local
       model.value.invoice_number = store.state.invoices.invoiceNumber
     }
   } catch (error) {

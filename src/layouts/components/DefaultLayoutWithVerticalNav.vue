@@ -74,25 +74,31 @@ const routeItem = computed(() => {
         to: '/dashboard',
         group: 'Dashboard',
       }" />
+        <VDivider class="my-4"></VDivider>
       <VerticalNavLink :active="true" :item="{
         title: 'Customer',
         icon: 'mdi-account-cog-outline',
         to: '/customer',
         group: 'Customer',
       }" />
-      <VDivider class="my-4"></VDivider>
       <VerticalNavLink :item="{
         title: 'Invoice',
         icon: 'mdi-invoice',
         to: '/invoice',
         group: 'Invoice',
       }" />
-      <VDivider class="my-4"></VDivider>
       <VerticalNavLink :item="{
         title: 'Payment',
         icon: 'mdi-payment',
         to: '/payment',
         group: 'Payment',
+      }" />
+      <VDivider class="my-4"></VDivider>
+      <VerticalNavLink :item="{
+        title: 'Setting',
+        icon: 'mdi-cog',
+        to: '/settings',
+        group: 'Setting',
       }" />
       <!-- 
       <VerticalNavSectionTitle :item="{
