@@ -95,6 +95,12 @@ const routeItem = computed(() => {
         to: '/payment',
         group: 'Payment',
       }" />
+      <VerticalNavLink   :item="{
+        title: 'AuditLogs',
+        icon: 'mdi-book',
+        to: '/auditLogs',
+        group: 'AuditLogs',
+      }" />
       <!-- 
       <VerticalNavSectionTitle :item="{
         heading: 'Pages',

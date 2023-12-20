@@ -23,10 +23,10 @@ const api = {
         return axios.post(`/addInvoice`, model)
     },
     editInvoice(id, model){
-        return axios.post(`/editInvoice/${id}`, model)
+        return axios.put(`/invoice/${id}`, model)
     },
     deleteInvoice(id){
-        return axios.delete(`/deleteInvoice/${id}`)
+        return axios.delete(`/invoice/${id}`)
     },
     sentInvoice(id){
         return axios.get(`/sentInvoice/${id}`)
