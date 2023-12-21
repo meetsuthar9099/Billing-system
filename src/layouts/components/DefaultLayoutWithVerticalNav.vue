@@ -1,12 +1,27 @@
 <script setup>
-import VerticalNavLayout from '@layouts/components/VerticalNavLayout.vue'
-import VerticalNavLink from '@layouts/components/VerticalNavLink.vue'
+import VerticalNavLayout from "@layouts/components/VerticalNavLayout.vue";
+import VerticalNavLink from "@layouts/components/VerticalNavLink.vue";
+import snackbar from "@/components/snackbar.vue";
 
 // Components
-import Footer from '@/layouts/components/Footer.vue'
-import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
-import UserProfile from '@/layouts/components/UserProfile.vue'
+import Footer from "@/layouts/components/Footer.vue";
+import NavbarThemeSwitcher from "@/layouts/components/NavbarThemeSwitcher.vue";
+import UserProfile from "@/layouts/components/UserProfile.vue";
+import { useRouter } from "vue-router";
+import { checkPermission } from '@/mixins/permissionMixin'
+const router = useRouter();
 
+const showSnackbar = ref(false)
+const routeItem = computed(() => {
+  let routePath = router.currentRoute.value.path
+    .split("/")
+    .map((item) => item.charAt(0).toUpperCase() + item.slice(1));
+  routePath.shift();
+  if (routePath[1] == 0) {
+    routePath[1] = "Add";
+  }
+  return routePath;
+});
 </script>
 
 <template>
@@ -20,24 +35,28 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         </IconBtn>
 
         <!-- 👉 Search -->
-        <div class="d-flex align-center cursor-pointer" style="user-select: none;">
+        <div class="d-flex align-center cursor-pointer" style="width: 100%">
           <!-- 👉 Search Trigger button -->
-          <IconBtn>
+          <!-- <IconBtn>
             <VIcon icon="bx-search" />
           </IconBtn>
 
           <span class="d-none d-md-flex align-center text-disabled">
             <span class="me-3">Search</span>
 
-          </span>
+          </span> -->
+          <v-breadcrumbs class="px-0">
+            <v-breadcrumbs-item :to="'/dashboard'"> Home </v-breadcrumbs-item>/
+            <template v-for="(item, index) in routeItem" :key="'route' + index">
+              <v-breadcrumbs-item :to="item">
+                {{ item }}
+              </v-breadcrumbs-item>
+              <span v-if="index < routeItem.length - 1">/</span>
+            </template>
+          </v-breadcrumbs>
         </div>
 
         <VSpacer />
-
-        <IconBtn class="me-2" href="https://github.com/themeselection/sneat-vuetify-vuejs-admin-template-free"
-          target="_blank" rel="noopener noreferrer">
-          <VIcon icon="bxl-github" />
-        </IconBtn>
 
         <IconBtn class="me-2">
           <VIcon icon="bx-bell" />
@@ -54,11 +73,39 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
         title: 'Dashboard',
         icon: 'bx-home',
         to: '/dashboard',
+        group: 'Dashboard',
       }" />
-      <VerticalNavLink :item="{
+        <VDivider class="my-4"></VDivider>
+      <VerticalNavLink v-if="checkPermission('View Customer')" :active="true" :item="{
         title: 'Customer',
         icon: 'mdi-account-cog-outline',
         to: '/customer',
+        group: 'Customer',
+      }" />
+      <VerticalNavLink v-if="checkPermission('View Invoice')" :item="{
+        title: 'Invoice',
+        icon: 'mdi-invoice',
+        to: '/invoice',
+        group: 'Invoice',
+      }" />
+      <VerticalNavLink v-if="checkPermission('View Payment')" :item="{
+        title: 'Payment',
+        icon: 'mdi-payment',
+        to: '/payment',
+        group: 'Payment',
+      }" />
+      <VDivider class="my-4"></VDivider>
+      <VerticalNavLink :item="{
+        title: 'Setting',
+        icon: 'mdi-cog',
+        to: '/settings',
+        group: 'Setting',
+      }" />
+      <VerticalNavLink :item="{
+        title: 'AuditLogs',
+        icon: 'mdi-book',
+        to: '/auditLogs',
+        group: 'AuditLogs',
       }" />
       <!-- 
       <VerticalNavSectionTitle :item="{
@@ -116,7 +163,6 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
     </template>
   </VerticalNavLayout>
 </template>
-
 <style lang="scss" scoped>
 .meta-key {
   border: thin solid rgba(var(--v-border-color), var(--v-border-opacity));

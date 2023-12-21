@@ -38,9 +38,9 @@
                         <span>filter</span>
                         <v-icon>{{ isFilterVisible ? 'mdi-close' : 'mdi-filter' }}</v-icon>
                     </v-btn>
-                    <v-btn v-if="checkPermission('Add Customer')" :to="{ path: 'customer/0' }">
+                    <v-btn v-if="checkPermission('Add Payment')" :to="{ path: 'payment/0' }">
                         <v-icon>mdi-plus</v-icon>
-                        <span>Add Customer</span>
+                        <span>Add Payment</span>
                     </v-btn>
 
                 </v-col>
@@ -54,13 +54,18 @@
                 <v-col cols="12">
                     <v-row>
                         <v-col cols="4">
-                            <VTextField label="Display Name" v-model="filter.name" density="compact"></VTextField>
+                            <VSelect item-title="name" item-value="_id" :hide-selected="true" label="Select Customer"
+                                density="compact" name="display_name" :items="allCustomers" v-model="filter.customer_id"
+                                prepend-inner-icon="bx-user" />
                         </v-col>
                         <v-col cols="4">
-                            <VTextField label="Contact Name" v-model="filter.contact_name" density="compact"></VTextField>
+                            <VTextField label="Payment Number" v-model="filter.payment_number" density="compact">
+                            </VTextField>
                         </v-col>
                         <v-col cols="4">
-                            <VTextField label="Phone" v-model="filter.phone" density="compact"></VTextField>
+                            <VSelect item-title="name" item-value="value" :hide-selected="true" label="Select Payment Mode"
+                                density="compact" name="display_name" :items="paymentModes" v-model="filter.payment_mode"
+                                prepend-inner-icon="bx-user" />
                         </v-col>
                     </v-row>
                 </v-col>
@@ -74,37 +79,45 @@
                         <v-checkbox v-model="checkAll" :value="true" @click="checkAllCustomer"
                             ref="myCheckbox"></v-checkbox>
                     </th>
-                    <th>Name</th>
-                    <th>Contact Name</th>
-                    <th>Email</th>
-                    <th>phone</th>
-                    <th v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">Actions</th>
+                    <th>Date</th>
+                    <th>Paymnent Number</th>
+                    <th>Customer</th>
+                    <th>Invoice Number</th>
+                    <th>Payment Mode</th>
+                    <th>Amount</th>
+                    <th v-if="checkPermission('Update payment') || checkPermission('Delete Payment')">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in customers" :key="'customer' + index">
+                <tr v-for="(item, index) in payments" :key="'customer' + index">
                     <td width="100">
                         <v-checkbox :value="item._id" v-model="selectCustomer"></v-checkbox>
                     </td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.contact_name ? item.contact_name : '-' }}</td>
-                    <td>{{ item.email ? item.email : '-' }}</td>
-                    <td>{{ item.phone ? item.phone : '-' }}</td>
-                    <td width="200" v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">
+                    <td>{{ item.date }}</td>
+                    <td>{{ item.payment_number }}</td>
+                    <td>{{ item.customer.contact_name ? item.customer.contact_name : '-' }}</td>
+                    <td>{{ item.invoice.invoice_number }}</td>
+                    <td>{{ item.paymentMode.name }}</td>
+                    <td>{{ item.currency.symbol }}&nbsp;{{ item.amount.toFixed(2) }}</td>
+                    <td width="200" v-if="checkPermission('Update payment') || checkPermission('Delete Payment')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
                                 <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
+
                             <v-list>
-                                <v-list-item v-if="checkPermission('Update Customer')" :to="'customer/' + item._id">
+                                <v-list-item v-if="checkPermission('Update Payment')" :to="'payment/' + item._id">
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item v-if="checkPermission('Delete Customer')" @click="deleteConfirm(item._id)">
+                                <v-list-item v-if="checkPermission('Delete Payment')" @click="deleteConfirm(item._id)">
                                     <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </td>
+                </tr>
+                <tr v-if="!payments.length > 0">
+                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>
@@ -117,12 +130,10 @@
 <script setup>
 import { inject, onMounted } from 'vue';
 import {checkPermission}  from '@/mixins/permissionMixin'
-
 const defaultFilter = Object.freeze({
-    currentPage: 1,
-    name: '',
-    contact_name: '',
-    phone: null,
+    payment_mode: null,
+    customer_id: null,
+    payment_number: null,
     limit: 5
 })
 let deleteCustomerId = null
@@ -136,13 +147,18 @@ const selectCustomer = ref([])
 // const myCheckbox = ref(null);
 
 //computed
-const customers = computed(() => { return store.state.customers.customerUsers })
-
+const payments = computed(() => { return store.state.payment.payments })
+const allCustomers = computed(() => {
+    return store.state.invoices.allCustomers;
+});
+const paymentModes = computed(() => {
+    return store.state.payment.paymentModes;
+});
 const pagination = computed(() => {
     return {
-        totalPage: store.state.customers.totalPage,
-        limit: store.state.customers.limit,
-        currentPage: store.state.customers.currentPage
+        totalPage: store.state.payment.totalPage,
+        limit: store.state.payment.limit,
+        currentPage: store.state.payment.currentPage
     }
 })
 
@@ -151,14 +167,15 @@ const deleteConfirm = async (id) => {
     deleteModel.value = true
     deleteCustomerId = id
 }
+
 const doSearch = async () => {
     const query = {
         page: filter.value.currentPage,
-        name: filter.value.name,
-        contact_name: filter.value.contact_name,
-        phone: filter.value.phone
+        customer_id: filter.value.customer_id ? filter.value.customer_id : '',
+        payment_mode: filter.value.payment_mode ? filter.value.payment_mode : '',
+        payment_number: filter.value.payment_number,
     }
-    await store.dispatch('customers/fetchAll', { query });
+    await store.dispatch('payment/fetchAll', { query });
 }
 const deleteCustomer = async () => {
     if (deleteCustomerId) {
@@ -193,14 +210,17 @@ watch(selectCustomer, async (val) => {
 const checkAllCustomer = () => {
     if (!checkAll.value) {
         selectCustomer.value = customers.value.map(i => i._id)
-    }else{
+    } else {
         selectCustomer.value = []
     }
 }
 
 //mounted
 onMounted(async () => {
+    await store.dispatch("payment/fetchPaymentModes");
+    await store.dispatch("invoices/fetchAllCustomers");
     resetFilter()
+    doSearch()
 });
 
 </script>
