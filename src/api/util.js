@@ -20,6 +20,15 @@ const api = {
     },
     addPaymentMode(model) {
         return axios.post(`/paymentmodes`, model)
+    },
+    expenseCategory(){
+        return axios.get(`/expenseCategory`)
+    },
+    addExpenseCategory(model){
+        return axios.post(`/expenseCategory`, model)
+    },
+    deleteExpenseCategory(id){
+        return axios.delete(`/expenseCategory/${id}`)
     }
 }
 export default api

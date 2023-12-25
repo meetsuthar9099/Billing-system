@@ -47,6 +47,30 @@ const router = createRouter({
           meta: { requiresAuth: true, group: 'Invoice' }
         },
         {
+          name: 'expenses',
+          path: 'expenses',
+          component: () => import('../pages/expenses/expenses-list.vue'),
+          meta: { requiresAuth: true, group: 'Expenses' }
+        },
+        {
+          name: 'expenses_view',
+          path: 'expense/:id',
+          component: () => import('../pages/expenses/expenses-view.vue'),
+          meta: { requiresAuth: true, group: 'Expenses' }
+        },
+        {
+          name: 'reports',
+          path: 'reports',
+          component: () => import('../pages/reports/report-list.vue'),
+          meta: { requiresAuth: true, group: 'Reports' }
+        },
+        {
+          name: 'reports_view',
+          path: 'report/:id',
+          component: () => import('../pages/reports/report-view.vue'),
+          meta: { requiresAuth: true, group: 'Reports' }
+        },
+        {
           name: 'payment',
           path: 'payment',
           component: () => import('../pages/payment/payment-list.vue'),
@@ -75,12 +99,6 @@ const router = createRouter({
           path: 'customer/:id',
           component: () => import('../pages/customer/customer-view.vue'),
           meta: { requiresAuth: true, group: 'Customer' }
-        },
-        {
-          name: 'account_settings',
-          path: 'account-settings',
-          component: () => import('../pages/account-settings.vue'),
-          meta: { requiresAuth: true, group: 'Account Settings' }
         },
         {
           name: 'settings',

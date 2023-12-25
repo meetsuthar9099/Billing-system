@@ -6,7 +6,8 @@ export default {
     namespaced: true,
     state: {
         currencies: [],
-        paymentMode: []
+        paymentMode: [],
+        expenseCategory:[]
     },
     mutations: {
         SET_CURRENCIES(state, payload) {
@@ -14,6 +15,9 @@ export default {
         },
         SET_PAYMENT_MODE(state, payload) {
             state.paymentMode = payload
+        },
+        SET_EXPENSE_CATEGORY(state, payload) {
+            state.expenseCategory = payload
         }
     },
     actions: {
@@ -79,5 +83,28 @@ export default {
                 throw error
             }
         },
+        async fetchExpenseCategory({commit},model){
+            try {
+                const response = await api.expenseCategory()
+                const {category} = response.data
+                commit('SET_EXPENSE_CATEGORY',category)
+            } catch (error) {
+                throw error
+            }
+        },
+        async addExpenseCategory({},model){
+            try {
+                await api.addExpenseCategory(model)
+            } catch (error) {
+                throw error
+            }
+        },
+        async deleteExpenseCategory({},id){
+            try {
+                await api.deleteExpenseCategory(id)
+            } catch (error) {
+                throw error
+            }
+        }
     },
 }

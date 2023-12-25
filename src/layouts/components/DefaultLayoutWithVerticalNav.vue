@@ -94,6 +94,12 @@ const routeItem = computed(() => {
         to: '/payment',
         group: 'Payment',
       }" />
+      <VerticalNavLink v-if="checkPermission('View Expense')" :item="{
+        title: 'Expenses',
+        icon: 'mdi-calculator',
+        to: '/expenses',
+        group: 'expenses',
+      }" />
       <VDivider class="my-4"></VDivider>
       <VerticalNavLink :item="{
         title: 'Setting',
@@ -106,6 +112,12 @@ const routeItem = computed(() => {
         icon: 'mdi-book',
         to: '/auditLogs',
         group: 'AuditLogs',
+      }" />
+      <VerticalNavLink v-if="checkPermission('View Expense')" :item="{
+        title: 'Reports',
+        icon: 'mdi-analytics',
+        to: '/reports',
+        group: 'Reports',
       }" />
       <!-- 
       <VerticalNavSectionTitle :item="{
