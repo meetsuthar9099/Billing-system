@@ -24,14 +24,14 @@
     <v-card class="mb-5">
       <VRow>
         <VCol cols="6" class="text-start d-flex align-center gap-2 pa-5">
-          <span>Page {{ page }} of {{ totalPages }} - Total Payment Mode: {{ paymentModes && paymentModes.length }}</span>
+          <span>Page {{ page }} of {{ totalPages }} - Total: {{ paymentModes && paymentModes.length }}</span>
         </VCol>
         <VCol cols="6" class="d-flex justify-end gap-3 align-center pa-5">
           <div class="w-25">
             <v-select :items="[5, 10, 15, 20]" v-model="itemsPerPage" density="comfortable" variant="underlined"
               label="Item Per Page"></v-select>
           </div>
-          <v-btn color="success" @click="addpaymentMode = true">Add paymentMode</v-btn>
+          <v-btn @click="addpaymentMode = true"><v-icon>mdi-plus-circle</v-icon>&nbsp;Add</v-btn>
         </VCol>
       </VRow>
     </v-card>

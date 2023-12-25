@@ -380,6 +380,7 @@ onMounted(async () => {
     console.log(model.value.transaction_fee, "Transaction")
     model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD');
     model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD');
+    model.value.currency_symbol = customer.value.primary_currency.symbol
     currencySymbol.value = customer.value.primary_currency.symbol
     await store.dispatch("invoices/fetchProjects", { customer_id: model.value.customer_id, invoice_id: getId });
   }

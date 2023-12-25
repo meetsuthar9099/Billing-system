@@ -19,7 +19,7 @@ const api = {
         return axios.get(`/customerProjectTasks/${id}`)
     },
     addInvoice(model) {
-        return axios.post(`/invoice`, model)
+        return axios.post(`/invoices`, model)
     },
     editInvoice(id, model){
         return axios.put(`/invoice/${id}`, model)

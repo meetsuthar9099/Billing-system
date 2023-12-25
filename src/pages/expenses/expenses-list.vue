@@ -3,10 +3,10 @@
         <v-card>
             <v-card-title>Confirmation</v-card-title>
             <v-card-text>
-                Are you sure you want to delete these customers?
+                Are you sure you want to delete these expenses?
             </v-card-text>
             <v-card-actions>
-                <v-btn @click="bulkDeleteCustomer()">Yes</v-btn>
+                <v-btn @click="bulkDeleteexpense()">Yes</v-btn>
                 <v-btn @click="deleteModel = false">No</v-btn>
             </v-card-actions>
         </v-card>
@@ -15,10 +15,10 @@
         <v-card>
             <v-card-title>Confirmation</v-card-title>
             <v-card-text>
-                Are you sure you want to delete this customer?
+                Are you sure you want to delete this expense?
             </v-card-text>
             <v-card-actions>
-                <v-btn @click="deleteCustomer()">Yes</v-btn>
+                <v-btn @click="deleteExpense()">Yes</v-btn>
                 <v-btn @click="deleteModel = false">No</v-btn>
             </v-card-actions>
         </v-card>
@@ -30,7 +30,7 @@
                     <div><span>Page {{ pagination.currentPage }} of {{ pagination.totalPage }}</span></div>
                 </v-col>
                 <v-col cols="6" class="d-flex justify-end">
-                    <v-btn class="me-2" variant="outlined" v-if="selectCustomer.length > 1"
+                    <v-btn class="me-2" variant="outlined" v-if="selectExpense.length > 1"
                         @click="bulkDeleteModel = true">Bulk
                         Delete</v-btn>
 
@@ -38,9 +38,9 @@
                         <span>filter</span>
                         <v-icon>{{ isFilterVisible ? 'mdi-close' : 'mdi-filter' }}</v-icon>
                     </v-btn>
-                    <v-btn v-if="checkPermission('Add Customer')" :to="{ path: 'customer/0' }">
+                    <v-btn v-if="checkPermission('Add Expense')" :to="{ path: 'expense/0' }">
                         <v-icon>mdi-plus</v-icon>
-                        <span>Add Customer</span>
+                        <span>Add expense</span>
                     </v-btn>
 
                 </v-col>
@@ -53,14 +53,20 @@
                 </v-col>
                 <v-col cols="12">
                     <v-row>
-                        <v-col cols="4">
-                            <VTextField label="Display Name" v-model="filter.name" density="compact"></VTextField>
+                        <v-col cols="3">
+                            <VSelect label="Customer" item-title="name" item-value="_id" :items="customers" v-model="filter.customer" density="compact">
+                            </VSelect>
                         </v-col>
-                        <v-col cols="4">
-                            <VTextField label="Contact Name" v-model="filter.contact_name" density="compact"></VTextField>
+                        <v-col cols="3">
+                            <VSelect label="Category" item-title="category_name" item-value="_id" :items="categories" v-model="filter.category" density="compact">
+                            </VSelect>
                         </v-col>
-                        <v-col cols="4">
-                            <VTextField label="Phone" v-model="filter.phone" density="compact"></VTextField>
+                        <v-col cols="3">
+                            <VTextField type="date" label="From Date" v-model="filter.due_from" density="compact">
+                            </VTextField>
+                        </v-col>
+                        <v-col cols="3">
+                            <VTextField type="date" label="To Date" v-model="filter.due_to" density="compact"></VTextField>
                         </v-col>
                     </v-row>
                 </v-col>
@@ -71,42 +77,43 @@
             <thead slot="head">
                 <tr>
                     <th>
-                        <v-checkbox v-model="checkAll" :value="true" @click="checkAllCustomer"
-                            ref="myCheckbox"></v-checkbox>
+                        <v-checkbox v-model="checkAll" :value="true" @click="checkAllexpense" ref="myCheckbox"></v-checkbox>
                     </th>
-                    <th>Name</th>
-                    <th>Contact Name</th>
-                    <th>Email</th>
-                    <th>phone</th>
-                    <th v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">Actions</th>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Customer</th>
+                    <th>Note</th>
+                    <th>Amount</th>
+                    <th v-if="checkPermission('Update Expense') || checkPermission('Delete Expense')">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="(item, index) in customers" :key="'customer' + index">
+                <tr v-for="(item, index) in expenses" :key="'expense' + index">
                     <td width="100">
-                        <v-checkbox :value="item._id" v-model="selectCustomer"></v-checkbox>
+                        <v-checkbox :value="item._id" v-model="selectExpense"></v-checkbox>
                     </td>
-                    <td>{{ item.name }}</td>
-                    <td>{{ item.contact_name ? item.contact_name : '-' }}</td>
-                    <td>{{ item.email ? item.email : '-' }}</td>
-                    <td>{{ item.phone ? item.phone : '-' }}</td>
-                    <td width="200" v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">
+                    <td>{{ moment(item.due_date).format('DD-MM-YYYY') }}</td>
+                    <td>{{ item.category ? item.category.category_name : "-" }}</td>
+                    <td>{{ item.customer ? item.customer.name : "-" }}</td>
+                    <td>{{ item.note ? item.note : '-' }}</td>
+                    <td>{{ item.amount ? item.amount : '-' }}</td>
+                    <td width="200" v-if="checkPermission('Update Expense') || checkPermission('Delete Expense')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
                                 <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
                             <v-list>
-                                <v-list-item v-if="checkPermission('Update Customer')" :to="'customer/' + item._id">
+                                <v-list-item v-if="checkPermission('Update Expense')" :to="'expense/' + item._id">
                                     <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
                                 </v-list-item>
-                                <v-list-item v-if="checkPermission('Delete Customer')" @click="deleteConfirm(item._id)">
+                                <v-list-item v-if="checkPermission('Delete Expense')" @click="deleteConfirm(item._id)">
                                     <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
                     </td>
                 </tr>
-                <tr v-if="!customers.length > 0">
+                <tr v-if="!expenses.length > 0">
                     <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
@@ -119,62 +126,64 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
-import {checkPermission}  from '@/mixins/permissionMixin'
+import { checkPermission } from '@/mixins/permissionMixin'
+import moment from 'moment';
 
 const defaultFilter = Object.freeze({
-    currentPage: 1,
-    name: '',
-    contact_name: '',
-    phone: null,
-    limit: 5
+    customer: null,
+    category: null,
+    due_from: null,
+    due_to: null,
 })
-let deleteCustomerId = null
+let deleteExpenseId = null
 const store = inject('store');
 const isFilterVisible = ref(false)
 const bulkDeleteModel = ref(false)
 const deleteModel = ref(false)
 let checkAll = ref(false)
 const filter = ref({})
-const selectCustomer = ref([])
+const selectExpense = ref([])
 // const myCheckbox = ref(null);
 
 //computed
-const customers = computed(() => { return store.state.customers.customerUsers })
+const customers = computed(() => store.state.expenses.customers)
+const categories = computed(() => store.state.expenses.categories)
+const expenses = computed(() => { return store.state.expenses.items })
 
 const pagination = computed(() => {
     return {
-        totalPage: store.state.customers.totalPage,
-        limit: store.state.customers.limit,
-        currentPage: store.state.customers.currentPage
+        totalPage: store.state.expenses.totalPage,
+        limit: store.state.expenses.limit,
+        currentPage: store.state.expenses.currentPage
     }
 })
 
 //method
 const deleteConfirm = async (id) => {
     deleteModel.value = true
-    deleteCustomerId = id
+    deleteExpenseId = id
 }
 const doSearch = async () => {
     const query = {
-        page: filter.value.currentPage,
-        name: filter.value.name,
-        contact_name: filter.value.contact_name,
-        phone: filter.value.phone
+        customer: filter.value.customer,
+        category: filter.value.category,
+        due_from: filter.value.due_from,
+        due_to: filter.value.due_to
     }
-    await store.dispatch('customers/fetchAll', { query });
+    await store.dispatch('expenses/fetchExpenses');
 }
-const deleteCustomer = async () => {
-    if (deleteCustomerId) {
-        await store.dispatch('customers/deleteCustomer', deleteCustomerId);
+const deleteExpense = async () => {
+    if (deleteExpenseId) {
+        await store.dispatch('expenses/deleteExpense', deleteExpenseId);
         deleteModel.value = false
         doSearch()
     }
 }
-const bulkDeleteCustomer = async () => {
-    if (!!selectCustomer.value.length) {
-        await store.dispatch('customers/bulkDeleteCustomer', selectCustomer.value);
+const bulkDeleteexpense = async () => {
+    if (!!selectExpense.value.length) {
+        await store.dispatch('expenses/bulkDeleteexpense', selectExpense.value);
         bulkDeleteModel.value = false
-        selectCustomer.value = []
+        selectExpense.value = []
         doSearch()
     }
 }
@@ -188,21 +197,22 @@ watch(filter, async () => {
     doSearch()
 }, { deep: true })
 
-watch(selectCustomer, async (val) => {
-    console.log(val, "selectCustomer");
-    checkAll.value = !!(val.length === customers.value.length)
+watch(selectExpense, async (val) => {
+    checkAll.value = !!(val.length === expenses.value.length)
 }, { deep: true })
 
-const checkAllCustomer = () => {
+const checkAllexpense = () => {
     if (!checkAll.value) {
-        selectCustomer.value = customers.value.map(i => i._id)
-    }else{
-        selectCustomer.value = []
+        selectExpense.value = expenses.value.map(i => i._id)
+    } else {
+        selectExpense.value = []
     }
 }
 
 //mounted
 onMounted(async () => {
+    await store.dispatch("expenses/fetchCustomer")
+    await store.dispatch("expenses/fetchCategory")
     resetFilter()
 });
 

@@ -24,23 +24,23 @@
                             </VCol>
 
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Payment Number" v-model="model.payment_number"
-                                    placeholder="PAY-XXXX" />
+                                <VTextField density="comfortable" :rules="rules.text" label="Payment Number"
+                                    v-model="model.payment_number" placeholder="PAY-XXXX" />
                             </VCol>
                         </VRow>
                     </VCol>
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VSelect density="comfortable" item-title="name" item-value="_id" :hide-selected="true" label="Select Customer"
-                                    name="customer_name" :rules="rules.date" :items="allCustomers"
+                                <VSelect density="comfortable" item-title="name" item-value="_id" :hide-selected="true"
+                                    label="Select Customer" name="customer_name" :rules="rules.text" :items="allCustomers"
                                     v-model="model.customer_id" prepend-inner-icon="bx-user" />
                             </VCol>
                             <VCol cols="6">
                                 <VSelect density="comfortable"
                                     :item-title="item => `${item.invoice_number} (${item.currency && item.currency.symbol} ${item.grand_total})`"
                                     item-value="_id" :hide-selected="true" label="Select Invoice" name="currency"
-                                    :rules="rules.date" :items="invoices" v-model="model.invoice_id"
+                                    :rules="rules.text" :items="invoices" v-model="model.invoice_id"
                                     prepend-inner-icon="bx-user" />
                                 <span class="text-muted" v-if="model.invoice_id"> Due Amount:{{ getId == 0 ? amount_due :
                                     total_cost }} </span>
@@ -55,16 +55,16 @@
                                         <VTextField density="comfortable" :value="currency_symbol" type="text" readonly />
                                     </v-col>
                                     <v-col cols="11">
-                                        <VTextField density="comfortable" label="Amount"
-                                            :class="{ 'red-border': amountError }" v-model="model.amount" type="number" :min="0" :max="amount_due" />
+                                        <VTextField density="comfortable" label="Amount" :rules="rules.amount"
+                                            :class="{ 'red-border': amountError }" v-model="model.amount" type="number"
+                                            :min="0" :max="amount_due" />
                                     </v-col>
                                 </v-row>
-                                <span class="amountError" v-if="amountError"> Entered Payment is more than due amount of this invoice.</span>
                             </VCol>
                             <VCol cols="6">
                                 <VSelect item-title="name" density="comfortable" item-value="value" :hide-selected="true"
                                     label="Select Payment Mode" name="payment_mode" :items="paymentModes"
-                                    v-model="model.payment_mode" prepend-inner-icon="bx-user" />
+                                    :rules="rules.text" v-model="model.payment_mode" prepend-inner-icon="bx-user" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -184,14 +184,14 @@ watchEffect(async () => {
 watchEffect(async () => {
     try {
         if (model.value.invoice_id) {
-            const otherPaymentData = payments.value.filter(x =>(x.invoice_id ==  model.value.invoice_id && x._id !== model.value._id))
+            const otherPaymentData = payments.value.filter(x => (x.invoice_id == model.value.invoice_id && x._id !== model.value._id))
             const totalAmount = otherPaymentData.reduce((accumulator, currentValue) => {
                 accumulator += currentValue.amount;
                 return accumulator
             }, 0);
             console.log("otherInvoiceData", totalAmount)
             const invoiceData = invoices.value.find(x => x._id == model.value.invoice_id)
-            total_cost.value = invoiceData && invoiceData.grand_total - totalAmount             
+            total_cost.value = invoiceData && invoiceData.grand_total - totalAmount
             // if(invoiceData !=='undefined'){
             console.log("invoiceData._id", invoiceData)
             currency_symbol.value = invoiceData && invoiceData.currency.symbol
@@ -210,6 +210,11 @@ const rules = {
         (v) => !!v || "This Email is Required",
         (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
     ],
+    amount: [
+        () => !!amount_due.value || "First Select Invoice to Enter an Amount",
+        (v) => !!v || "This Amount is Required",
+        (v) => (v <= 0 || v <= amount_due.value) || `Payment should be between 0 to ${amount_due.value}`
+    ]
 };
 const form = ref(null);
 const onSubmit = async () => {

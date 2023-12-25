@@ -30,14 +30,14 @@
         <v-card class="mb-5">
             <VRow>
                 <VCol cols="6" class="text-start d-flex align-center gap-2 pa-5">
-                    <span>Page {{ page }} of {{ totalPages }} - Total Currency: {{ currencies && currencies.length }}</span>
+                    <span>Page {{ page }} of {{ totalPages }} - Total: {{ currencies && currencies.length }}</span>
                 </VCol>
                 <VCol cols="6" class="d-flex justify-end gap-3 align-center pa-5">
                     <div class="w-25">
                         <v-select :items="[5, 10, 15, 20]" v-model="itemsPerPage" density="comfortable" variant="underlined"
                             label="Item Per Page"></v-select>
                     </div>
-                    <v-btn color="success" @click="addCurrency = true">Add Currency</v-btn>
+                    <v-btn @click="addCurrency = true"><v-icon>mdi-plus-circle</v-icon>&nbsp;Add</v-btn>
                 </VCol>
             </VRow>
         </v-card>
@@ -61,7 +61,7 @@
                         <td>{{ item.symbol }}</td>
                         <td>
                             <div class="w-100 d-flex justify-center">
-                                {{ item.is_default?'Yes':'No' }}
+                                {{ item.is_default ? 'Yes' : 'No' }}
                             </div>
                         </td>
                         <td width="auto" class="d-flex gap-2 justify-center align-center">
