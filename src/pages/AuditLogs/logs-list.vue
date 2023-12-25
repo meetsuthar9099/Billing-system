@@ -57,7 +57,7 @@
                     <td>{{ item.timestamp ? moment(item.timestamp).format('DD-MM-YYYY hh:mm:ss a') : '-' }}</td>
                     <td>{{ item.meta.type ? item.meta.type : '-' }}</td>
                     <td>{{ item.meta.user_id ? userName(item.meta.user_id) : '-' }}</td>
-                    <td>{{ item.message }}</td>
+                    <td v-html="item.message"/>
 
                 </tr>
                 <tr v-if="!logs.length > 0">

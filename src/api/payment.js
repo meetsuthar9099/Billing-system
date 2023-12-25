@@ -11,10 +11,10 @@ export default {
         return await axios.get(`paymentmodes`)
     },
     async payment(id){
-        return axios.get(`/editPayment/${id}`)
+        return axios.get(`/payments/${id}`)
     },
     async editPayment(id, model){
-        return axios.post(`/editPayment/${id}`, model)
+        return axios.post(`/payments/${id}`, model)
     },
     async addPayment(payload) {
         return axios.post('/addPayment', payload)
