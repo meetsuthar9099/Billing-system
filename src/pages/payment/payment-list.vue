@@ -6,7 +6,7 @@
                 Are you sure you want to delete these customers?
             </v-card-text>
             <v-card-actions>
-                <v-btn @click="bulkDeleteCustomer()">Yes</v-btn>
+                <v-btn @click="bulkdeletePayment()">Yes</v-btn>
                 <v-btn @click="deleteModel = false">No</v-btn>
             </v-card-actions>
         </v-card>
@@ -18,7 +18,7 @@
                 Are you sure you want to delete this customer?
             </v-card-text>
             <v-card-actions>
-                <v-btn @click="deleteCustomer()">Yes</v-btn>
+                <v-btn @click="deletePayment()">Yes</v-btn>
                 <v-btn @click="deleteModel = false">No</v-btn>
             </v-card-actions>
         </v-card>
@@ -136,7 +136,7 @@ const defaultFilter = Object.freeze({
     payment_number: null,
     limit: 5
 })
-let deleteCustomerId = null
+let deletePaymentId = null
 const store = inject('store');
 const isFilterVisible = ref(false)
 const bulkDeleteModel = ref(false)
@@ -165,7 +165,7 @@ const pagination = computed(() => {
 //method
 const deleteConfirm = async (id) => {
     deleteModel.value = true
-    deleteCustomerId = id
+    deletePaymentId = id
 }
 
 const doSearch = async () => {
@@ -177,16 +177,16 @@ const doSearch = async () => {
     }
     await store.dispatch('payment/fetchAll', { query });
 }
-const deleteCustomer = async () => {
-    if (deleteCustomerId) {
-        await store.dispatch('customers/deleteCustomer', deleteCustomerId);
+const deletePayment = async () => {
+    if (deletePaymentId) {
+        await store.dispatch('payment/deletePayment', deletePaymentId);
         deleteModel.value = false
         doSearch()
     }
 }
-const bulkDeleteCustomer = async () => {
+const bulkdeletePayment = async () => {
     if (!!selectCustomer.value.length) {
-        await store.dispatch('customers/bulkDeleteCustomer', selectCustomer.value);
+        await store.dispatch('customers/bulkdeletePayment', selectCustomer.value);
         bulkDeleteModel.value = false
         selectCustomer.value = []
         doSearch()

@@ -59,8 +59,8 @@ export default {
       commit("SET_LIMIT", data.limit);
     },
     async fetchAllCustomerInvoice({ commit }, payload) {
-      const { customer_id } = payload;
-      const response = await api.fetchAllCustomerInvoice(customer_id);
+      const { customer_id,edit } = payload;
+      const response = await api.fetchAllCustomerInvoice(customer_id,edit);
       let data = response.data.invoiceData;
       commit("SET_CUSTOMER_INVOICES", data);
     },

@@ -4,7 +4,10 @@ import moment from 'moment';
 const store = inject('store');
 const imageUrl = inject('imageUrl');
 const user = computed(() => store.state.user)
-const userImage = computed(() => imageUrl + user.value.photo)
+const userImage = computed(() => {
+  return user.value.photo ?
+    imageUrl + user.value.photo : 'https://backoffice.codecrewinfotech.com/static/media/01.156de087ecf69314edd6.png'
+})
 const roleName = computed(() => store.state.role.role_name)
 
 watchEffect(() => {

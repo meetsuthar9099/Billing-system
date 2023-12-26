@@ -3,8 +3,8 @@ const api = {
     invoices({ page, invoice_date_from, limit, invoice_date_to, status, customer_id,invoice_number }) {
         return axios.get(`/invoices?page=${page ? page : 1}&limit=${limit ? limit : '10'}&invoice_date_from=${invoice_date_from ? invoice_date_from : ''}&invoice_date_to=${invoice_date_to ? invoice_date_to : ''}&customer_id=${customer_id ? customer_id :''}&status=${status ? status : ''}&invoice_number=${invoice_number ? invoice_number : ''} `)
     },
-    fetchAllCustomerInvoice(customer_id){
-        return axios.get(`/invoices/${customer_id}`)
+    fetchAllCustomerInvoice(customer_id,edit){
+        return axios.get(`/invoices/${customer_id}/${edit}`)
     },
     invoice(id){
         return axios.get(`/invoice/${id}`)

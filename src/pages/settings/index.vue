@@ -18,10 +18,14 @@
                     currency
                 </v-tab>
                 <v-tab value="option-4">
+                    <v-icon class="me-2">mdi-flag</v-icon>
+                    Country
+                </v-tab>
+                <v-tab value="option-5">
                     <v-icon class="me-2">mdi-payment</v-icon>
                     payment Modes
                 </v-tab>
-                <v-tab value="option-5">
+                <v-tab value="option-6">
                     <v-icon class="me-2">mdi-note-text</v-icon>
                     Expense Category
                 </v-tab>
@@ -40,6 +44,9 @@
                     <countrySettings />
                 </v-window-item>
                 <v-window-item value="option-5" class="h-screen overflow-auto pa-3 pb-16">
+                    <paymentMode />
+                </v-window-item>
+                <v-window-item value="option-6" class="h-screen overflow-auto pa-3 pb-16">
                     <expenseCategory />
                 </v-window-item>
             </v-window>
@@ -50,7 +57,8 @@
 import accountSettings from './account-settings.vue'
 import companySettings from './company-settings.vue'
 import currencySettings from './currency-settings.vue'
-import countrySettings from './payment-mode-settings.vue'
+import countrySettings from './country-settings.vue'
+import paymentMode from './payment-mode-settings.vue'
 import expenseCategory from './expense-category.vue'
 import { ref } from 'vue'
 const tab = ref(0)
