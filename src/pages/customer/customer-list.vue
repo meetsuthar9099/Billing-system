@@ -7,7 +7,7 @@
             </v-card-text>
             <v-card-actions>
                 <v-btn @click="bulkDeleteCustomer()">Yes</v-btn>
-                <v-btn @click="deleteModel = false">No</v-btn>
+                <v-btn @click="bulkDeleteModel = false">No</v-btn>
             </v-card-actions>
         </v-card>
     </v-dialog>

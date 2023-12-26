@@ -2,9 +2,11 @@
 import router from '@/router';
 const store = inject('store');
 const imageUrl = inject('imageUrl');
-const user = computed(() => { return store.state.user })
-const userImage = computed(() => { return imageUrl + user.value.photo })
-const roleName = computed(() => { return store.state.role.role_name })
+
+const user = computed(() => store.state.user)
+const userImage = computed(() => user.value.photo ? imageUrl + user.value.photo : 'https://backoffice.codecrewinfotech.com/static/media/01.156de087ecf69314edd6.png')
+const roleName = computed(() => store.state.role.role_name)
+
 const logout = () => {
   store.dispatch('logout').then(() => {
     router.push({ name: 'Login' })

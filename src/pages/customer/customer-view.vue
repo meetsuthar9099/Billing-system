@@ -14,15 +14,15 @@
             <VCard class="pa-8">
                 <VRow>
                     <div>
-                        <v-row align="center" justify="center">
+                        <v-row align="center" justify="center" class="ps-3">
                             <v-col>
-                                <div class="text-right">Export</div>
+                                <div class="text-right"><strong>Export</strong></div>
                             </v-col>
                             <v-col>
                                 <v-switch v-model="model.is_local" color="primary" hide-details></v-switch>
                             </v-col>
                             <v-col>
-                                <div class="text-left">Local</div>
+                                <div class="text-left"><strong>Local</strong></div>
                             </v-col>
                         </v-row>
                     </div>
@@ -33,13 +33,11 @@
                         <VRow>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Company Name" name="display_name"
-                                    :rules="rules.text" v-model="model.name" prepend-inner-icon="bx-user"
-                                    placeholder="John" />
+                                    :rules="rules.text" v-model="model.name" prepend-inner-icon="bx-user" />
                             </VCol>
 
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Contact Name" v-model="model.contact_name"
-                                    placeholder="John Doe" />
+                                <VTextField density="comfortable" label="Contact Name" v-model="model.contact_name" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -47,12 +45,11 @@
                         <VRow>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Email" v-model="model.email"
-                                    prepend-inner-icon="bx-envelope" type="email" :rules="rules.email"
-                                    placeholder="johndoe@email.com" />
+                                    prepend-inner-icon="bx-envelope" type="email" :rules="rules.email" />
                             </VCol>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Mobile" v-model="model.phone" type="number"
-                                    prepend-inner-icon="bx-mobile" placeholder="+1 123 456 7890" />
+                                    prepend-inner-icon="bx-mobile" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -63,18 +60,12 @@
                                     label="Primary Currency" v-model="model.primary_currency" :items="currencies" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Website" v-model="model.website" type="text"
-                                    placeholder="www.johndoe.com" />
+                                <VTextField density="comfortable" label="Website" v-model="model.website" type="text" />
                             </VCol>
                         </VRow>
                     </VCol>
-                    <VCol cols="12">
-                        <VRow>
-                            <VCol cols="6">
-                                <VTextField density="comfortable" label="Prefix" v-model="model.prefix" type="text"
-                                    placeholder="+1 123 456 7890" />
-                            </VCol>
-                        </VRow>
+                    <VCol cols="12" v-if="model.is_local">
+                        <VTextField density="comfortable" label="GSTIN" v-model="model.billing.gstin" />
                     </VCol>
                 </VRow>
             </VCard>
@@ -87,7 +78,7 @@
                         <VRow>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Name" v-model="model.billing.name" type="text"
-                                    prepend-inner-icon="bx-user" placeholder="John" />
+                                    prepend-inner-icon="bx-user" />
                             </VCol>
                             <VCol cols="6">
                                 <VSelect item-title="name" item-value="code" density="comfortable" label="Countries"
@@ -96,39 +87,33 @@
                         </VRow>
                         <VRow>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="State" v-model="model.billing.state" type="text"
-                                    placeholder="Gujarat" />
+                                <VTextField density="comfortable" label="State" v-model="model.billing.state" type="text" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="City" v-model="model.billing.city" type="text"
-                                    placeholder="Ahmedabad" />
+                                <VTextField density="comfortable" label="City" v-model="model.billing.city" type="text" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="6">
                                 <VTextarea label="Address" :auto-grow="true" v-model="model.billing.address_street_1"
-                                    rows="2" :max-rows="6" type="text" placeholder="" />
+                                    rows="2" :max-rows="6" type="text" />
                             </VCol>
                             <VCol cols="6">
                                 <VTextarea :auto-grow="true" label="Address2" v-model="model.billing.address_street_2"
-                                    rows="2" :max-rows="6" type="text" placeholder="" />
+                                    rows="2" :max-rows="6" type="text" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Phone" v-model="model.billing.phone"
-                                    prepend-inner-icon="bx-mobile" type="number" placeholder="" />
+                                    prepend-inner-icon="bx-mobile" type="number" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Zip Code" v-model="model.billing.zip" type="number"
-                                    placeholder="382443" />
+                                <VTextField density="comfortable" label="Zip Code" v-model="model.billing.zip"
+                                    type="number" />
                             </VCol>
                         </VRow>
-                        <VRow>
-                            <VCol cols="12">
-                                <VTextField density="comfortable" label="GSTIN" v-model="model.billing.gstin" />
-                            </VCol>
-                        </VRow>
+
                     </VCol>
                 </VRow>
             </VCard>
@@ -167,7 +152,7 @@ const confirmationDialog = ref(false);
 const router = useRouter();
 const route = useRoute();
 const model = ref({
-    is_local:false,
+    is_local: false,
     name: "",
     project_id: [],
     contact_name: "",
@@ -199,25 +184,7 @@ const model = ref({
     //     gstin: null,
     // },
 });
-const countries = [
-    { name: "United States", code: "US" },
-    { name: "Canada", code: "CA" },
-    { name: "United Kingdom", code: "GB" },
-    { name: "Australia", code: "AU" },
-    { name: "Germany", code: "DE" },
-    { name: "Japan", code: "JP" },
-    { name: "France", code: "FR" },
-    { name: "Brazil", code: "BR" },
-    { name: "India", code: "IN" },
-    { name: "China", code: "CN" },
-    { name: "South Africa", code: "ZA" },
-    { name: "Mexico", code: "MX" },
-    { name: "Italy", code: "IT" },
-    { name: "Spain", code: "ES" },
-    { name: "Russia", code: "RU" },
-    { name: "South Korea", code: "KR" },
-    { name: "New Zealand", code: "NZ" },
-];
+const countries = computed(() => store.state.customers.countries)
 const isEdit = ref(false);
 const customer = computed(() => {
     return store.state.customers.customerUser;
@@ -231,6 +198,7 @@ const currencies = computed(() => {
 let getId = route.params.id;
 onMounted(async () => {
     await store.dispatch("customers/fetchCurrencies");
+    await store.dispatch("customers/fetchCountries");
     if (getId != 0) {
         try {
             await store.dispatch("customers/fetchCustomer", getId);
@@ -238,10 +206,10 @@ onMounted(async () => {
         } catch (error) {
             router.push({ name: '404' })
         }
-    }else{
-        model.value.primary_currency = currencies.value.find(item=>item.is_default)?._id 
+    } else {
+        model.value.primary_currency = currencies.value.find(item => item.is_default)?._id
     }
-    await store.dispatch("customers/fetchProjects",getId);
+    await store.dispatch("customers/fetchProjects", getId);
 });
 
 const rules = {
@@ -257,7 +225,7 @@ const onSubmit = async () => {
         const { valid } = await form.value.validate();
         if (valid) {
             if (route.params.id != 0) {
-               await store.dispatch("customers/editCustomer", {
+                await store.dispatch("customers/editCustomer", {
                     id: route.params.id,
                     model: model.value,
                 });

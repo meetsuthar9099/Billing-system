@@ -24,20 +24,20 @@
             <VCard class="pa-8">
                 <VRow>
                     <VCol cols="6">
-                        <VSelect item-title="category_name" item-value="_id" density="comfortable" :items="categories"
+                        <VSelect item-title="category_name" item-value="_id" density="comfortable" :rules="rules.text" :items="categories"
                             label="Category" v-model="model.category" />
                     </VCol>
                     <VCol cols="6">
-                        <VTextField density="comfortable" label="Date" v-model="model.due_date" />
+                        <VTextField density="comfortable" label="Date" v-model="model.due_date" :rules="rules.text" />
                     </VCol>
                 </VRow>
                 <VRow>
                     <VCol cols="6">
-                        <VTextField density="comfortable" label="Amount" v-model="model.amount" />
+                        <VTextField density="comfortable" label="Amount" v-model="model.amount" :rules="rules.text" />
                     </VCol>
                     <VCol cols="6">
                         <VSelect item-title="name" item-value="_id" density="comfortable" :items="customers"
-                            label="Customer" v-model="model.customer" />
+                            label="Customer" v-model="model.customer" :rules="rules.text" />
                     </VCol>
                 </VRow>
                 <VRow>
@@ -52,10 +52,10 @@
                 <VRow>
                     <VCol cols="6">
                         <v-card class="pa-4 position-relative border">
-                            <v-file-input style="opacity: 0;height:100%; width:100%; top:0; left:-10px; z-index: 999;"
+                            <v-file-input style="opacity: 0;height:100%; width:100%; top:0; left:-10px; z-index: 999; cursor: pointer !important"
                                 :class="{ 'position-absolute': previewImage }" accept="*" show-size @change="imageStore" />
                             <div class="position-absolute d-flex align-center gap-2"
-                                style="top: 23%;left: 36%; z-index: -1;" v-if="!previewImage">
+                                style="top: 23%;left: 36%; z-index: -1;cursor: pointer !important" v-if="!previewImage">
                                 <h3>Upload Receipt</h3><v-icon size="50">mdi-cloud-upload</v-icon>
                             </div>
                             <div class="position-relative" v-if="previewImage">
@@ -120,10 +120,6 @@ const imageStore = (event) => {
         model.value.receipt = event.target.files[0];
         if (model.value.receipt) {
             receiptType.value = model.value.receipt.type.split('/').pop()
-            // const array_of_allowed_files = ["png", "jpeg", "jpg", "gif"];
-            // if (array_of_allowed_files.includes(receiptType.value)) {
-            //     previewImage.value = URL.createObjectURL(model.value.receipt)
-            // } 
             if (receiptType.value == 'pdf') {
                 previewImage.value = "https://cdn4.iconfinder.com/data/icons/file-extensions-1/64/pdfs-512.png"
             }else{

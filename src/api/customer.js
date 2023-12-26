@@ -23,6 +23,9 @@ const api = {
     },
     fetchCurrencies() {
         return axios.get(`/currencies`)
-    }
+    },
+    fetchCountries() {
+        return axios.get(`/country`)
+    },
 }
 export default api

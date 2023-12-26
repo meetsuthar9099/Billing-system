@@ -135,6 +135,13 @@ export default {
           throw error;
         }
       },
+    async deletePayment({}, id) {
+        try {
+          await api.deletePayment(id);
+        } catch (error) {
+          throw error;
+        }
+      },
     async fetchPaymentModes({ commit }) {
       try {
         const response = await api.fetchPaymentModes();

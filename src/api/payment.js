@@ -16,6 +16,9 @@ export default {
     async editPayment(id, model){
         return axios.post(`/payments/${id}`, model)
     },
+    async deletePayment(id){
+        return axios.delete(`/payments/${id}`)
+    },
     async addPayment(payload) {
         return axios.post('/addPayment', payload)
     },
