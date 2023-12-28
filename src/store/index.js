@@ -10,6 +10,7 @@ import paymentModule from "./payment.module"
 import utilModule from "./util.module";
 import auditLogModule from "./auditlogs.module"
 import expensesModule from "./expenses.module";
+import reportsModule from "./reports.module";
 export default createStore({
     modules: {
         customers: customersModule,
@@ -18,7 +19,8 @@ export default createStore({
         payment: paymentModule,
         util:utilModule,
         auditLog: auditLogModule,
-        expenses:expensesModule
+        expenses:expensesModule,
+        reports:reportsModule
     },
     state: {
         user: {},

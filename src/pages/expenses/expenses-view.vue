@@ -24,8 +24,8 @@
             <VCard class="pa-8">
                 <VRow>
                     <VCol cols="6">
-                        <VSelect item-title="category_name" item-value="_id" density="comfortable" :rules="rules.text" :items="categories"
-                            label="Category" v-model="model.category" />
+                        <VSelect item-title="category_name" item-value="_id" density="comfortable" :rules="rules.text"
+                            :items="categories" label="Category" v-model="model.category" />
                     </VCol>
                     <VCol cols="6">
                         <VTextField density="comfortable" label="Date" v-model="model.due_date" :rules="rules.text" />
@@ -33,7 +33,12 @@
                 </VRow>
                 <VRow>
                     <VCol cols="6">
-                        <VTextField density="comfortable" label="Amount" v-model="model.amount" :rules="rules.text" />
+                        <VTextField density="comfortable" type="number" label="Amount" v-model="model.amount"
+                            :rules="rules.text">
+                            <template #append-inner>
+                                <h3 class="px-2">₹</h3>
+                            </template>
+                        </VTextField>
                     </VCol>
                     <VCol cols="6">
                         <VSelect item-title="name" item-value="_id" density="comfortable" :items="customers"
@@ -52,7 +57,8 @@
                 <VRow>
                     <VCol cols="6">
                         <v-card class="pa-4 position-relative border">
-                            <v-file-input style="opacity: 0;height:100%; width:100%; top:0; left:-10px; z-index: 999; cursor: pointer !important"
+                            <v-file-input
+                                style="opacity: 0;height:100%; width:100%; top:0; left:-10px; z-index: 999; cursor: pointer !important"
                                 :class="{ 'position-absolute': previewImage }" accept="*" show-size @change="imageStore" />
                             <div class="position-absolute d-flex align-center gap-2"
                                 style="top: 23%;left: 36%; z-index: -1;cursor: pointer !important" v-if="!previewImage">
@@ -90,11 +96,11 @@ const confirmationDialog = ref(false);
 const router = useRouter();
 const route = useRoute();
 const model = ref({
-    category: "",
+    category: [],
     due_date: moment().format('DD-MM-YYYY'),
     amount: "",
-    customer: "",
-    payment_mode: "",
+    customer: [],
+    payment_mode: [],
     note: "",
     receipt: ""
 });
@@ -122,7 +128,7 @@ const imageStore = (event) => {
             receiptType.value = model.value.receipt.type.split('/').pop()
             if (receiptType.value == 'pdf') {
                 previewImage.value = "https://cdn4.iconfinder.com/data/icons/file-extensions-1/64/pdfs-512.png"
-            }else{
+            } else {
                 throw new Error('Unsupported file extension. Please use PDF')
             }
         } else {
@@ -201,5 +207,4 @@ const copyBilling = (val) => {
     position: sticky;
     z-index: 999;
     top: 0px;
-}
-</style>
+}</style>
