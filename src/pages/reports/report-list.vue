@@ -1,16 +1,17 @@
 <template>
     <div>
-        <VCard class="px-8 border-bottom h-screen">
+        <VCard class="px-8 pb-8 border-bottom h-screen">
             <VCardTitle class="mt-4 pa-0">
                 <h3>Reports</h3>
             </VCardTitle>
-            <div>
+            <div class="d-flex justify-space-between">
                 <VTabs v-model="model.type">
                     <VTab value="sales">Sales</VTab>
                     <VTab value="profit">Profit & Loss</VTab>
                     <VTab value="expenses">Expenses</VTab>
                     <VTab value="taxes">Taxes</VTab>
                 </VTabs>
+                <v-btn class="align-self-center" color="primary" variant="outlined"><v-icon class="me-2">mdi-file-excel</v-icon>Export Excel</v-btn>
             </div>
             <VRow>
                 <VCol cols="4">
@@ -37,23 +38,116 @@
                                 </VTextField>
                             </VCol>
                         </VRow>
-                        <VRow v-if="model.type == 'sales'">
-                            <VCol cols="12">
-                                <VSelect :items="reportType" item-title="value" item-value="key" density="comfortable" v-model="model.report_type"
-                                    label="Report Type"></VSelect>
-                            </VCol>
-                        </VRow>
                         <VRow>
                             <VCol>
-                                <v-btn variant="outlined">Update Report</v-btn>
+                                <v-btn variant="outlined" @click="changeValues">Update Report</v-btn>
                             </VCol>
                         </VRow>
                     </div>
                 </VCol>
-
                 <VCol cols="8">
-                    <div class="h-screen">
-                        <embed width="100%" height="100%" src="http://localhost:3000/reports" />
+                    <div class="h-100 pt-8">
+                        <v-window v-model="model.type" class="w-100">
+                            <v-window-item value="sales">
+                                <v-card border class="overflow-x-hidden pa-5">
+                                    <h2 class="text-center">Total Sales</h2>
+                                    <div v-for="item in reports.customer">
+                                        <h3 class="pa-1">{{ item.customerName }}</h3>
+                                        <VRow class="px-3 mt-0 " v-for="i in item.invoices">
+                                            <VCol cols="6" class="py-2"><span class="ms-4">{{ i.invoice_number }}</span>
+                                            </VCol>
+                                            <VCol cols="6" class="text-end py-2"><span>{{ i.grand_total }} {{
+                                                i.currencyDetails.symbol
+                                            }}</span></VCol>
+                                        </VRow>
+                                        <v-divider class="my-3"></v-divider>
+                                        <VRow class="px-3">
+                                            <VCol cols="12" class="text-end">{{ item.totalGrandTotal }} {{ item.symbol }}
+                                            </VCol>
+                                        </VRow>
+                                    </div>
+
+                                    <VRow class="pa-3">
+                                        <VCol cols="6">
+                                            <h3>Total Sales:</h3>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end"><span v-for="i in total"><span> {{ i.amount }} {{
+                                            i.symbol }}</span><br></span><span v-if="!total.length">0</span></VCol>
+                                    </VRow>
+                                </v-card>
+                            </v-window-item>
+                            <v-window-item value="profit">
+                                <v-card border class="overflow-x-hidden pa-5">
+                                    <h2 class="text-center">Profit & Loss</h2>
+                                    <VRow>
+                                        <VCol cols="6">
+                                            <span>Profit</span>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end">
+                                            <span>{{ reports.profit }}</span>
+                                        </VCol>
+                                    </VRow>
+                                    <VRow>
+                                        <VCol cols="6">
+                                            <span>Expenses</span>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end">
+                                            <span>{{ reports.loss }}</span>
+                                        </VCol>
+                                    </VRow>
+                                    <v-divider class="my-3"></v-divider>
+                                    <VRow>
+                                        <VCol cols="6">
+                                            <h3>Net Profit</h3>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end">
+                                            <span>{{ reports.total }}</span>
+                                        </VCol>
+                                    </VRow>
+                                </v-card>
+                            </v-window-item>
+                            <v-window-item value="expenses">
+                                <v-card border class="overflow-x-hidden pa-5">
+                                    <h2 class="text-center">Expenses</h2>
+                                    <VRow v-for="i in reports.expenses">
+                                        <VCol cols="6"><span>{{ i.category_name }}</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ i.amount }}</span></VCol>
+                                    </VRow>
+                                    <v-divider class="my-3"></v-divider>
+                                    <VRow>
+                                        <VCol cols="6">
+                                            <h3>Total Expenses</h3>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.total }}</span></VCol>
+                                    </VRow>
+
+                                </v-card>
+                            </v-window-item>
+                            <v-window-item value="taxes">
+                                <v-card border class="overflow-x-hidden pa-5">
+                                    <h2 class="text-center">Taxes</h2>
+                                    <VRow>
+                                        <VCol cols="6"><span>CGST</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax.cgst }}</span></VCol>
+                                    </VRow>
+                                    <VRow>
+                                        <VCol cols="6"><span>SGST</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax.sgst }}</span></VCol>
+                                    </VRow>
+                                    <VRow>
+                                        <VCol cols="6"><span>IGST</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax.igst }}</span></VCol>
+                                    </VRow>
+                                    <v-divider class="my-3"></v-divider>
+                                    <VRow>
+                                        <VCol cols="6">
+                                            <h3>Total Taxes</h3>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.totalGst }}</span></VCol>
+                                    </VRow>
+                                </v-card>
+                            </v-window-item>
+                        </v-window>
                     </div>
                 </VCol>
             </VRow>
@@ -61,13 +155,9 @@
     </div>
 </template>
 <script setup>
+import { watch, inject } from 'vue'
 import moment from 'moment';
-const reportType = computed(() => {
-    return [
-        { key: "customer", value: "By Customer" },
-        { key: "item", value: "By Item" }
-    ]
-})
+const store = inject('store')
 const selectedDateRange = computed(() => {
     return [
         { key: "today", value: "Today" },
@@ -84,18 +174,25 @@ const selectedDateRange = computed(() => {
 
 const model = ref({
     type: "sales",
-    date_range: "today",
+    date_range: "this_month",
     date_from: "",
     date_to: "",
-    report_type: "customer"
+})
+const reports = computed(() => store.state.reports.data)
+const total = computed(() => {
+    return reports.value.total && Object.entries(reports.value.total).map(([currency, item]) => ({
+        currency,
+        amount: item.total,
+        symbol: item.symbol
+    }))
 })
 watchEffect(() => {
     if (model.value.date_range) {
         console.log(model.value.date_range, "model.date_range");
         switch (model.value.date_range) {
             case "today":
-                model.value.date_from = moment().format('YYYY-MM-DD')
-                model.value.date_to = moment().format('YYYY-MM-DD')
+                model.value.date_from = moment().startOf('day').format('YYYY-MM-DD')
+                model.value.date_to = moment().endOf('day').format('YYYY-MM-DD')
                 break;
             case "this_week":
                 model.value.date_from = moment().startOf('week').format('YYYY-MM-DD')
@@ -133,8 +230,20 @@ watchEffect(() => {
                 break;
         }
     }
-    if(model.value.type){
-        store.dispatch('expenses/')
-    }
 })
+const changeValues = async () => {
+    try {
+        const dateFrom = model.value.date_from
+        const dateTo = model.value.date_to
+        const value = {
+            type: model.value.type, dateFrom, dateTo
+        }
+        await store.dispatch('reports/fetchData', value)
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+watch(() => model.value.type, async () => {
+    changeValues()
+}, { immediate: true })
 </script>

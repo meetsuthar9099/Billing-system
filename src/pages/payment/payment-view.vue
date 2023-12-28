@@ -234,7 +234,6 @@ watchEffect(async () => {
         const amountInINR = parseFloat((!!model.value.exchange_rate && model.value.exchange_rate != 0) ? model.value.exchange_rate : 1) * parseFloat(model.value.amount ? model.value.amount : 0)
         model.value.amount_in_inr = amountInINR.toFixed(2)
     }
-
 })
 
 const rules = {
@@ -245,7 +244,7 @@ const rules = {
         (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
     ],
     amount: [
-        () => amount_due.value || "First Select Invoice to Enter an Amount",
+        () => getId == 0 ? (amount_due.value || "First Select Invoice to Enter an Amount") : true,
         (v) => !!v || "This Amount is Required",
         (v) => (v <= 0 || v <= (getId != 0 ? total_cost.value : amount_due.value)) || `Payment should be between 0 to ${getId != 0 ? total_cost.value : amount_due.value}`
     ]

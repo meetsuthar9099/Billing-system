@@ -68,7 +68,7 @@
                   </VTextField>
                 </VCol>
                 <VCol cols="6" v-if="!isLocal">
-                  <VTextField type="text" v-model="model.bond_no" density="comfortable" label="LUT/BOND No">
+                  <VTextField type="text" v-model="model.bond_no" :rules="rules.text" density="comfortable" label="LUT/BOND No">
                   </VTextField>
                 </VCol>
               </VRow>
@@ -190,7 +190,7 @@
               </VRow>
             </VCol>
           </VRow>
-          <VRow class="align-center" v-if="isLocal">
+          <VRow v-if="isLocal" class="align-center">
             <VCol cols="9">
               <span>{{ isLocal ? 'Total Amount Before Tax' : 'Total Amount' }}:</span>
             </VCol>
