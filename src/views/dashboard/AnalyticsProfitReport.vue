@@ -1,28 +1,31 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts'
+import moment  from 'moment';
 import {
   useDisplay,
   useTheme,
 } from 'vuetify'
 import { hexToRgb } from '@layouts/utils'
+const props = defineProps({
+  profileReportArray: {
+    type: Array,
+  },
+  dashboardData: {
+    type: Object,
+  },
+})
 
 const vuetifyTheme = useTheme()
 const display = useDisplay()
 
-const series = [{
-  data: [
-    30,
-    58,
-    35,
-    53,
-    50,
-    68,
-  ],
-}]
+const series = computed(() => [{
+  data: props.profileReportArray
+}
+])
 
 const chartOptions = computed(() => {
   const currentTheme = vuetifyTheme.current.value.colors
-  
+
   return {
     chart: {
       parentHeightOffset: 0,
@@ -37,7 +40,7 @@ const chartOptions = computed(() => {
       },
     },
     tooltip: { enabled: false },
-    colors: [`rgba(${ hexToRgb(String(currentTheme.warning)) }, 1)`],
+    colors: [`rgba(${hexToRgb(String(currentTheme.warning))}, 1)`],
     stroke: {
       width: 4,
       curve: 'smooth',
@@ -90,34 +93,24 @@ const chartOptions = computed(() => {
             Profile Report
           </h6>
           <VChip color="warning">
-            Year 2022
+            {{ moment().year() }}
           </VChip>
         </div>
 
         <div>
-          <div class="text-success text-sm">
-            <VIcon
-              icon="bx-up-arrow-alt"
-              size="18"
-              class="me-1"
-            />
-            <span>68.2%</span>
+          <div  class="text-success text-sm">
+            <VIcon icon="bx-up-arrow-alt"  size="18" class="me-1" />
+            <span>{{props.dashboardData?.profitFromLastYear }}</span>
           </div>
 
           <h5 class="text-h5">
-            $84,686k
+            ₹ {{ props.dashboardData?.totalProfit }}
           </h5>
         </div>
       </div>
 
       <div class="h-100 d-flex align-center">
-        <VueApexCharts
-          type="line"
-          :height="131"
-          width="80%"
-          :options="chartOptions"
-          :series="series"
-        />
+        <VueApexCharts type="line" :height="131" width="80%" :options="chartOptions" :series="series" />
       </div>
     </VCardText>
   </VCard>
