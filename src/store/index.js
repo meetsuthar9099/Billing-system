@@ -9,6 +9,7 @@ import companyModule from "./company.module";
 import paymentModule from "./payment.module"
 import utilModule from "./util.module";
 import auditLogModule from "./auditlogs.module"
+import dashboardModule from "./dashboard.module";
 import expensesModule from "./expenses.module";
 import reportsModule from "./reports.module";
 export default createStore({
@@ -17,6 +18,7 @@ export default createStore({
         invoices: invoiceModule,
         company: companyModule,
         payment: paymentModule,
+        dashboard: dashboardModule,
         util:utilModule,
         auditLog: auditLogModule,
         expenses:expensesModule,
