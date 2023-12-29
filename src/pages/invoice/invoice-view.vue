@@ -13,10 +13,14 @@
   <v-snackbar location="top right" v-model="projectError.isError" color="error">
     <v-icon class="me-1">mdi-warning</v-icon><strong>{{ projectError.message }}</strong>
   </v-snackbar>
-  <VForm class="d-flex flex-column" @submit.prevent="onSubmit" ref="form">
+  <v-card v-if="!company" class="px-8 py-6 mb-6">
+    <h3 class="text-error"><v-icon class="me-2 mb-1">mdi-warning</v-icon>Add company detail to create invoice <router-link
+        to="/settings" class="text-primary" style="text-decoration: underline;">Company Detail</router-link></h3>
+  </v-card>
+  <VForm :disabled="!company" class="d-flex flex-column" @submit.prevent="onSubmit" ref="form">
     <VRow>
       <VCol cols="12" md="6">
-        <VCard class="pa-8 h-100">
+        <VCard :disabled="!company" class="pa-8 h-100">
           <VRow>
             <VCol cols="12">
               <VRow>
@@ -49,7 +53,7 @@
         </VCard>
       </VCol>
       <VCol cols="12" md="6">
-        <VCard class="pa-8">
+        <VCard :disabled="!company" class="pa-8">
           <VRow>
             <VCol cols="12">
               <VRow>
@@ -68,7 +72,8 @@
                   </VTextField>
                 </VCol>
                 <VCol cols="6" v-if="!isLocal">
-                  <VTextField type="text" v-model="model.bond_no" :rules="rules.text" density="comfortable" label="LUT/BOND No">
+                  <VTextField type="text" v-model="model.bond_no" :rules="rules.text" density="comfortable"
+                    label="LUT/BOND No">
                   </VTextField>
                 </VCol>
               </VRow>
@@ -79,11 +84,10 @@
     </VRow>
     <VRow>
       <VCol>
-        <VCard class="pa-8">
+        <VCard :disabled="!company" class="pa-8">
           <VTable>
             <thead>
               <th>Particulars</th>
-              <!-- <th>tasks</th> -->
               <th>HSN/SAC</th>
               <th>Rate</th>
               <th>UOM</th>
@@ -156,25 +160,25 @@
     </VRow>
     <VRow>
       <VCol :cols="isLocal ? 6 : 9">
-        <VCard class="pa-8 h-100">
+        <VCard :disabled="!company" class="pa-8 h-100">
           <VRow>
             <VCol :cols="isLocal ? 6 : 3"><span>Bank Account:</span></VCol>
-            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.ac_no }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company?.ac_no }}</strong></VCol>
             <VCol :cols="isLocal ? 6 : 3"><span>Acount Holder Name:</span></VCol>
-            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.ac_holder_name }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company?.ac_holder_name }}</strong></VCol>
             <VCol :cols="isLocal ? 6 : 3"><span>Bank Name:</span></VCol>
-            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.bank_name }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company?.bank_name }}</strong></VCol>
             <VCol :cols="isLocal ? 6 : 3"><span>Swift Number:</span></VCol>
-            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.swift_code }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company?.swift_code }}</strong></VCol>
             <VCol :cols="isLocal ? 6 : 3"><span>Bank IFSC:</span></VCol>
-            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.ifsc_code }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company?.ifsc_code }}</strong></VCol>
             <VCol :cols="isLocal ? 6 : 3"><span>Pan Number:</span></VCol>
-            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company.pan_no }}</strong></VCol>
+            <VCol :cols="isLocal ? 6 : 3"><strong>{{ company?.pan_no }}</strong></VCol>
           </VRow>
         </VCard>
       </VCol>
       <VCol :cols="isLocal ? 6 : 3">
-        <VCard class="pa-8 h-100">
+        <VCard :disabled="!company" class="pa-8 h-100">
           <VRow v-if="!isLocal" class="align-center">
             <VCol cols="6">
               <span>Transaction fee:</span>
@@ -504,9 +508,9 @@ watchEffect(async () => {
           }]
       }
     }
-    isLocal.value = customer.value.is_local
+    isLocal.value = customer.value?.is_local
     if (model.value.customer_id && getId == 0) {
-      await store.dispatch("invoices/getInvoiceNumber", { is_local: customer.value.is_local });
+      await store.dispatch("invoices/getInvoiceNumber", { is_local: customer.value?.is_local });
       currencySymbol.value = customer.value.primary_currency.symbol
       model.value.invoice_number = store.state.invoices.invoiceNumber
     }

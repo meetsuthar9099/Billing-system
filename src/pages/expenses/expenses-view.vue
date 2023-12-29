@@ -76,6 +76,8 @@
             <VCard class="pa-6">
                 <VRow>
                     <VCol class="d-flex justify-end gap-2" cols="12">
+                        <VBtn size="large" color="primary" v-if="getId != 0 && expense.receipt" @click="downloadReceipt">
+                            Download</VBtn>
                         <VBtn size="large" type="submit" color="success">{{ getId == 0 ? "Create" : "Update" }} Expenses
                         </VBtn>
                         <VBtn size="large" @click="router.back()" color="error">Back</VBtn>
@@ -177,12 +179,14 @@ const onSubmit = async () => {
     }
 };
 const expense = computed(() => store.state.expenses.item)
+
 onMounted(async () => {
     await store.dispatch("expenses/fetchCustomer")
     await store.dispatch("expenses/fetchCategory")
     await store.dispatch("expenses/fetchPaymentModes")
     if (route.params.id != 0) {
         await store.dispatch("expenses/fetchExpense", route.params.id)
+        console.log(expense.value,"expense.value");
         model.value = expense.value
         const isPdf = model.value.receipt.split('.').pop() == 'pdf'
         if (isPdf) {
@@ -192,6 +196,9 @@ onMounted(async () => {
         }
     }
 })
+const downloadReceipt = () => {
+    store.dispatch("expenses/fetchReceipt", getId)
+}
 const openModel = () => {
     confirmationDialog.value = true;
 };
@@ -207,4 +214,5 @@ const copyBilling = (val) => {
     position: sticky;
     z-index: 999;
     top: 0px;
-}</style>
+}
+</style>

@@ -70,10 +70,6 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
-                    <th>
-                        <v-checkbox v-model="checkAll" :value="true" @click="checkAllCustomer"
-                            ref="myCheckbox"></v-checkbox>
-                    </th>
                     <th>Name</th>
                     <th>Contact Name</th>
                     <th>Email</th>
@@ -83,9 +79,6 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in customers" :key="'customer' + index">
-                    <td width="100">
-                        <v-checkbox :value="item._id" v-model="selectCustomer"></v-checkbox>
-                    </td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.contact_name ? item.contact_name : '-' }}</td>
                     <td>{{ item.email ? item.email : '-' }}</td>

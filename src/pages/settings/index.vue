@@ -6,12 +6,12 @@
         <div class="d-flex">
             <v-tabs class="" v-model="tab" direction="vertical" color="primary" width="300">
                 <v-tab value="option-1">
-                    <v-icon class="me-2">mdi-user</v-icon>
-                    Account Details
-                </v-tab>
-                <v-tab value="option-2">
                     <v-icon class="me-2">mdi-building</v-icon>
                     Company Information
+                </v-tab>
+                <v-tab value="option-2">
+                    <v-icon class="me-2">mdi-user</v-icon>
+                    Account Details
                 </v-tab>
                 <v-tab value="option-3">
                     <v-icon class="me-2">mdi-currency-inr</v-icon>
@@ -31,11 +31,11 @@
                 </v-tab>
             </v-tabs>
             <v-window v-model="tab" class="w-100">
-                <v-window-item value="option-1" class="h-screen overflow-auto pb-16">
-                    <accountSettings />
-                </v-window-item>
-                <v-window-item value="option-2" class="h-screen overflow-auto pa-3 pb-16">
+                <v-window-item value="option-1" class="h-screen overflow-auto pa-3 pb-16">
                     <companySettings />
+                </v-window-item>
+                <v-window-item value="option-2" class="h-screen overflow-auto pb-16">
+                    <accountSettings />
                 </v-window-item>
                 <v-window-item value="option-3" class="h-screen overflow-auto pa-3 pb-16">
                     <currencySettings />

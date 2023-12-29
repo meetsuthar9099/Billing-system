@@ -11,7 +11,8 @@
                     <VTab value="expenses">Expenses</VTab>
                     <VTab value="taxes">Taxes</VTab>
                 </VTabs>
-                <v-btn class="align-self-center" color="primary" variant="outlined"><v-icon class="me-2">mdi-file-excel</v-icon>Export Excel</v-btn>
+                <v-btn class="align-self-center" color="primary" variant="outlined" @click="exportExcel"><v-icon
+                        class="me-2">mdi-file-excel</v-icon>Export Excel</v-btn>
             </div>
             <VRow>
                 <VCol cols="4">
@@ -56,13 +57,12 @@
                                         <VRow class="px-3 mt-0 " v-for="i in item.invoices">
                                             <VCol cols="6" class="py-2"><span class="ms-4">{{ i.invoice_number }}</span>
                                             </VCol>
-                                            <VCol cols="6" class="text-end py-2"><span>{{ i.grand_total }} {{
-                                                i.currencyDetails.symbol
-                                            }}</span></VCol>
+                                            <VCol cols="6" class="text-end py-2"><span> {{ i.currencyDetails.symbol }} {{
+                                                i.grand_total }}</span></VCol>
                                         </VRow>
                                         <v-divider class="my-3"></v-divider>
                                         <VRow class="px-3">
-                                            <VCol cols="12" class="text-end">{{ item.totalGrandTotal }} {{ item.symbol }}
+                                            <VCol cols="12" class="text-end">{{ item.totalGrandTotal }}
                                             </VCol>
                                         </VRow>
                                     </div>
@@ -71,8 +71,8 @@
                                         <VCol cols="6">
                                             <h3>Total Sales:</h3>
                                         </VCol>
-                                        <VCol cols="6" class="text-end"><span v-for="i in total"><span> {{ i.amount }} {{
-                                            i.symbol }}</span><br></span><span v-if="!total.length">0</span></VCol>
+                                        <VCol cols="6" class="text-end"><span v-for="i in total"><span>{{ i.symbol }} {{
+                                            i.amount }}</span><br></span><span v-if="!total?.length">0</span></VCol>
                                     </VRow>
                                 </v-card>
                             </v-window-item>
@@ -93,6 +93,14 @@
                                         </VCol>
                                         <VCol cols="6" class="text-end">
                                             <span>{{ reports.loss }}</span>
+                                        </VCol>
+                                    </VRow>
+                                    <VRow>
+                                        <VCol cols="6">
+                                            <span>Taxes</span>
+                                        </VCol>
+                                        <VCol cols="6" class="text-end">
+                                            <span>{{ reports.taxes }}</span>
                                         </VCol>
                                     </VRow>
                                     <v-divider class="my-3"></v-divider>
@@ -128,15 +136,15 @@
                                     <h2 class="text-center">Taxes</h2>
                                     <VRow>
                                         <VCol cols="6"><span>CGST</span></VCol>
-                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax.cgst }}</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax?.cgst }}</span></VCol>
                                     </VRow>
                                     <VRow>
                                         <VCol cols="6"><span>SGST</span></VCol>
-                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax.sgst }}</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax?.sgst }}</span></VCol>
                                     </VRow>
                                     <VRow>
                                         <VCol cols="6"><span>IGST</span></VCol>
-                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax.igst }}</span></VCol>
+                                        <VCol cols="6" class="text-end"><span>{{ reports.allTax?.igst }}</span></VCol>
                                     </VRow>
                                     <v-divider class="my-3"></v-divider>
                                     <VRow>
@@ -188,7 +196,6 @@ const total = computed(() => {
 })
 watchEffect(() => {
     if (model.value.date_range) {
-        console.log(model.value.date_range, "model.date_range");
         switch (model.value.date_range) {
             case "today":
                 model.value.date_from = moment().startOf('day').format('YYYY-MM-DD')
@@ -207,8 +214,14 @@ watchEffect(() => {
                 model.value.date_to = moment().endOf('quarter').format('YYYY-MM-DD')
                 break;
             case "this_year":
-                model.value.date_from = moment().startOf('year').format('YYYY-MM-DD')
-                model.value.date_to = moment().endOf('year').format('YYYY-MM-DD')
+                model.value.date_from = moment().month() >= 3 ?
+                    moment().startOf('year').add(3, 'months').format('YYYY-MM-DD') :
+                    moment().subtract(1, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD');
+
+                model.value.date_to = moment().month() >= 3 ?
+                    moment().endOf('year').add(3, 'months').format('YYYY-MM-DD') :
+                    moment().subtract(1, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD')
+
                 break;
             case "previous_week":
                 model.value.date_from = moment().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
@@ -223,22 +236,29 @@ watchEffect(() => {
                 model.value.date_to = moment().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD')
                 break;
             case "previous_year":
-                model.value.date_from = moment().subtract(1, 'year').startOf('year').format('YYYY-MM-DD')
-                model.value.date_to = moment().subtract(1, 'year').endOf('year').format('YYYY-MM-DD')
+                model.value.date_from = moment().month() >= 3 ? moment().subtract(1, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD') : moment().subtract(2, 'years').startOf('year').add(3, 'months').format('YYYY-MM-DD');
+                model.value.date_to = moment().month() >= 3 ? moment().subtract(1, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD') : moment().subtract(2, 'years').endOf('year').add(3, 'months').format('YYYY-MM-DD');
                 break;
             default:
                 break;
         }
     }
 })
-const changeValues = async () => {
+const changeValues = async ({ isExcel } = false) => {
     try {
         const dateFrom = model.value.date_from
         const dateTo = model.value.date_to
         const value = {
-            type: model.value.type, dateFrom, dateTo
+            type: model.value.type, dateFrom, dateTo, isExcel
         }
         await store.dispatch('reports/fetchData', value)
+    } catch (error) {
+        console.error(error.message);
+    }
+}
+const exportExcel = () => {
+    try {
+        return changeValues({ isExcel: true })
     } catch (error) {
         console.error(error.message);
     }

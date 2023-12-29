@@ -59,9 +59,23 @@ export default {
         throw error
       }
     },
+    async fetchReceipt({ }, id) {
+      try {
+        const response = await api.fetchReceipt(id)
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(response.data);
+        link.download = `${id}_${new Date().toISOString()}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } catch (error) {
+        throw error
+      }
+    },
     async fetchExpense({ commit }, id) {
       try {
         const response = await api.fetchExpense(id)
+        console.log(response,"SET_EXPENSE");
         const { expense } = response.data
         commit('SET_EXPENSE', expense)
       } catch (error) {

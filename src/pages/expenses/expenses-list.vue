@@ -76,9 +76,6 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
-                    <th>
-                        <v-checkbox v-model="checkAll" :value="true" @click="checkAllexpense" ref="myCheckbox"></v-checkbox>
-                    </th>
                     <th>Date</th>
                     <th>Category</th>
                     <th>Customer</th>
@@ -89,9 +86,6 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in expenses" :key="'expense' + index">
-                    <td width="100">
-                        <v-checkbox :value="item._id" v-model="selectExpense"></v-checkbox>
-                    </td>
                     <td>{{ moment(item.due_date).format('DD-MM-YYYY') }}</td>
                     <td>{{ item.category ? item.category.category_name : "-" }}</td>
                     <td>{{ item.customer ? item.customer.name : "-" }}</td>
