@@ -102,7 +102,7 @@
             <VCard class="pa-6">
                 <VRow>
                     <VCol class="d-flex justify-end gap-2" cols="12">
-                        <VBtn size="large" :disabled="amountError" type="submit" color="success">{{
+                        <VBtn size="large" type="submit" color="success">{{
                             getId == 0 ? "Create" : "Update" }} Payment</VBtn>
                         <VBtn size="large" @click="router.back()" color="error">Back</VBtn>
                     </VCol>

@@ -42,8 +42,7 @@ const isPositive = controlledComputed(() => props.change, () => Math.sign(props.
       <p class="mb-1">
         {{ props.title }}
       </p>
-      <h5 class="text-h5 text-no-wrap mb-3">
-        {{ props.stats }}
+      <h5 class="text-h5 text-no-wrap mb-3" v-html="props.stats">
       </h5>
       <span
         :class="isPositive ? 'text-success' : 'text-error'"

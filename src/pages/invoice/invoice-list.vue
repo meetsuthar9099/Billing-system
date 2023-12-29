@@ -18,9 +18,6 @@
             <v-form @submit.prevent="submitForm" ref="form" style="padding: 20px;">
                 <v-row>
                     <v-col cols="12" md="12">
-                        <v-text-field v-model="model.from" label="From" required></v-text-field>
-                    </v-col>
-                    <v-col cols="12" md="12">
                         <v-text-field v-model="model.to" label="To" required></v-text-field>
                     </v-col>
                 </v-row>
@@ -39,7 +36,7 @@
 
                 <v-row>
                     <v-col cols="12">
-                        <v-btn type="submit" color="primary">Submit</v-btn>
+                        <v-btn type="submit" :disabled="sending" color="primary">Submit</v-btn>
                     </v-col>
                 </v-row>
             </v-form>
@@ -144,9 +141,6 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
-                    <th>
-                        <v-checkbox v-model="checkAll" ref="myCheckbox"></v-checkbox>
-                    </th>
                     <th>Invoice Number</th>
                     <th>Customer</th>
                     <th>Invoice Date</th>
@@ -159,9 +153,6 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in invoices" :key="'invoice' + index">
-                    <td width="100">
-                        <v-checkbox :value="item._id" @click="bulkDelete"></v-checkbox>
-                    </td>
                     <td>
                         <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ?
                             item.invoice_number : '-' }}</span></router-link>
@@ -235,7 +226,7 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
-import {checkPermission}  from '@/mixins/permissionMixin'
+import { checkPermission } from '@/mixins/permissionMixin'
 import { useRoute, useRouter } from "vue-router";
 import moment from 'moment'
 const defaultFilter = Object.freeze({
@@ -248,6 +239,7 @@ const defaultFilter = Object.freeze({
     limit: 1
 })
 const model = ref({
+    invoice_id: null,
     customer_id: null,
     form: null,
     to: null,
@@ -296,18 +288,19 @@ const deleteConfirm = async (id) => {
 }
 const sendInvoice = async (id) => {
     sendInvoiceModal.value = true
-    model.value.customer_id = id
-    // deleteInvoiceId = id
+    model.value.invoice_id = id
 }
+const sending = ref(false)
 const submitForm = async () => {
     try {
         const { valid } = await form.value.validate();
         if (valid) {
-            console.log("model.value", model.value)
+            sending.value = true
             await store.dispatch("invoices/sendInvoice", model.value);
             sendInvoiceModal.value = false
+            model.value = []
+            sending.value = false
             doSearch()
-
         }
     } catch (error) {
         console.log("error", error)
