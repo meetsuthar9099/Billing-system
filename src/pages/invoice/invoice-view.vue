@@ -62,9 +62,13 @@
                   <VTextField type="date" v-model="model.due_date" :rules="rules.date" density="comfortable"
                     label="Due Date"></VTextField>
                 </VCol>
-                <VCol cols="12">
+                <VCol :cols="isLocal ? 12 : 6">
                   <VTextField type="text" readonly v-model="model.invoice_number" density="comfortable"
                     label="Invoice Number">
+                  </VTextField>
+                </VCol>
+                <VCol cols="6" v-if="!isLocal">
+                  <VTextField type="text" v-model="model.bond_no" :rules="rules.text" density="comfortable" label="LUT/BOND No">
                   </VTextField>
                 </VCol>
               </VRow>
@@ -186,7 +190,7 @@
               </VRow>
             </VCol>
           </VRow>
-          <VRow class="align-center" v-if="isLocal">
+          <VRow v-if="isLocal" class="align-center">
             <VCol cols="9">
               <span>{{ isLocal ? 'Total Amount Before Tax' : 'Total Amount' }}:</span>
             </VCol>
@@ -290,6 +294,7 @@ const model = ref({
       amount: null,
       uom: '',
       quantity: 1,
+      bond_no: '',
       taxable_value: 0,
       rate: null,
       tasks: [],
@@ -511,7 +516,7 @@ watchEffect(async () => {
 });
 const rules = {
   customer: [(v) => !!v || "Customer is Required"],
-  project: [(v) => !!v || "Project/Service is Required"],
+  project: [(v) => !!v || "Particulars is Required"],
   amount: [(v) => !!v || "Amount is Required"],
   date: [(v) => !!v || "Date is Required"],
   qty: [(v) => !!v || "Quantity is Required"],

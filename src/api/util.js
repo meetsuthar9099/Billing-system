@@ -20,6 +20,24 @@ const api = {
     },
     addPaymentMode(model) {
         return axios.post(`/paymentmodes`, model)
+    },
+    expenseCategory() {
+        return axios.get(`/expenseCategory`)
+    },
+    addExpenseCategory(model) {
+        return axios.post(`/expenseCategory`, model)
+    },
+    deleteExpenseCategory(id) {
+        return axios.delete(`/expenseCategory/${id}`)
+    },
+    fetchCountries() {
+        return axios.get(`/country`)
+    },
+    addCountry(payload) {
+        return axios.post(`/country`, payload)
+    },
+    deleteCountry(id) {
+        return axios.delete(`/country/${id}`)
     }
 }
 export default api

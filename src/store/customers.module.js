@@ -11,6 +11,7 @@ export default {
     limit: null,
     projects: [],
     currencies: [],
+    countries: []
   },
   mutations: {
     SET_CUSTOMER(state, payload) {
@@ -24,6 +25,9 @@ export default {
     },
     SET_CUSTOMERS(state, payload) {
       state.customerUsers = payload;
+    },
+    SET_COUNTRIES(state, payload) {
+      state.countries = payload;
     },
     SET_TOTALPAGES(state, payload) {
       state.totalPage = payload;
@@ -64,20 +68,20 @@ export default {
       try {
         // storageCache.reset()
         const response = await api.addCustomer(payload);
-        console.log("response.data.CustomerData",response.data)
+        console.log("response.data.CustomerData", response.data)
         commit("SET_CUSTOMER_ID", response.data._id);
       } catch (error) {
         throw error;
       }
     },
-    async deleteCustomer({}, id) {
+    async deleteCustomer({ }, id) {
       try {
         await api.deleteCustomer(id);
       } catch (error) {
         throw error;
       }
     },
-    async bulkDeleteCustomer({}, arrayId) {
+    async bulkDeleteCustomer({ }, arrayId) {
       try {
         await api.bulkDeleteCustomer(arrayId);
       } catch (error) {
@@ -136,5 +140,17 @@ export default {
         throw error;
       }
     },
+    async fetchCountries({ commit }) {
+      try {
+        const response = await api.fetchCountries()
+        console.log(response,"SET_COUNTRIES");
+        const { countries } = response.data
+        commit('SET_COUNTRIES', countries)
+      }
+      catch (error) {
+        throw error
+      }
+
+    }
   },
 };

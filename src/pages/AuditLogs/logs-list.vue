@@ -117,7 +117,7 @@ const doSearch = async () => {
 const userName = (user_id) => {
     // filter.value = { ...defaultFilter }
     const user = users &&users.value.find(user => user._id.toString() == user_id)
-    return user.firstname+' '+user.last_name  
+    return user?.firstname+' '+user?.last_name  
 }
 
 const resetFilter = () => {

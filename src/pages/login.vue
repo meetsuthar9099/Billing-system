@@ -58,13 +58,13 @@ const isPasswordVisible = ref(false)
           <VRow>
             <!-- email -->
             <VCol cols="12">
-              <VTextField v-model="form.email" required autofocus placeholder="johndoe@email.com" label="Email"
+              <VTextField v-model="form.email" required autofocus label="Email"
                 type="email" />
             </VCol>
 
             <!-- password -->
             <VCol cols="12">
-              <VTextField v-model="form.password" required label="Password" placeholder="············"
+              <VTextField v-model="form.password" required label="Password"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'bx-hide' : 'bx-show'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible" />

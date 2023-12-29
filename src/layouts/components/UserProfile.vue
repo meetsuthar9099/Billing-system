@@ -2,12 +2,15 @@
 import router from '@/router';
 const store = inject('store');
 const imageUrl = inject('imageUrl');
-const user = computed(() => { return store.state.user })
-const userImage = computed(() => { return imageUrl + user.value.photo })
-const roleName = computed(() => { return store.state.role.role_name })
+
+const user = computed(() => store.state.user)
+const userImage = computed(() => user.value.photo ? imageUrl + user.value.photo : 'https://backoffice.codecrewinfotech.com/static/media/01.156de087ecf69314edd6.png')
+const roleName = computed(() => store.state.role.role_name)
+
 const logout = () => {
-  store.dispatch('logout')
-  router.push({ name: 'Login' })
+  store.dispatch('logout').then(() => {
+    router.push({ name: 'Login' })
+  })
 }
 </script>
 
@@ -35,45 +38,6 @@ const logout = () => {
             </VListItemTitle>
             <VListItemSubtitle>{{ roleName }}</VListItemSubtitle>
           </VListItem>
-          <VDivider class="my-2" />
-
-          <!-- 👉 Profile -->
-          <VListItem to="/account-settings">
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-user" size="22" />
-            </template>
-
-            <VListItemTitle>Profile</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Settings -->
-          <VListItem link to="/company-settings">
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-cog" size="22" />
-            </template>
-
-            <VListItemTitle>Company Settings</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 Pricing -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-dollar" size="22" />
-            </template>
-
-            <VListItemTitle>Pricing</VListItemTitle>
-          </VListItem>
-
-          <!-- 👉 FAQ -->
-          <VListItem link>
-            <template #prepend>
-              <VIcon class="me-2" icon="bx-help-circle" size="22" />
-            </template>
-
-            <VListItemTitle>FAQ</VListItemTitle>
-          </VListItem>
-
-          <!-- Divider -->
           <VDivider class="my-2" />
 
           <!-- 👉 Logout -->

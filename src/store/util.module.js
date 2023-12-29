@@ -6,7 +6,9 @@ export default {
     namespaced: true,
     state: {
         currencies: [],
-        paymentMode: []
+        paymentMode: [],
+        expenseCategory: [],
+        countries: []
     },
     mutations: {
         SET_CURRENCIES(state, payload) {
@@ -14,6 +16,12 @@ export default {
         },
         SET_PAYMENT_MODE(state, payload) {
             state.paymentMode = payload
+        },
+        SET_EXPENSE_CATEGORY(state, payload) {
+            state.expenseCategory = payload
+        },
+        SET_COUNTRIES(state, payload) {
+            state.countries = payload
         }
     },
     actions: {
@@ -58,16 +66,16 @@ export default {
                 throw error
             }
         },
-        async addPaymentMode({ },model) {
+        async addPaymentMode({ }, model) {
             try {
-               await api.addPaymentMode(model)
+                await api.addPaymentMode(model)
             } catch (error) {
                 throw error
             }
         },
-        async deletePaymentMode({ },id) {
+        async deletePaymentMode({ }, id) {
             try {
-               await api.deletePaymentMode(id)
+                await api.deletePaymentMode(id)
             } catch (error) {
                 throw error
             }
@@ -79,5 +87,54 @@ export default {
                 throw error
             }
         },
+        async fetchExpenseCategory({ commit }) {
+            try {
+                const response = await api.expenseCategory()
+                const { category } = response.data
+                commit('SET_EXPENSE_CATEGORY', category)
+            } catch (error) {
+                throw error
+            }
+        },
+        async addExpenseCategory({ }, model) {
+            try {
+                await api.addExpenseCategory(model)
+            } catch (error) {
+                throw error
+            }
+        },
+        async deleteExpenseCategory({ }, id) {
+            try {
+                await api.deleteExpenseCategory(id)
+            } catch (error) {
+                throw error
+            }
+        },
+        async fetchCountries({ commit }) {
+            try {
+                const response = await api.fetchCountries()
+                const { countries } = response.data
+                commit('SET_COUNTRIES', countries)
+            }
+            catch (error) {
+                throw error
+            }
+        },
+        async addCountry({ }, payload) {
+            try {
+                await api.addCountry(payload)
+            }
+            catch (error) {
+                throw error
+            }
+        },
+        async deleteCountry({ }, id) {
+            try {
+                await api.deleteCountry(id)
+            }
+            catch (error) {
+                throw error
+            }
+        }
     },
 }
