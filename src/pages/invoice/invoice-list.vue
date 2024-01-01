@@ -141,6 +141,7 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
+                    <th>Sr No</th>
                     <th>Invoice Number</th>
                     <th>Customer</th>
                     <th>Invoice Date</th>
@@ -153,6 +154,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in invoices" :key="'invoice' + index">
+                    <td>{{ item.index }}</td>
                     <td>
                         <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ?
                             item.invoice_number : '-' }}</span></router-link>
@@ -203,18 +205,9 @@
                             </v-list>
                         </v-menu>
                     </td>
-
-                    <!-- <td width="200">
-                        <v-btn class="me-2" color="#03A9F4" :to="'invoice/' + item._id" variant="tonal">
-                            <v-icon>mdi-eye</v-icon>
-                        </v-btn>
-                        <v-btn color="error" @click="deleteConfirm(item._id)" variant="tonal">
-                            <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                    </td> -->
                 </tr>
                 <tr v-if="!invoices.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>
@@ -418,9 +411,12 @@ onMounted(async () => {
 });
 
 </script>
-<style>
+<style >
 .badge-align .v-badge__badge {
-    bottom: calc(100% - 5px) !important;
-    left: calc(100% - 28px) !important;
+    bottom: calc(100% - 6px) !important;
+    left: calc(100% - 15px) !important;
+}
+.v-table>.v-table__wrapper>table>tbody>tr>td {
+    padding: 0px 30px;
 }
 </style>

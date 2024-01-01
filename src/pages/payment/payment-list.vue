@@ -75,8 +75,9 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
+                    <th>Sr No</th>
                     <th>Date</th>
-                    <th>Paymnent Number</th>
+                    <th>Payment Number</th>
                     <th>Customer</th>
                     <th>Invoice Number</th>
                     <th>Payment Mode</th>
@@ -86,16 +87,18 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in payments" :key="'customer' + index">
+                    <td>{{ item.index }}</td>
                     <td>{{ item.date }}</td>
                     <td>{{ item.payment_number }}</td>
                     <td>{{ item.customer.contact_name ? item.customer.contact_name : '-' }}</td>
-                    <td>{{ item.invoice.invoice_number }}</td>
+                    <td><router-link :to="'/invoice/pdf/' + item.invoice._id"><strong>{{ item.invoice.invoice_number }}</strong></router-link>
+                    </td>
                     <td>{{ item.paymentMode.name }}</td>
                     <td>{{ item.currency.symbol }}&nbsp;{{ item.amount.toFixed(2) }}</td>
                     <td width="200" v-if="checkPermission('Update payment') || checkPermission('Delete Payment')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
-                                <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                                <v-btn elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
 
                             <v-list>
@@ -110,7 +113,7 @@
                     </td>
                 </tr>
                 <tr v-if="!payments.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>
@@ -122,7 +125,7 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
-import {checkPermission}  from '@/mixins/permissionMixin'
+import { checkPermission } from '@/mixins/permissionMixin'
 const defaultFilter = Object.freeze({
     payment_mode: null,
     customer_id: null,
@@ -137,10 +140,9 @@ const deleteModel = ref(false)
 let checkAll = ref(false)
 const filter = ref({})
 const selectCustomer = ref([])
-// const myCheckbox = ref(null);
 
 //computed
-const payments = computed(() => { return store.state.payment.payments })
+const payments = computed(() => store.state.payment.payments)
 const allCustomers = computed(() => {
     return store.state.invoices.allCustomers;
 });
@@ -154,6 +156,7 @@ const pagination = computed(() => {
         currentPage: store.state.payment.currentPage
     }
 })
+
 
 //method
 const deleteConfirm = async (id) => {

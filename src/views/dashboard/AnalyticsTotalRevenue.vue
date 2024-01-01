@@ -1,5 +1,6 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts'
+import { reactive } from 'vue'
 import {
   useDisplay,
   useTheme,
@@ -8,11 +9,8 @@ import { hexToRgb } from '@layouts/utils'
 const props = defineProps(['monthlyIncomeArray', 'monthlyExpenseArray']);
 const vuetifyTheme = useTheme()
 const display = useDisplay()
-console.log('Monthly Income Array:', props.monthlyIncomeArray);
-console.log('Monthly Expense Array:', props.monthlyExpenseArray);
 
 const series = computed(() => {
-  console.log('Inside computed function');
   const incomeData = Array.isArray(props.monthlyIncomeArray) ? props.monthlyIncomeArray : [];
   const expenseData = Array.isArray(props.monthlyExpenseArray) ? props.monthlyExpenseArray : [];
 
@@ -256,8 +254,9 @@ const balanceData = [
 #bar-chart .apexcharts-series[rel="2"] {
   transform: translateY(-10px);
 }
+
 .apexcharts-active {
-font-size: 24px;
-color: black;
+  font-size: 24px;
+  color: black;
 }
 </style>

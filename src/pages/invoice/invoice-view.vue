@@ -84,18 +84,18 @@
     </VRow>
     <VRow>
       <VCol>
-        <VCard :disabled="!company" class="pa-8">
+        <VCard :disabled="!company" v-if="model.projects.length > 0" class="pa-8">
           <VTable>
             <thead>
-              <th>Particulars</th>
+              <th style="text-align: center !important;">Particulars</th>
               <th>HSN/SAC</th>
               <th>Rate</th>
               <th>UOM</th>
               <th>Quantity</th>
               <th>Discount</th>
-              <th v-if="isLocal">cgst({{ gstValue.cgst }}%)</th>
-              <th v-if="isLocal">sgst({{ gstValue.sgst }}%)</th>
-              <th v-if="isLocal">igst({{ gstValue.igst }}%)</th>
+              <th v-if="isLocal">cgst({{ model.projects[0].cgst.rate }}%)</th>
+              <th v-if="isLocal">sgst({{ model.projects[0].sgst.rate }}%)</th>
+              <th v-if="isLocal">igst({{ model.projects[0].igst.rate }}%)</th>
               <th>Amount</th>
               <th v-if="isLocal">Tax</th>
               <th v-if="isLocal">Total</th>
@@ -110,13 +110,13 @@
                   <VTextField :disabled="!model.projects[i].id" type="text" density="compact"
                     v-model="model.projects[i].hsa"></VTextField>
                 </td>
-                <td width="150">
+                <td width="210">
                   <VTextField :disabled="!model.projects[i].id" type="number" min="0" :rules="rules.rate"
                     density="compact" v-model="model.projects[i].rate"></VTextField>
                 </td>
-                <td width="150">
-                  <VTextField :disabled="!model.projects[i].id" density="compact" v-model="model.projects[i].uom">
-                  </VTextField>
+                <td width="210">
+                  <v-select density="compact" :disabled="!model.projects[i].id" :items="uom"
+                    v-model="model.projects[i].uom"></v-select>
                 </td>
                 <td width="150">
                   <VTextField :disabled="!model.projects[i].id" type="number" :rules="rules.qty" min="0" density="compact"
@@ -126,17 +126,17 @@
                   <VTextField :disabled="!model.projects[i].id" type="number" min="0" density="compact"
                     prepend-inner-icon="mdi-percent" v-model="model.projects[i].discount"></VTextField>
                 </td>
-                <td width="150" v-if="isLocal">
-                  <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
-                    v-model="model.projects[i].cgst.amount" min="0" max="100"></VTextField>
+                <td width="100" v-if="isLocal">
+                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].cgst.amount" min="0"
+                    max="100"></VTextField>
                 </td>
-                <td width="150" v-if="isLocal">
-                  <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
-                    v-model="model.projects[i].sgst.amount" min="0" max="100"></VTextField>
+                <td width="100" v-if="isLocal">
+                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].sgst.amount" min="0"
+                    max="100"></VTextField>
                 </td>
-                <td width="150" v-if="isLocal">
-                  <VTextField :disabled="!model.projects[i].id" type="number" density="compact"
-                    v-model="model.projects[i].igst.amount" min="0" max="100">
+                <td width="100" v-if="isLocal">
+                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].igst.amount" min="0"
+                    max="100">
                   </VTextField>
                 </td>
                 <td width="150">
@@ -152,8 +152,8 @@
               </tr>
             </tbody>
           </VTable>
-          <v-btn class="w-100 mt-4" color="grey-50 pointer-cursor" @click="addProjectField"><v-icon
-              class="me-1">mdi-plus-circle</v-icon><span>Add New
+          <v-btn v-if="model.projects.length != 0" class="w-100 mt-4" color="grey-50 pointer-cursor"
+            @click="addProjectField"><v-icon class="me-1">mdi-plus-circle</v-icon><span>Add New
               PARTICULARS</span></v-btn>
         </VCard>
       </VCol>
@@ -271,7 +271,7 @@
 </template>
 <script setup>
 import moment from "moment";
-import { nextTick, ref, watchEffect } from "vue";
+import { nextTick, ref, watchEffect, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const store = inject("store");
 const confirmationDialog = ref(false);
@@ -291,24 +291,7 @@ const model = ref({
   invoice_date: moment().format('YYYY-MM-DD'),
   due_date: moment().add(15, 'days').format('YYYY-MM-DD'),
   discount_type: 'Fixed',
-  projects: [
-    {
-      id: null,
-      hsa: null,
-      amount: null,
-      uom: '',
-      quantity: 1,
-      bond_no: '',
-      taxable_value: 0,
-      rate: null,
-      tasks: [],
-      discount: 0,
-      assigned_tasks: [],
-      total: 0,
-      cgst: { rate: 0, amount: 0 },
-      sgst: { rate: 0, amount: 0 },
-      igst: { rate: 0, amount: 0 },
-    }],
+  projects: [],
   total_discount: 0,
   total_without_discount: 0,
   currency_symbol: "₹",
@@ -400,9 +383,8 @@ onMounted(async () => {
 
 });
 
-const company = computed(() => { return store.state.company.settings })
+const company = computed(() => store.state.company.settings)
 
-console.log(customer.value, "gstValue");
 const gstValue = computed(() => {
   if (!customer.value) { return { cgst: 0, sgst: 0, igst: 0 } }
   const isIndia = (customer.value.billing.country_id == "IN")
@@ -413,6 +395,23 @@ const gstValue = computed(() => {
   let gst = (isIndia && isLocal.value)
     ? (isState ? { cgst, sgst, igst: 0 } : { cgst: 0, sgst: 0, igst })
     : { cgst: 0, sgst: 0, igst: 0 };
+  if (getId == 0) model.value.projects = [{
+    id: null,
+    hsa: null,
+    amount: null,
+    uom: '',
+    quantity: 1,
+    bond_no: '',
+    taxable_value: 0,
+    rate: null,
+    tasks: [],
+    discount: 0,
+    assigned_tasks: [],
+    total: 0,
+    cgst: { rate: gst.cgst, amount: 0 },
+    sgst: { rate: gst.sgst, amount: 0 },
+    igst: { rate: gst.igst, amount: 0 },
+  }]
   return gst
 })
 
@@ -443,9 +442,9 @@ watchEffect(async () => {
       discount = (totalWithoutDiscount * project.discount / 100);
       let taxFactor = ((totalWithoutDiscount - discount) * tax / 100);
 
-      project.cgst.amount = ((totalWithoutDiscount - discount) * gstValue.value.cgst / 100);
-      project.sgst.amount = ((totalWithoutDiscount - discount) * gstValue.value.sgst / 100);
-      project.igst.amount = ((totalWithoutDiscount - discount) * gstValue.value.igst / 100);
+      project.cgst.amount = ((totalWithoutDiscount - discount) * project.cgst.rate / 100);
+      project.sgst.amount = ((totalWithoutDiscount - discount) * project.sgst.rate / 100);
+      project.igst.amount = ((totalWithoutDiscount - discount) * project.igst.rate / 100);
 
       totalCGST += project.cgst.amount;
       totalSGST += project.sgst.amount;
@@ -462,9 +461,7 @@ watchEffect(async () => {
   }
 
   model.value.total_cost = totalCost.value ? totalCost.value : 0;
-  // const totalTax = (totalCost.value) * model.value.total_tax / 100;
   model.value.total_tax = addCGST.value + addSGST.value + addIGST.value
-  // model.value.grand_total = totalCost.value + totalTax;
 });
 watchEffect(() => {
   const transactionFee = model.value.transaction_fee;
@@ -518,6 +515,12 @@ watchEffect(async () => {
     console.log("ErrorInLoop", error);
   }
 });
+const uom = computed(() => {
+  return ['Resource',
+    'Hourly',
+    'Monthly'
+  ]
+})
 const rules = {
   customer: [(v) => !!v || "Customer is Required"],
   project: [(v) => !!v || "Particulars is Required"],
@@ -595,10 +598,10 @@ const copyBilling = (val) => {
   confirmationDialog.value = false;
 };
 </script>
-<style>
-.v-table th:first-child {
+<style scoped>
+/* .v-table th:first-child {
   text-align: center !important;
-}
+} */
 
 .v-table>.v-table__wrapper>table>tbody>tr>td {
   padding: 0px 3px !important;

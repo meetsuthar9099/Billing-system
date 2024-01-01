@@ -39,6 +39,7 @@
             <v-table class="rounded">
                 <thead slot="head">
                     <tr>
+                        <th>sr no</th>
                         <th>Name</th>
                         <th>Code</th>
                         <th>Action</th>
@@ -46,21 +47,11 @@
                 </thead>
                 <tbody>
                     <tr v-for="item in paginatedCountries">
+                        <td>{{ item.index }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.code }}</td>
-                        <td class="d-flex gap-2 justify-center align-center">
-                            <v-menu>
-                                <template v-slot:activator="{ props }">
-                                    <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
-                                </template>
-
-                                <v-list>
-                                    <v-list-item>
-                                        <v-list-item-title @click="deleteCountry(item._id)"><v-icon>mdi-delete</v-icon>
-                                            Delete</v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
+                        <td class="px-1">
+                            <v-btn color="none" elevation="0" @click="deleteCountry(item._id)"><v-icon>mdi-delete</v-icon></v-btn>
                         </td>
                     </tr>
                 </tbody>
@@ -92,7 +83,9 @@ const paginatedCountries = computed(() => {
     if (!Countries.value) {
         return [];
     }
-
+    Countries.value.forEach(({ }, i) => {
+        Countries.value[i].index = i + 1
+    });
     const start = (page.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
     return Countries.value.slice(start, end);

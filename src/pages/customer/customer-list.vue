@@ -70,6 +70,7 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
+                    <th>Sr No</th>
                     <th>Name</th>
                     <th>Contact Name</th>
                     <th>Email</th>
@@ -79,6 +80,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in customers" :key="'customer' + index">
+                    <td>{{ item.index  }}</td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.contact_name ? item.contact_name : '-' }}</td>
                     <td>{{ item.email ? item.email : '-' }}</td>
@@ -86,7 +88,7 @@
                     <td width="200" v-if="checkPermission('Update Customer') || checkPermission('Delete Customer')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
-                                <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                                <v-btn elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
                             <v-list>
                                 <v-list-item v-if="checkPermission('Update Customer')" :to="'customer/' + item._id">
@@ -100,7 +102,7 @@
                     </td>
                 </tr>
                 <tr v-if="!customers.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>

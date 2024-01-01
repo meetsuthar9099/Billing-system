@@ -9,7 +9,7 @@
                             <v-text-field name="name" label="Name" v-model="model.name" />
                         </VCol>
                         <VCol cols="12">
-                            <VTextarea name="Category" label="Category" v-model="model.description" />
+                            <VTextarea name="description" label="Description" v-model="model.description" />
                         </VCol>
                     </VRow>
                     <VRow>
@@ -39,6 +39,7 @@
             <v-table class="rounded">
                 <thead slot="head">
                     <tr>
+                        <th>sr no</th>
                         <th>Name</th>
                         <th>Description</th>
                         <th>Action</th>
@@ -46,26 +47,17 @@
                 </thead>
                 <tbody>
                     <tr v-for="item, i in paginatedCategories">
+                        <td>{{ item.index }}</td>
                         <td>{{ item.category_name }}</td>
                         <td>{{ item.description }}</td>
-                        <td width="auto" class="d-flex gap-2 justify-center align-center">
-                            <v-menu>
-                                <template v-slot:activator="{ props }">
-                                    <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
-                                </template>
-
-                                <v-list>
-                                    <v-list-item>
-                                        <v-list-item-title @click="deleteCategory(item._id)"><v-icon>mdi-delete</v-icon>
-                                            Delete</v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
+                        <td width="auto" class="px-1">
+                            <v-btn color="none" elevation="0"
+                                @click="deleteCategory(item._id)"><v-icon>mdi-delete</v-icon></v-btn>
                         </td>
                     </tr>
                     <tr v-if="!paginatedCategories.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
-                </tr>
+                        <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    </tr>
                 </tbody>
             </v-table>
         </VCard>
@@ -81,7 +73,7 @@ const Categories = computed(() => store.state.util.expenseCategory)
 const addCategory = ref(false)
 const model = ref({
     name: "",
-    description:""
+    description: ""
 })
 
 const itemsPerPage = ref(10)
@@ -99,6 +91,9 @@ const paginatedCategories = computed(() => {
 
     const start = (page.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
+    Categories.value.forEach(({ }, i) => {
+        Categories.value[i].index = i + 1
+    });
     return Categories.value.slice(start, end);
 });
 

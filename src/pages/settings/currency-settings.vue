@@ -45,42 +45,23 @@
             <v-table class="rounded">
                 <thead slot="head">
                     <tr>
+                        <th>Sr No</th>
                         <th>Name</th>
                         <th>Currency</th>
                         <th>Code</th>
                         <th>Symbol</th>
-                        <th>Default</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="item, i in paginatedCurrencies">
+                        <td>{{ item.index }}</td>
                         <td>{{ item.name }}</td>
                         <td>{{ item.currency }}</td>
                         <td>{{ item.code }}</td>
                         <td>{{ item.symbol }}</td>
-                        <td>
-                            <div class="w-100 d-flex justify-center">
-                                {{ item.is_default ? 'Yes' : 'No' }}
-                            </div>
-                        </td>
-                        <td width="auto" class="d-flex gap-2 justify-center align-center">
-                            <v-menu>
-                                <template v-slot:activator="{ props }">
-                                    <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
-                                </template>
-
-                                <v-list>
-                                    <v-list-item>
-                                        <v-list-item-title @click="makeDefault(item._id)"><v-icon>mdi-tick</v-icon> Make
-                                            default</v-list-item-title>
-                                    </v-list-item>
-                                    <v-list-item>
-                                        <v-list-item-title @click="deleteCurrency(item._id)"><v-icon>mdi-delete</v-icon>
-                                            Delete</v-list-item-title>
-                                    </v-list-item>
-                                </v-list>
-                            </v-menu>
+                        <td class="px-1">
+                            <v-btn color="none" elevation="0" @click="deleteCurrency(item._id)"><v-icon>mdi-delete</v-icon></v-btn>
                         </td>
                     </tr>
                 </tbody>
@@ -118,6 +99,9 @@ const paginatedCurrencies = computed(() => {
 
     const start = (page.value - 1) * itemsPerPage.value;
     const end = start + itemsPerPage.value;
+    currencies.value.forEach(({ }, i) => {
+        currencies.value[i].index = i + 1
+    });
     return currencies.value.slice(start, end);
 });
 

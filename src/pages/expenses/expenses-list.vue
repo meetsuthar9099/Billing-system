@@ -76,6 +76,7 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
+                    <th>Sr No</th>
                     <th>Date</th>
                     <th>Category</th>
                     <th>Customer</th>
@@ -86,6 +87,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in expenses" :key="'expense' + index">
+                    <td>{{ item.index }}</td>
                     <td>{{ moment(item.due_date).format('DD-MM-YYYY') }}</td>
                     <td>{{ item.category ? item.category.category_name : "-" }}</td>
                     <td>{{ item.customer ? item.customer.name : "-" }}</td>
@@ -94,7 +96,7 @@
                     <td width="200" v-if="checkPermission('Update Expense') || checkPermission('Delete Expense')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
-                                <v-btn icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                                <v-btn elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
                             </template>
                             <v-list>
                                 <v-list-item v-if="checkPermission('Update Expense')" :to="'expense/' + item._id">
@@ -108,7 +110,7 @@
                     </td>
                 </tr>
                 <tr v-if="!expenses.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>

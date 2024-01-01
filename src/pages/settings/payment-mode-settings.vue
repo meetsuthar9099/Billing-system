@@ -21,7 +21,7 @@
         </v-form>
       </v-card>
     </v-dialog>
-    <v-card class="mb-5">
+    <v-card class="mb-5" elevation="2">
       <VRow>
         <VCol cols="6" class="text-start d-flex align-center gap-2 pa-5">
           <span>Page {{ page }} of {{ totalPages }} - Total: {{ paymentModes && paymentModes.length }}</span>
@@ -35,21 +35,23 @@
         </VCol>
       </VRow>
     </v-card>
-    <VCard>
-      <v-table class="rounded">
+    <VCard elevation="0">
+      <v-table class="rounded" >
         <thead slot="head">
           <tr>
+            <th>sr no</th>
             <th>Key</th>
             <th>Label</th>
-            <th>Action</th>
+            <th class="ps-7">Action</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="item, i in paginatedpaymentModes">
+            <td>{{ item.index }}</td>
             <td>{{ item.value }}</td>
             <td>{{ item.name }}</td>
-            <td width="auto" class="d-flex gap-2 justify-center align-center">
-              <v-btn color="none" @click="deletePaymentMode(item._id)"><v-icon>mdi-delete</v-icon></v-btn>
+            <td width="auto">
+              <v-btn color="none" elevation="0" @click="deletePaymentMode(item._id)"><v-icon>mdi-delete</v-icon></v-btn>
             </td>
           </tr>
         </tbody>
@@ -85,6 +87,9 @@ const paginatedpaymentModes = computed(() => {
 
   const start = (page.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
+  paymentModes.value.forEach(({},i) => {
+    paymentModes.value[i].index = i + 1
+  });
   return paymentModes.value.slice(start, end);
 });
 

@@ -10,7 +10,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form">
+        <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form" lazy-validation>
             <VCard class="pa-8">
                 <VRow>
                     <div>
@@ -65,7 +65,7 @@
                         </VRow>
                     </VCol>
                     <VCol cols="12" v-if="model.is_local">
-                        <VTextField density="comfortable" label="GSTIN" v-model="model.billing.gstin" />
+                        <VTextField density="comfortable" label="GSTIN" :rules="rules.gstinRules" v-model="model.billing.gstin" />
                     </VCol>
                 </VRow>
             </VCard>
@@ -159,11 +159,11 @@ const model = ref({
     email: "",
     phone: null,
     website: "",
-    primary_currency: "INR",
+    primary_currency: "",
     prefix: "",
     billing: {
         name: "",
-        country_id: "IN",
+        country_id: "",
         state: "",
         city: "",
         address_street_1: "",
@@ -171,18 +171,7 @@ const model = ref({
         address_street_2: "",
         zip: null,
         gstin: null,
-    },
-    // shipping: {
-    //     name: "",
-    //     country_id: "IN",
-    //     state: "",
-    //     city: "",
-    //     address_street_1: "",
-    //     phone: null,
-    //     address_street_2: "",
-    //     zip: null,
-    //     gstin: null,
-    // },
+    }
 });
 const countries = computed(() => store.state.customers.countries)
 const isEdit = ref(false);
@@ -218,6 +207,10 @@ const rules = {
         (v) => !!v || "This Email is Required",
         (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
     ],
+    gstinRules: [
+        v => !!v || 'GSTIN is required',
+        v => /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/.test(v) || 'Invalid GSTIN. Please check the format.',
+      ],
 };
 const form = ref(null);
 const onSubmit = async () => {

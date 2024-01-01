@@ -61,7 +61,7 @@
 
                 </tr>
                 <tr v-if="!logs.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>
