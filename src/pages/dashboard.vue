@@ -201,7 +201,6 @@ const monthlyIncomeArray = computed(() => {
 const monthlyExpenseArray = computed(() => {
   return dashboardData.value?.monthlyExpensesArray;
 });
-console.log(monthlyExpenseArray.value, "monthlyExpenseArrayValue");
 const profileReportArray = computed(() => {
   return dashboardData.value?.profileReportArray
     ;

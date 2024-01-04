@@ -11,6 +11,9 @@
             </v-card-actions>
         </v-card>
     </v-dialog>
+    <v-snackbar location="top right" v-model="errorAlert.show" :color="errorAlert.variant">
+        <v-icon class="me-1">{{ errorAlert.icon }}</v-icon><strong>{{ errorAlert.message }}</strong>
+    </v-snackbar>
     <v-dialog v-model="deleteModel" max-width="400">
         <v-card>
             <v-card-title>Confirmation</v-card-title>
@@ -80,7 +83,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in customers" :key="'customer' + index">
-                    <td>{{ item.index  }}</td>
+                    <td>{{ item.index }}</td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.contact_name ? item.contact_name : '-' }}</td>
                     <td>{{ item.email ? item.email : '-' }}</td>
@@ -114,7 +117,7 @@
 </template>
 <script setup>
 import { inject, onMounted } from 'vue';
-import {checkPermission}  from '@/mixins/permissionMixin'
+import { checkPermission } from '@/mixins/permissionMixin'
 
 const defaultFilter = Object.freeze({
     currentPage: 1,
@@ -132,7 +135,24 @@ let checkAll = ref(false)
 const filter = ref({})
 const selectCustomer = ref([])
 // const myCheckbox = ref(null);
-
+const errorAlert = ref({
+    show: false,
+    message: "",
+    icon: "",
+    variant: ""
+})
+const showAlert = (message, variant = 'error', timeout = 3000) => {
+    errorAlert.value.show = true
+    errorAlert.value.message = message
+    errorAlert.value.variant = variant
+    errorAlert.value.icon = variant == "error" ? 'mdi-warning' : variant == "success" ? 'mdi-tick' : ''
+    setTimeout(() => {
+        errorAlert.value.show = false
+        errorAlert.value.message = ""
+        errorAlert.value.icon = ""
+        errorAlert.value.variant = ""
+    }, timeout)
+}
 //computed
 const customers = computed(() => { return store.state.customers.customerUsers })
 
@@ -159,11 +179,16 @@ const doSearch = async () => {
     await store.dispatch('customers/fetchAll', { query });
 }
 const deleteCustomer = async () => {
-    if (deleteCustomerId) {
-        await store.dispatch('customers/deleteCustomer', deleteCustomerId);
-        deleteModel.value = false
-        doSearch()
+    try {
+        if (deleteCustomerId) {
+            await store.dispatch('customers/deleteCustomer', deleteCustomerId);
+            doSearch()
+            showAlert("Customer deleted successfully", "success")
+        }
+    } catch (error) {
+        showAlert(error)
     }
+    deleteModel.value = false
 }
 const bulkDeleteCustomer = async () => {
     if (!!selectCustomer.value.length) {
@@ -191,7 +216,7 @@ watch(selectCustomer, async (val) => {
 const checkAllCustomer = () => {
     if (!checkAll.value) {
         selectCustomer.value = customers.value.map(i => i._id)
-    }else{
+    } else {
         selectCustomer.value = []
     }
 }

@@ -31,14 +31,13 @@ const chartOptions = computed(() => {
   const disabledTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['disabled-opacity']})`
   const primaryTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['high-emphasis-opacity']})`
   const borderColor = `rgba(${hexToRgb(String(variableTheme['border-color']))},${variableTheme['border-opacity']})`
-  console.log(props.monthlyExpenseArray, "monthlyExpenseArray")
-  const minValue =
-    (Math.max(...props.monthlyExpenseArray) != -Infinity && (Math.max(...props.monthlyExpenseArray)) != 0) ?
-      (Math.round(Math.max(...props.monthlyExpenseArray) / 1000) * 1000) - 10000 : -50000;
 
-  const maxValue =
-    (Math.max(...props.monthlyIncomeArray) != -Infinity && (Math.max(...props.monthlyIncomeArray)) != 0) ?
-      (Math.round(Math.max(...props.monthlyIncomeArray) / 5000) * 1000) + 10000 : 50000
+  const incomeArray = props.monthlyIncomeArray || [];
+  const expenseArray = props.monthlyExpenseArray || [];
+
+  const combinedArray = [...incomeArray, ...expenseArray].map(value => Math.abs(parseFloat(value) || 0));
+  const maxArrayValue = Math.max(...combinedArray);
+  const roundedMaxValue = Math.pow(10, Math.log10(maxArrayValue / 5)) * 5;
 
   return {
     bar: {
@@ -118,9 +117,9 @@ const chartOptions = computed(() => {
         },
       },
       yaxis: {
-        forceNiceScale: false,
-        min: -100000,   // Set the minimum value
-        max: 100000,     // Set the maximum value
+        forceNiceScale: true,
+        min: -roundedMaxValue,   // Set the minimum value
+        max: roundedMaxValue,     // Set the maximum value
         tickAmount: 10,
         labels: {
           style: {

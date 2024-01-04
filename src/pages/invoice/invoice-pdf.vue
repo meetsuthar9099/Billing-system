@@ -47,7 +47,6 @@ const router = useRouter()
 const id = computed(() => { return route.params.id })
 const url = ref(baseUrl + "/invoiceGenerate/" + id.value)
 const loading = ref(true)
-
 const changeInvoice = (newId) => {
     if (id.value !== newId) {
         loading.value = true;
@@ -58,7 +57,7 @@ const changeInvoice = (newId) => {
         router.push({ params: { id: newId } })
     }
 }
-const invoices = computed(() => { return store.state.invoices.items })
+const invoices = computed(() => store.state.invoices.items )
 
 onMounted(async () => {
     setTimeout(() => {
@@ -76,23 +75,25 @@ onMounted(async () => {
     bottom: calc(100% - 5px) !important;
     left: calc(100% - 0px) !important;
 }
+
 .v-slide-group__content button {
-    display:flex;
+    display: flex;
     padding: 30px;
 }
+
 ::-webkit-scrollbar {
-  width: 5px;
+    width: 5px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  box-shadow: none; 
-  border-radius: 10px;
+    box-shadow: none;
+    border-radius: 10px;
 }
- 
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: grey; 
-  border-radius: 10px;
+    background: grey;
+    border-radius: 10px;
 }
 </style>

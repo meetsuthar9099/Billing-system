@@ -45,16 +45,24 @@
                             </VCol>
                         </VRow>
                     </VCol>
-                    
-                    <VCol cols="4" v-if="!model.adjustable_amount">
+
+                    <VCol cols="4">
                         <VRow class="align-center">
-                            <v-col cols="2" class="pe-0">
-                                <VTextField density="comfortable" :value="currency_symbol" type="text" readonly />
-                            </v-col>
-                            <v-col cols="10">
-                                <VTextField density="comfortable" label="Amount" :rules="rules.amount"
-                                    :class="{ 'red-border': amountError }" v-model="model.amount" type="number" :min="0"
-                                    :max="amount_due" />
+                            <v-col cols="12">
+                                <VTextField v-if="!model.adjustable_amount" density="comfortable" label="Amount"
+                                    :rules="rules.amount" :class="{ 'red-border': amountError }" v-model="model.amount"
+                                    type="number" :min="0" :max="amount_due">
+                                    <template #prepend-inner>
+                                        <h3>{{ currency_symbol }}</h3>
+                                    </template>
+                                </VTextField>
+                                <VTextField v-else density="comfortable" label="Adjustable Amount"
+                                    :rules="rules.adjustable_amount" :class="{ 'red-border': amountError }"
+                                    v-model="model.amount" type="number" :min="0">
+                                    <template #prepend-inner>
+                                        <h3>{{ currency_symbol }}</h3>
+                                    </template>
+                                </VTextField>
                             </v-col>
                         </VRow>
                         <span class="text-error" v-if="model.invoice_id"> Due Amount: <strong>
@@ -62,24 +70,14 @@
                                     total_cost }} {{ currency_symbol }}
                             </strong></span>
                     </VCol>
-                    <VCol v-else cols="4">
-                        <VRow>
-                            <v-col cols="2" class="pe-0">
-                                <VTextField density="comfortable" :value="currency_symbol" type="text" readonly />
-                            </v-col>
-                            <v-col cols="10">
-                                <VTextField density="comfortable" label="Adjustable Amount" :disabled="!model.amount"
-                                    :rules="rules.adjustable_amount" :class="{ 'red-border': amountError }"
-                                    v-model="model.adjustable_amount" type="number" />
-                            </v-col>
-                        </VRow>
-                    </VCol>
-                    <VCol cols="2" class="d-flex align-center">
-                        <v-checkbox v-model="model.adjustable_amount" density="comfort" label="Adjustable Amount"></v-checkbox>
+                    <VCol cols="2" class="d-flex gap-2 justify-center"
+                        :class="model.invoice_id ? 'align-stretch' : 'align-center'">
+                        <v-switch id="adjustable_amount" v-model="model.adjustable_amount" density="comfort"></v-switch>
+                        <label class="h-50 d-flex align-end" for="adjustable_amount">Adjustable</label>
                     </VCol>
 
                     <VCol cols="3" v-if="currency_symbol != '₹'">
-                        <VTextField label="Exchange Rate" density="comfortable" class="text-input-right"
+                        <VTextField label="Exchange Rate" density="comfortable" :rules="rules.text" class="text-input-right"
                             v-model="model.exchange_rate" type="number" placeholder="">
                             <template #prepend-inner>
                                 <div class="d-flex px-5 gap-2">
@@ -95,7 +93,7 @@
                         </VTextField>
                     </VCol>
                     <VCol cols="3" v-if="currency_symbol != '₹'">
-                        <VTextField label="Amount in INR" density="comfortable" class="text-input-right"
+                        <VTextField label="Amount in INR" density="comfortable" :rules="rules.text" class="text-input-right"
                             v-model="model.amount_in_inr" type="text" readonly>
                             <template #append-inner>
                                 <div class="d-flex px-3">
@@ -204,7 +202,13 @@ onMounted(async () => {
 watchEffect(async () => {
     try {
         if (model.value.customer_id) {
-            await store.dispatch("invoices/fetchAllCustomerInvoice", { customer_id: model.value.customer_id, edit: getId == 0 ? 0 : 1 });
+            if (getId == 0) {
+                model.value.invoice_id = null
+                model.value.amount = null
+            }
+            
+            await store.dispatch("invoices/fetchAllCustomerInvoice",
+                { customer_id: model.value.customer_id, edit: getId == 0 ? 0 : 1 });
         }
     } catch (error) {
         console.log("ErrorInLoop", error);
@@ -257,19 +261,23 @@ watchEffect(async () => {
     if (model.value.amount || model.value.exchange_rate) {
         const amountInINR = parseFloat((!!model.value.exchange_rate && model.value.exchange_rate != 0) ? model.value.exchange_rate : 1) * parseFloat(model.value.amount ? model.value.amount : 0)
         model.value.amount_in_inr = amountInINR.toFixed(2)
+    } else {
+        model.value.amount_in_inr = 0
     }
 })
 watchEffect(async () => {
-    if (model.value.adjustable_amount) {
-        model.value.notes = `The Invoice Amount ${amount_due.value} But You Get ${model.value.adjustable_amount}`
-    } else if (model.value.amount) {
-        model.value.notes = `Recieved Amount is ${model.value.amount} `
-    } else {
-        model.value.notes = `Remaining Amount is ${amount_due.value}`
+    if (getId == 0) {
+        if (model.value.adjustable_amount) {
+            model.value.notes = `The Invoice Amount ${amount_due.value} But You Received ${model.value.amount}`
+        } else if (model.value.amount) {
+            model.value.notes = `Received Amount is ${model.value.amount}`
+        } else {
+            model.value.notes = `Remaining Amount is ${amount_due.value}`
+        }
     }
 })
 
-const rules = {
+let rules = {
     text: [(v) => (!!v || v == null) || "This Field is Required"],
     select: [(v) => (!!v || v == '' || !!v?.length) || "This Field is Required"],
     email: [
@@ -279,9 +287,14 @@ const rules = {
     amount: [
         () => getId == 0 ? (amount_due.value || "First Select Invoice to Enter an Amount") : true,
         (v) => !!v || "This Amount is Required",
-        (v) => (v <= 0 || v <= (getId != 0 ? total_cost.value : amount_due.value)) || `Payment should be between 0 to ${getId != 0 ? total_cost.value : amount_due.value}`
+        (v) => v <= 0 || v <= (getId != 0 ? total_cost.value : amount_due.value) || `Payment should be between 0 to ${getId != 0 ? total_cost.value : amount_due.value}`
+    ],
+    adjustable_amount: [
+        () => getId == 0 ? (amount_due.value || "First Select Invoice to Enter an Amount") : true,
+        (v) => !!v || "This Amount is Required"
     ]
 }
+
 const form = ref(null);
 const onSubmit = async () => {
     try {
@@ -302,15 +315,7 @@ const onSubmit = async () => {
     }
 };
 
-const openModel = () => {
-    confirmationDialog.value = true;
-};
-const copyBilling = (val) => {
-    if (val) {
-        model.value.shipping = { ...model.value.billing };
-    }
-    confirmationDialog.value = false;
-};
+
 </script>
 <style scoped>
 .merged-text-field {
