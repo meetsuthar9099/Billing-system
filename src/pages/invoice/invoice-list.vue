@@ -137,6 +137,7 @@
             <v-tab :value="null" selected>All</v-tab>
             <v-tab value="1">Draft</v-tab>
             <v-tab value="2">Sent</v-tab>
+            <v-tab value="4">Over Due</v-tab>
         </v-tabs>
         <v-table class="rounded">
             <thead slot="head">
@@ -161,15 +162,16 @@
                     <td>{{ item.invoice_date ? moment(item.invoice_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td>{{ item.due_date ? moment(item.due_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td class="badge-align">
-                        <VBadge :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#fef7d1' : '#c3ecd5'"
-                            :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">
+                        <VBadge
+                            :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#ff8933' : item.status == 4 ? '#ff0000' : '#71dd37'"
+                            :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : item.status == 4 ? 'OVER DUE' : 'COMPLETED'">
                         </VBadge>
                     </td>
                     <!-- {{ item }} -->
                     <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
                     <td class="badge-align">
                         <VBadge class="payment-status"
-                            :color="item.payment_status == 1 ? '#fef7d1' : item.payment_status == 2 ? '#fef7d1' : '#c3ecd5'"
+                            :color="item.payment_status == 1 ? '#fef7d1' : item.payment_status == 2 ? '#ff8933' : '#71dd37'"
                             :content="item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID'">
                         </VBadge>
                     </td>
@@ -256,6 +258,7 @@ const allStatus = ref([
     { id: 0, title: "Select Status" },
     { id: 1, title: "Draft" },
     { id: 2, title: "Sent" },
+    { id: 4, title: "Over Due" },
     { id: 3, title: "Completed" }
 ])
 const bulkDeleteModel = ref(false)
@@ -314,10 +317,12 @@ const submitForm = async () => {
 const sentPayment = async (id) => {
     const invoiceData = store.state.invoices.items && store.state.invoices.items.find(x => x._id == id)
     const invoice = {
-        date: moment().format('DD-MM-YYYY'),
+        date: moment().format('YYYY-MM-DD'),
         customer_id: invoiceData.customer_id,
         invoice_id: invoiceData._id
     }
+
+    console.log("invoiceeee", invoice)
     store.commit('payment/SET_PAYMENT', invoice)
     router.push({ path: `payment/${id}/0` })
 

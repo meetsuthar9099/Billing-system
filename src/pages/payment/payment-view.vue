@@ -42,25 +42,42 @@
                                     item-value="_id" :hide-selected="true" label="Select Invoice" name="currency"
                                     :rules="rules.select" :items="invoices" v-model="model.invoice_id"
                                     prepend-inner-icon="bx-user" />
-                                <span class="text-muted" v-if="model.invoice_id"> Due Amount: <strong>
-                                        {{ getId == 0 ? amount_due :
-                                            total_cost }} {{ currency_symbol }}
-                                    </strong></span>
                             </VCol>
                         </VRow>
                     </VCol>
-                    <VCol cols="6">
-                        <VRow>
-                            <v-col cols="1" class="pe-0">
+                    
+                    <VCol cols="4" v-if="!model.adjustable_amount">
+                        <VRow class="align-center">
+                            <v-col cols="2" class="pe-0">
                                 <VTextField density="comfortable" :value="currency_symbol" type="text" readonly />
                             </v-col>
-                            <v-col cols="11">
+                            <v-col cols="10">
                                 <VTextField density="comfortable" label="Amount" :rules="rules.amount"
                                     :class="{ 'red-border': amountError }" v-model="model.amount" type="number" :min="0"
                                     :max="amount_due" />
                             </v-col>
                         </VRow>
+                        <span class="text-error" v-if="model.invoice_id"> Due Amount: <strong>
+                                {{ getId == 0 ? amount_due :
+                                    total_cost }} {{ currency_symbol }}
+                            </strong></span>
                     </VCol>
+                    <VCol v-else cols="4">
+                        <VRow>
+                            <v-col cols="2" class="pe-0">
+                                <VTextField density="comfortable" :value="currency_symbol" type="text" readonly />
+                            </v-col>
+                            <v-col cols="10">
+                                <VTextField density="comfortable" label="Adjustable Amount" :disabled="!model.amount"
+                                    :rules="rules.adjustable_amount" :class="{ 'red-border': amountError }"
+                                    v-model="model.adjustable_amount" type="number" />
+                            </v-col>
+                        </VRow>
+                    </VCol>
+                    <VCol cols="2" class="d-flex align-center">
+                        <v-checkbox v-model="model.adjustable_amount" density="comfort" label="Adjustable Amount"></v-checkbox>
+                    </VCol>
+
                     <VCol cols="3" v-if="currency_symbol != '₹'">
                         <VTextField label="Exchange Rate" density="comfortable" class="text-input-right"
                             v-model="model.exchange_rate" type="number" placeholder="">
@@ -129,7 +146,8 @@ const model = ref({
     payment_number: null,
     customer_id: null,
     invoice_id: null,
-    amount: [],
+    amount: 0,
+    adjustable_amount: 0,
     payment_mode: null,
     exchange_rate: '',
     amount_in_inr: '',
@@ -160,12 +178,18 @@ const invoices = computed(() => {
     return store.state.invoices.customer_invoices;
 });
 let getId = route.params.id;
+
+console.log("route.params", route.params)
+const invoiceRefId = route.params.invoice_id
 onMounted(async () => {
     await store.dispatch('payment/fetchAllPayments')
     await store.dispatch("invoices/fetchAllCustomers");
     await store.dispatch("payment/fetchPaymentModes");
     // await store.dispatch("invoices/fetchAllInvoice");
     await store.dispatch("payment/getPaymentNumber");
+    if (invoiceRefId) {
+        model.value = { ...payment.value };
+    }
     model.value.payment_number = store.state.payment.payment_number
     if (getId != 0) {
         await store.dispatch("payment/fetch", { id: getId });
@@ -233,6 +257,15 @@ watchEffect(async () => {
     if (model.value.amount || model.value.exchange_rate) {
         const amountInINR = parseFloat((!!model.value.exchange_rate && model.value.exchange_rate != 0) ? model.value.exchange_rate : 1) * parseFloat(model.value.amount ? model.value.amount : 0)
         model.value.amount_in_inr = amountInINR.toFixed(2)
+    }
+})
+watchEffect(async () => {
+    if (model.value.adjustable_amount) {
+        model.value.notes = `The Invoice Amount ${amount_due.value} But You Get ${model.value.adjustable_amount}`
+    } else if (model.value.amount) {
+        model.value.notes = `Recieved Amount is ${model.value.amount} `
+    } else {
+        model.value.notes = `Remaining Amount is ${amount_due.value}`
     }
 })
 
