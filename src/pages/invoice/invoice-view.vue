@@ -10,6 +10,17 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <v-dialog v-model="draftNoteModal" max-width="600" persistent>
+    <v-card class="pa-8">
+      <VTextarea name="description" label="Description" v-model="model.description" :rules="rules.text" resizable
+        id="description">
+      </VTextarea>
+      <div class="d-flex gap-2 justify-end">
+        <v-btn type="submit" class="mt-3" @click="() => !!model.description && (draftNoteModal = false)">Submit</v-btn>
+        <v-btn color="error" class="mt-3" @click="router.push({ name: 'invoice' })">Go Back</v-btn>
+      </div>
+    </v-card>
+  </v-dialog>
   <v-snackbar location="top right" v-model="projectError.isError" color="error">
     <v-icon class="me-1">mdi-warning</v-icon><strong>{{ projectError.message }}</strong>
   </v-snackbar>
@@ -299,10 +310,12 @@ const model = ref({
   transaction_fee: 0,
   total_cost: 0,
   total_tax: 0,
-  grand_total: 0
+  grand_total: 0,
+  description: ''
 });
 const form = ref(null);
-
+const draftNoteModal = ref(false)
+const draftNote = ref('')
 const labelSubmit = computed(() => {
   return submiting.value ? (getId == 0 ? 'Adding' : 'Updating') : (getId == 0 ? 'Add' : 'Update');
 })
@@ -313,7 +326,6 @@ const customerProject = computed(() => {
 const allCustomers = computed(() => {
   return store.state.invoices.allCustomers;
 });
-
 
 
 const invoice = computed(() => { return store.state.invoices.item })
@@ -349,7 +361,7 @@ const filteredProjects = (currentIndex) => {
   const otherSelectedProjects = selectedProjects.value.filter(
     (project, index) => index !== currentIndex
   );
-  console.log(customerProject.value, "customerProject.value");
+
   const selectedProject = customerProject.value.filter(
     (project) => !otherSelectedProjects.includes(project.value)
   );
@@ -368,12 +380,17 @@ onMounted(async () => {
   await store.dispatch("company/fetch");
   if (getId != 0) {
     await store.dispatch("invoices/fetch", { id: getId });
+
     model.value = { ...invoice.value }
-    console.log(model.value.transaction_fee, "Transaction")
+    if (invoice.value.status == 2 && !model.value.description) {
+      draftNoteModal.value = true
+    }
+
     model.value.invoice_date = moment(invoice.value.invoice_date).format('YYYY-MM-DD');
     model.value.due_date = moment(invoice.value.due_date).format('YYYY-MM-DD');
     model.value.currency_symbol = customer.value.primary_currency.symbol
     currencySymbol.value = customer.value.primary_currency.symbol
+
     await store.dispatch("invoices/fetchProjects", { customer_id: model.value.customer_id, invoice_id: getId });
   }
 
@@ -386,33 +403,17 @@ onMounted(async () => {
 const company = computed(() => store.state.company.settings)
 
 const gstValue = computed(() => {
-  if (!customer.value) { return { cgst: 0, sgst: 0, igst: 0 } }
-  const isIndia = (customer.value.billing.country_id == "IN")
-  const isState = (customer.value.billing.state == company.value.state)
-  const cgst = company.value.cgst ? parseInt(company.value.cgst) : 9
-  const sgst = company.value.sgst ? parseInt(company.value.sgst) : 9
-  const igst = company.value.igst ? parseInt(company.value.igst) : 18
-  let gst = (isIndia && isLocal.value)
-    ? (isState ? { cgst, sgst, igst: 0 } : { cgst: 0, sgst: 0, igst })
-    : { cgst: 0, sgst: 0, igst: 0 };
-  if (getId == 0) model.value.projects = [{
-    id: null,
-    hsa: null,
-    amount: null,
-    uom: '',
-    quantity: 1,
-    bond_no: '',
-    taxable_value: 0,
-    rate: null,
-    tasks: [],
-    discount: 0,
-    assigned_tasks: [],
-    total: 0,
-    cgst: { rate: gst.cgst, amount: 0 },
-    sgst: { rate: gst.sgst, amount: 0 },
-    igst: { rate: gst.igst, amount: 0 },
-  }]
-  return gst
+  if (customer?.value) {
+    const country = (customer?.value.billing.country_id == company.value.country_code)
+    const state = (customer?.value.billing.state == company.value.state)
+    const cgst = company.value.cgst ? parseInt(company.value.cgst) : 9
+    const sgst = company.value.sgst ? parseInt(company.value.sgst) : 9
+    const igst = company.value.igst ? parseInt(company.value.igst) : 18
+    let gst = (country && customer?.value)
+      ? (state ? { cgst, sgst, igst: 0 } : { cgst: 0, sgst: 0, igst })
+      : { cgst: 0, sgst: 0, igst: 0 };
+    return gst
+  }
 })
 
 
@@ -441,7 +442,7 @@ watchEffect(async () => {
       totalWithoutDiscount = (project.rate * project.quantity);
       discount = (totalWithoutDiscount * project.discount / 100);
       let taxFactor = ((totalWithoutDiscount - discount) * tax / 100);
-
+      console.log(project.cgst, "((totalWithoutDiscount - discount) * project.cgst.rate / 100);");
       project.cgst.amount = ((totalWithoutDiscount - discount) * project.cgst.rate / 100);
       project.sgst.amount = ((totalWithoutDiscount - discount) * project.sgst.rate / 100);
       project.igst.amount = ((totalWithoutDiscount - discount) * project.igst.rate / 100);

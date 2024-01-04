@@ -8,6 +8,7 @@ const state = {
   limit: null,
   pagination: null,
   logTypes: [],
+  currentPage:null
 };
 
 const mutations = {
@@ -46,7 +47,7 @@ const actions = {
     console.log("datadata", data);
     commit("set", data.logs);
     commit("SET_TOTALPAGES", data.totalPages);
-    commit("SET_CURRENTPAGE", data.page);
+    commit("SET_CURRENTPAGE", data.currentPage);
     commit("SET_LIMIT", data.limit);
   },
   async users({ commit }) {

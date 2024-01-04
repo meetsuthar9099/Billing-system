@@ -2,7 +2,7 @@
     <v-app>
         <v-row>
             <v-col cols="12" md="3" class="d-none d-md-block">
-                <v-card rounded width="100%" class="pa-3 overflow-auto h-100">
+                <v-card rounded width="100%" max-height="900" class="pa-3 overflow-auto h-100">
                     <v-card class="pa-0 ma-0" v-for="(item, index) in invoices" :key="index + 'invoices'"
                         :color="id == item._id ? 'primary' : ''" @click="changeInvoice(item._id)" link>
                         <template #title>
@@ -27,7 +27,7 @@
                 </v-card>
             </v-col>
             <v-col cols="12" md="9">
-                <v-card width="100%" height="100%">
+                <v-card width="100%" height="100%" max-height="900">
                     <v-progress-linear indeterminate v-if="loading"></v-progress-linear>
                     <embed :src="url" v-show="!loading" width="100%" height="100%" zoom="100%">
                 </v-card>
@@ -75,5 +75,24 @@ onMounted(async () => {
 .badge-pdf-align .v-badge__badge {
     bottom: calc(100% - 5px) !important;
     left: calc(100% - 0px) !important;
+}
+.v-slide-group__content button {
+    display:flex;
+    padding: 30px;
+}
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  box-shadow: none; 
+  border-radius: 10px;
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: grey; 
+  border-radius: 10px;
 }
 </style>

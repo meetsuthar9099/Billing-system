@@ -28,7 +28,7 @@ const isPositive = controlledComputed(() => props.change, () => Math.sign(props.
 
       <VSpacer />
 
-      <MoreBtn size="x-small" class="me-n3 mt-n4" />
+      <!-- <MoreBtn size="x-small" class="me-n3 mt-n4" /> -->
     </VCardText>
 
     <VCardText>

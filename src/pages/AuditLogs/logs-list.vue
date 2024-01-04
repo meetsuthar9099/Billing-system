@@ -46,7 +46,7 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
-                    <th>Date</th>
+                    <th>Date & Time</th>
                     <th>Type</th>
                     <th>User</th>
                     <th>Message</th>

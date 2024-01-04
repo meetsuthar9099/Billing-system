@@ -79,9 +79,10 @@
                     <th>Sr No</th>
                     <th>Date</th>
                     <th>Category</th>
-                    <th>Customer</th>
                     <th>Note</th>
                     <th>Amount</th>
+                    <th>Paid To</th>
+                    <th>Paid By</th>
                     <th v-if="checkPermission('Update Expense') || checkPermission('Delete Expense')">Actions</th>
                 </tr>
             </thead>
@@ -90,9 +91,10 @@
                     <td>{{ item.index }}</td>
                     <td>{{ moment(item.due_date).format('DD-MM-YYYY') }}</td>
                     <td>{{ item.category ? item.category.category_name : "-" }}</td>
-                    <td>{{ item.customer ? item.customer.name : "-" }}</td>
                     <td>{{ item.note ? item.note : '-' }}</td>
-                    <td>{{ item.amount ? item.amount : '-' }}</td>
+                    <td>{{ item.amount ? '₹ '+item.amount : '-' }}</td>
+                    <td>{{ item.paid_to ? item.paid_to : "-" }}</td>
+                    <td>{{ item.paid_by ? item.paid_by : "-" }}</td>
                     <td width="200" v-if="checkPermission('Update Expense') || checkPermission('Delete Expense')">
                         <v-menu>
                             <template v-slot:activator="{ props }">
@@ -142,7 +144,6 @@ const selectExpense = ref([])
 // const myCheckbox = ref(null);
 
 //computed
-const customers = computed(() => store.state.expenses.customers)
 const categories = computed(() => store.state.expenses.categories)
 const expenses = computed(() => { return store.state.expenses.items })
 
@@ -207,7 +208,6 @@ const checkAllexpense = () => {
 
 //mounted
 onMounted(async () => {
-    await store.dispatch("expenses/fetchCustomer")
     await store.dispatch("expenses/fetchCategory")
     resetFilter()
 });

@@ -65,7 +65,30 @@
                         </VRow>
                     </VCol>
                     <VCol cols="12" v-if="model.is_local">
-                        <VTextField density="comfortable" label="GSTIN" :rules="rules.gstinRules" v-model="model.billing.gstin" />
+                        <VTextField density="comfortable" label="GSTIN" :rules="rules.gstinRules"
+                            v-model="model.billing.gstin">
+                            <template #append-inner>
+                                <v-tooltip location="bottom right">
+                                    <template v-slot:activator="{ props }">
+                                        <span v-bind="props"><v-icon class="cursor-pointer">mdi-info</v-icon></span>
+                                    </template>
+                                    <template #default>
+                                        <ol class="ms-6 my-1">
+                                            <li>First two digits: State code (01 to 37 representing
+                                                different states and
+                                                union territories)</li>
+                                            <li>Next ten digits: PAN (Permanent Account Number) of the
+                                                taxpayer</li>
+                                            <li>Thirteenth digit: Entity code (numeric)</li>
+                                            <li>Fourteenth digit: Blank space (reserved for future use)
+                                            </li>
+                                            <li>Fifteenth digit: Checksum digit (numeric)</li>
+                                        </ol>
+                                        <span class="ms-3">For Example: <strong>23AABCT1234C1Z5</strong></span>
+                                    </template>
+                                </v-tooltip>
+                            </template>
+                        </VTextField>
                     </VCol>
                 </VRow>
             </VCard>
@@ -200,7 +223,6 @@ onMounted(async () => {
     }
     await store.dispatch("customers/fetchProjects", getId);
 });
-
 const rules = {
     text: [(v) => !!v || "This Field is Required"],
     email: [
@@ -209,9 +231,11 @@ const rules = {
     ],
     gstinRules: [
         v => !!v || 'GSTIN is required',
-        v => /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/.test(v) || 'Invalid GSTIN. Please check the format.',
-      ],
+        v => /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/.test(v) || 'Invalid GSTIN. Please check your gstin number.'
+    ],
 };
+
+
 const form = ref(null);
 const onSubmit = async () => {
     try {

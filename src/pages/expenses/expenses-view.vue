@@ -10,22 +10,13 @@
                 </v-btn>
             </template>
         </v-snackbar>
-        <v-dialog v-model="confirmationDialog" max-width="400">
-            <v-card>
-                <v-card-title>Confirmation</v-card-title>
-                <v-card-text> Are you sure you want copy from Billing? </v-card-text>
-                <v-card-actions>
-                    <v-btn @click="copyBilling(true)">Yes</v-btn>
-                    <v-btn @click="copyBilling(false)">No</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
         <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form">
             <VCard class="pa-8">
                 <VRow>
                     <VCol cols="6">
-                        <VSelect item-title="category_name" item-value="_id" density="comfortable" :rules="rules.text"
-                            :items="categories" label="Category" v-model="model.category" />
+                        <VSelect item-title="category_name" :disabled="getId != 0" item-value="_id" density="comfortable"
+                            @change="() => categoryChange()" :rules="rules.text" :items="categories" label="Category"
+                            v-model="model.category" />
                     </VCol>
                     <VCol cols="6">
                         <VTextField density="comfortable" label="Date" v-model="model.due_date" :rules="rules.text" />
@@ -41,22 +32,27 @@
                         </VTextField>
                     </VCol>
                     <VCol cols="6">
-                        <VSelect item-title="name" item-value="_id" density="comfortable" :items="customers"
-                            label="Customer" v-model="model.customer" :rules="rules.text" />
-                    </VCol>
-                </VRow>
-                <VRow>
-                    <VCol cols="6">
                         <VSelect item-title="name" item-value="_id" density="comfortable" :items="paymentModes"
                             label="Payment mode" v-model="model.payment_mode" />
                     </VCol>
-                    <VCol cols="6">
-                        <VTextField density="comfortable" label="Note" v-model="model.note" />
-                    </VCol>
                 </VRow>
                 <VRow>
                     <VCol cols="6">
-                        <v-card class="pa-4 position-relative border">
+                        <VTextField item-title="name" item-value="_id" density="comfortable" label="Paid by"
+                            v-model="model.paid_by" :rules="rules.text" />
+                    </VCol>
+                    <VCol cols="6">
+                        <VTextField item-title="name" item-value="_id" density="comfortable" label="Paid to"
+                            v-model="model.paid_to" :rules="rules.text" />
+                    </VCol>
+
+                </VRow>
+                <VRow>
+                    <VCol cols="6">
+                        <VTextarea density="comfortable" rows="3" label="Note" v-model="model.note" />
+                    </VCol>
+                    <VCol cols="6">
+                        <v-card elevation="0" class="pa-4 position-relative" border>
                             <v-file-input
                                 style="opacity: 0;height:100%; width:100%; top:0; left:-10px; z-index: 999; cursor: pointer !important"
                                 :class="{ 'position-absolute': previewImage }" accept="*" show-size @change="imageStore" />
@@ -94,17 +90,17 @@ import { ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 const store = inject("store");
 const imageUrl = inject("imageUrl");
-const confirmationDialog = ref(false);
 const router = useRouter();
 const route = useRoute();
 const model = ref({
     category: [],
     due_date: moment().format('DD-MM-YYYY'),
-    amount: "",
-    customer: [],
+    amount: null,
+    paid_by: '',
+    paid_to: '',
     payment_mode: [],
-    note: "",
-    receipt: ""
+    note: '',
+    receipt: ''
 });
 let getId = route.params.id;
 
@@ -119,14 +115,13 @@ const rules = {
 const form = ref(null);
 const previewImage = ref(null);
 const InvalidCredentials = ref({ show: false, message: '' })
-const customers = computed(() => store.state.expenses.customers)
 const categories = computed(() => store.state.expenses.categories)
 const paymentModes = computed(() => store.state.expenses.paymentModes)
 
 const imageStore = (event) => {
     try {
         model.value.receipt = event.target.files[0];
-        if (model.value.receipt) {
+        if (model.value?.receipt) {
             receiptType.value = model.value.receipt.type.split('/').pop()
             if (receiptType.value == 'pdf') {
                 previewImage.value = "https://cdn4.iconfinder.com/data/icons/file-extensions-1/64/pdfs-512.png"
@@ -153,6 +148,25 @@ const resetImg = () => {
     previewImage.value = ""
     receiptType.value = ""
 }
+watch(() => model.value.category, (val) => {
+    const result = categories.value.find(item => item._id == val)
+    if (getId == 0) {
+        if (result && result?.recurring) {
+            result.amount && (model.value.amount = result.amount)
+            result.payment_mode && (model.value.payment_mode = result.payment_mode)
+            result.pay_by && (model.value.paid_by = result.pay_by)
+            result.pay_to && (model.value.paid_to = result.pay_to)
+            result.note && (model.value.note = result.note)
+        } else {
+            model.value.amount = null
+            model.value.payment_mode = []
+            model.value.paid_by = null
+            model.value.paid_to = null
+            model.value.note = null
+        }
+    }
+})
+
 const onSubmit = async () => {
     try {
         const { valid } = await form.value.validate();
@@ -161,7 +175,8 @@ const onSubmit = async () => {
             formData.append('category', model.value.category)
             formData.append('due_date', model.value.due_date)
             formData.append('amount', model.value.amount)
-            formData.append('customer', model.value.customer)
+            formData.append('paid_by', model.value.paid_by)
+            formData.append('paid_to', model.value.paid_to)
             formData.append('payment_mode', model.value.payment_mode)
             formData.append('note', model.value.note)
             if (!!model.value.receipt && typeof model.value.receipt == "object") {
@@ -181,33 +196,25 @@ const onSubmit = async () => {
 const expense = computed(() => store.state.expenses.item)
 
 onMounted(async () => {
-    await store.dispatch("expenses/fetchCustomer")
     await store.dispatch("expenses/fetchCategory")
     await store.dispatch("expenses/fetchPaymentModes")
     if (route.params.id != 0) {
         await store.dispatch("expenses/fetchExpense", route.params.id)
-        console.log(expense.value,"expense.value");
-        model.value = expense.value
-        const isPdf = model.value.receipt.split('.').pop() == 'pdf'
+        expense.value.due_date = moment(expense.value.due_date).format('DD-MM-YYYY')
+        model.value = { ...expense.value }
+        console.log(model.value, "model.value.receipt");
+        const isPdf = model.value.receipt && model.value.receipt.split('.').pop() == 'pdf'
         if (isPdf) {
             previewImage.value = "https://cdn4.iconfinder.com/data/icons/file-extensions-1/64/pdfs-512.png"
         } else {
-            previewImage.value = imageUrl + expense.value.receipt
+            previewImage.value = null
         }
     }
 })
 const downloadReceipt = () => {
     store.dispatch("expenses/fetchReceipt", getId)
 }
-const openModel = () => {
-    confirmationDialog.value = true;
-};
-const copyBilling = (val) => {
-    if (val) {
-        model.value.shipping = { ...model.value.billing };
-    }
-    confirmationDialog.value = false;
-};
+
 </script>
 <style scoped>
 .sticky-element {

@@ -1,7 +1,6 @@
 <script setup>
 import VerticalNavLayout from "@layouts/components/VerticalNavLayout.vue";
 import VerticalNavLink from "@layouts/components/VerticalNavLink.vue";
-import snackbar from "@/components/snackbar.vue";
 
 // Components
 import Footer from "@/layouts/components/Footer.vue";
@@ -11,7 +10,6 @@ import { useRouter } from "vue-router";
 import { checkPermission } from '@/mixins/permissionMixin'
 const router = useRouter();
 
-const showSnackbar = ref(false)
 const routeItem = computed(() => {
   let routePath = router.currentRoute.value.path
     .split("/")
@@ -34,17 +32,7 @@ const routeItem = computed(() => {
           <VIcon icon="bx-menu" />
         </IconBtn>
 
-        <!-- 👉 Search -->
-        <div class="d-flex align-center cursor-pointer" style="width: 100%">
-          <!-- 👉 Search Trigger button -->
-          <!-- <IconBtn>
-            <VIcon icon="bx-search" />
-          </IconBtn>
-
-          <span class="d-none d-md-flex align-center text-disabled">
-            <span class="me-3">Search</span>
-
-          </span> -->
+        <div class="d-flex align-center cursor-pointer">
           <v-breadcrumbs class="px-0">
             <v-breadcrumbs-item :to="'/dashboard'"> Home </v-breadcrumbs-item>/
             <template v-for="(item, index) in routeItem" :key="'route' + index">
@@ -63,7 +51,6 @@ const routeItem = computed(() => {
         <UserProfile />
       </div>
     </template>
-
     <template #vertical-nav-content>
       <VerticalNavLink :item="{
         title: 'Dashboard',
@@ -71,7 +58,7 @@ const routeItem = computed(() => {
         to: '/dashboard',
         group: 'Dashboard',
       }" />
-        <VDivider class="my-4"></VDivider>
+      <VDivider class="my-4"></VDivider>
       <VerticalNavLink v-if="checkPermission('View Customer')" :active="true" :item="{
         title: 'Customer',
         icon: 'mdi-account-cog-outline',

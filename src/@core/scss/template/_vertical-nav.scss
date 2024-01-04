@@ -51,21 +51,6 @@ $divider-gap: 0.75rem;
       }
     }
 
-    // Active status indicator
-    .nav-link .router-link-exact-active,
-    .nav-group.active:not(.nav-group .nav-group) > :first-child {
-      &::after {
-        position: absolute;
-        background-color: rgb(var(--v-global-theme-primary));
-        block-size: 2.625rem;
-        border-end-start-radius: 0.375rem;
-        border-start-start-radius: 0.375rem;
-        content: "";
-        inline-size: 0.25rem;
-        inset-inline-end: - variables.$vertical-nav-horizontal-spacing;
-      }
-    }
-
     // 👉 Vertical nav link
     .nav-group {
       .nav-link {

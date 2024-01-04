@@ -9,6 +9,9 @@ export default {
     customers: [],
     paymentModes: [],
     categories: [],
+    totalPage: null,
+    currentPage: null,
+    limit: null
   },
   mutations: {
     SET_EXPENSES(state, payload) {
@@ -25,6 +28,15 @@ export default {
     },
     SET_CATEGORIES(state, payload) {
       state.categories = payload
+    },
+    SET_TOTALPAGES(state, payload) {
+      state.totalPage = payload;
+    },
+    SET_CURRENTPAGE(state, payload) {
+      state.currentPage = payload;
+    },
+    SET_LIMIT(state, payload) {
+      state.limit = payload;
     },
   },
   actions: {
@@ -53,8 +65,12 @@ export default {
     async fetchExpenses({ commit }) {
       try {
         const response = await api.fetchExpenses()
-        const { expenses } = response.data
-        commit('SET_EXPENSES', expenses)
+        const data = response.data
+
+        commit('SET_EXPENSES', data.expenses)
+        commit("SET_TOTALPAGES", data.totalPages);
+        commit("SET_CURRENTPAGE", data.page);
+        commit("SET_LIMIT", data.limit);
       } catch (error) {
         throw error
       }
@@ -75,7 +91,7 @@ export default {
     async fetchExpense({ commit }, id) {
       try {
         const response = await api.fetchExpense(id)
-        console.log(response,"SET_EXPENSE");
+        console.log(response, "SET_EXPENSE");
         const { expense } = response.data
         commit('SET_EXPENSE', expense)
       } catch (error) {

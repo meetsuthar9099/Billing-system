@@ -31,8 +31,7 @@
                 </v-col>
                 <v-col cols="6" class="d-flex justify-end">
                     <v-btn class="me-2" variant="outlined" v-if="selectCustomer.length > 1"
-                        @click="bulkDeleteModel = true">Bulk
-                        Delete</v-btn>
+                        @click="bulkDeleteModel = true">Bulk Delete</v-btn>
 
                     <v-btn class="me-2" variant="outlined" @click="isFilterVisible = !isFilterVisible">
                         <span>filter</span>

@@ -176,34 +176,41 @@
                         </VBadge>
                     </td>
                     <td width="200">
-                        <v-menu>
-                            <template v-slot:activator="{ props }">
-                                <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
-                            </template>
-
-                            <v-list>
-                                <v-list-item :to="'invoice/pdf/' + item._id">
-                                    <v-list-item-title><v-icon>mdi-eye</v-icon> View</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item v-if="checkPermission('Update Invoice')" :to="'invoice/' + item._id">
-                                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item @click="sendInvoice(item._id)">
-                                    <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' :
-                                        'Resend invoice' }}</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item v-if="item.status == 1 || item.status == 2"
-                                    @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
-                                    <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status
-                                        == 2 ? 'mdi-payment' : '' }}</v-icon>{{ item.status == 1 ? ' Mark As Sent' :
-        item.status
-            == 2 ? ' Record Payment' : '' }}</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item v-if="checkPermission('Delete Invoice')" @click="deleteConfirm(item._id)">
-                                    <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
+                        <div class="d-flex align-center justify-space-between">
+                            <v-menu>
+                                <template v-slot:activator="{ props }">
+                                    <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                                </template>
+                                <v-list>
+                                    <v-list-item :to="'invoice/pdf/' + item._id">
+                                        <v-list-item-title><v-icon>mdi-eye</v-icon> View</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status !== 3 && checkPermission('Update Invoice')"
+                                        :to="'invoice/' + item._id">
+                                        <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item @click="sendInvoice(item._id)">
+                                        <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' :
+                                            'Resend invoice' }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status !== 3"
+                                        @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
+                                        <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status == 2 ||
+                                            item.status == 4 ? 'mdi-payment' : '' }}</v-icon>{{ item.status == 1 ?
+        ' Mark As Sent' : item.status == 2 || item.status == 4 ? ' Record Payment' : ''
+    }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="checkPermission('Delete Invoice')" @click="deleteConfirm(item._id)">
+                                        <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                            <v-tooltip :text="item.description" v-if="item.description" location="left">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon v-bind="props">mdi-info</v-icon>
+                                </template>
+                            </v-tooltip>
+                        </div>
                     </td>
                 </tr>
                 <tr v-if="!invoices.length > 0">
@@ -416,7 +423,8 @@ onMounted(async () => {
     bottom: calc(100% - 6px) !important;
     left: calc(100% - 15px) !important;
 }
-.v-table>.v-table__wrapper>table>tbody>tr>td {
+
+/* .v-table>.v-table__wrapper>table>tbody>tr>td {
     padding: 0px 30px;
-}
+} */
 </style>
