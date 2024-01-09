@@ -37,7 +37,7 @@
                             </VCol>
 
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Contact Name" v-model="model.contact_name" />
+                                <VTextField density="comfortable" :rules="rules.text" label="Contact Name" v-model="model.contact_name" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -57,7 +57,7 @@
                         <VRow>
                             <VCol cols="6">
                                 <VSelect item-title="currency" item-value="_id" density="comfortable"
-                                    label="Primary Currency" v-model="model.primary_currency" :items="currencies" />
+                                    label="Primary Currency"  :rules="rules.select" v-model="model.primary_currency" :items="currencies" />
                             </VCol>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Website" v-model="model.website" type="text" />
@@ -100,20 +100,20 @@
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Name" v-model="model.billing.name" type="text"
+                                <VTextField density="comfortable" label="Name" :rules="rules.text" v-model="model.billing.name" type="text"
                                     prepend-inner-icon="bx-user" />
                             </VCol>
                             <VCol cols="6">
-                                <VSelect item-title="name" item-value="code" density="comfortable" label="Countries"
+                                <VSelect item-title="name" item-value="code" :rules="rules.select" density="comfortable" label="Countries"
                                     v-model="model.billing.country_id" :items="countries" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="State" v-model="model.billing.state" type="text" />
+                                <VTextField density="comfortable" label="State" :rules="rules.text" v-model="model.billing.state" type="text" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="City" v-model="model.billing.city" type="text" />
+                                <VTextField density="comfortable" label="City" :rules="rules.text" v-model="model.billing.city" type="text" />
                             </VCol>
                         </VRow>
                         <VRow>
@@ -225,6 +225,7 @@ onMounted(async () => {
 });
 const rules = {
     text: [(v) => !!v || "This Field is Required"],
+    select: [(v) => !!v || !!v?.length || "This Field is Required"],
     email: [
         (v) => !!v || "This Email is Required",
         (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",

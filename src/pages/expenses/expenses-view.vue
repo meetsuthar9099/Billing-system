@@ -15,7 +15,7 @@
                 <VRow>
                     <VCol cols="6">
                         <VSelect item-title="category_name" :disabled="getId != 0" item-value="_id" density="comfortable"
-                            @change="() => categoryChange()" :rules="rules.text" :items="categories" label="Category"
+                            @change="() => categoryChange()" :rules="rules.select" :items="categories" label="Category"
                             v-model="model.category" />
                     </VCol>
                     <VCol cols="6">
@@ -32,8 +32,8 @@
                         </VTextField>
                     </VCol>
                     <VCol cols="6">
-                        <VSelect item-title="name" item-value="_id" density="comfortable" :items="paymentModes"
-                            label="Payment mode" v-model="model.payment_mode" />
+                        <VSelect item-title="name" item-value="_id" density="comfortable" :rules="rules.select"
+                            :items="paymentModes" label="Payment mode" v-model="model.payment_mode" />
                     </VCol>
                 </VRow>
                 <VRow>
@@ -49,10 +49,10 @@
                 </VRow>
                 <VRow>
                     <VCol cols="6">
-                        <VTextarea density="comfortable" rows="3" label="Note" v-model="model.note" />
+                        <VTextarea density="comfortable" rows="3" label="Remarks" v-model="model.note" />
                     </VCol>
                     <VCol cols="6">
-                        <v-card elevation="0" class="pa-4 position-relative" border>
+                        <v-card elevation="0" class="pa-4 position-relative receipt-card" border>
                             <v-file-input
                                 style="opacity: 0;height:100%; width:100%; top:0; left:-10px; z-index: 999; cursor: pointer !important"
                                 :class="{ 'position-absolute': previewImage }" accept="*" show-size @change="imageStore" />
@@ -93,12 +93,12 @@ const imageUrl = inject("imageUrl");
 const router = useRouter();
 const route = useRoute();
 const model = ref({
-    category: [],
+    category: null,
     due_date: moment().format('DD-MM-YYYY'),
     amount: null,
     paid_by: '',
     paid_to: '',
-    payment_mode: [],
+    payment_mode: null,
     note: '',
     receipt: ''
 });
@@ -107,6 +107,7 @@ let getId = route.params.id;
 
 const rules = {
     text: [(v) => !!v || "This Field is Required"],
+    select: [(v) => (!!v || v == '' || !!v?.length) || "This Field is Required"],
     email: [
         (v) => !!v || "This Email is Required",
         (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
@@ -178,7 +179,7 @@ const onSubmit = async () => {
             formData.append('paid_by', model.value.paid_by)
             formData.append('paid_to', model.value.paid_to)
             formData.append('payment_mode', model.value.payment_mode)
-            formData.append('note', model.value.note)
+            formData.append('note', model.value.note ? model.value.note : '')
             if (!!model.value.receipt && typeof model.value.receipt == "object") {
                 formData.append('receipt', model.value.receipt)
             }
@@ -221,5 +222,9 @@ const downloadReceipt = () => {
     position: sticky;
     z-index: 999;
     top: 0px;
+}
+
+.receipt-card {
+    border: 1px solid #5a5b6e;
 }
 </style>

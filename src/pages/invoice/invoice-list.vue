@@ -137,6 +137,7 @@
             <v-tab :value="null" selected>All</v-tab>
             <v-tab value="1">Draft</v-tab>
             <v-tab value="2">Sent</v-tab>
+            <v-tab value="3">Completed</v-tab>
             <v-tab value="4">Over Due</v-tab>
         </v-tabs>
         <v-table class="rounded">
@@ -164,18 +165,18 @@
                     <td>{{ item.invoice_date ? moment(item.invoice_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td>{{ item.due_date ? moment(item.due_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td class="badge-align">
-                        <VBadge
-                            :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#ff8933' : item.status == 4 ? '#ff0000' : '#71dd37'"
-                            :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : item.status == 4 ? 'OVER DUE' : 'COMPLETED'">
-                        </VBadge>
+                        <VChip
+                            :color="item.status == 1 ? 'secondary' : item.status == 2 ? 'warning' : item.status == 4 ? 'error' : 'success'">
+                            {{ item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : item.status == 4 ? 'OVER DUE' :
+                                'COMPLETED' }}
+                        </VChip>
                     </td>
-                    <!-- {{ item }} -->
                     <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
                     <td class="badge-align">
-                        <VBadge class="payment-status"
-                            :color="item.payment_status == 1 ? '#fef7d1' : item.payment_status == 2 ? '#ff8933' : '#71dd37'"
-                            :content="item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID'">
-                        </VBadge>
+                        <VChip class="payment-status"
+                            :color="item.payment_status == 1 ? 'error' : item.payment_status == 2 ? 'warning' : 'success'">
+                            {{ item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID' }}
+                        </VChip>
                     </td>
                     <td width="200">
                         <div class="d-flex align-center justify-space-between">
@@ -199,9 +200,8 @@
                                         @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
                                         <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status == 2 ||
                                             item.status == 4 ? 'mdi-payment' : '' }}</v-icon>{{ item.status == 1 ?
-        ' Mark As Sent' : item.status == 2 || item.status == 4 ? ' Record Payment' : ''
-    }}</v-list-item-title>
-                                    </v-list-item>
+        ' Mark As Sent' : item.status == 2 || item.status == 4 ? ' Record Payment' :
+            '' }}</v-list-item-title></v-list-item>
                                     <v-list-item v-if="checkPermission('Delete Invoice')" @click="deleteConfirm(item._id)">
                                         <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
                                     </v-list-item>
@@ -229,7 +229,7 @@
 <script setup>
 import { inject, onMounted } from 'vue';
 import { checkPermission } from '@/mixins/permissionMixin'
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import moment from 'moment'
 const defaultFilter = Object.freeze({
     page: 2,
@@ -306,7 +306,6 @@ const submitForm = async () => {
             doSearch()
         }
     } catch (error) {
-        console.log("error", error)
         // projectError.value.isError = true
         // projectError.value.message = error?.message
         // setTimeout(() => {
@@ -423,13 +422,23 @@ onMounted(async () => {
 });
 
 </script>
-<style >
-.badge-align .v-badge__badge {
-    bottom: calc(100% - 6px) !important;
-    left: calc(100% - 15px) !important;
+<style>
+.badge-align .text-success {
+    background-color: #4CAF50;
 }
 
-/* .v-table>.v-table__wrapper>table>tbody>tr>td {
-    padding: 0px 30px;
-} */
-</style>
+.badge-align .text-secondary {
+    background-color: #424242;
+}
+
+.badge-align .text-warning {
+    background-color: #FFA500;
+}
+
+.badge-align .text-error {
+    background-color: #FF1744;
+}
+
+.badge-align .v-chip__content {
+    color: #fefefe;
+}</style>

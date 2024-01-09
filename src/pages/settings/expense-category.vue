@@ -6,7 +6,7 @@
                 <v-form @submit.prevent="onSubmit">
                     <VRow>
                         <VCol cols="6">
-                            <v-text-field name="name" density="compact" label="Name" v-model="model.name" />
+                            <v-text-field name="name" density="compact" label="Category Name" v-model="model.name" />
                         </VCol>
                         <VCol cols="6">
                             <v-text-field name="description" density="compact" label="Description"
@@ -31,7 +31,7 @@
                             <v-text-field name="pay_to" density="compact" label="Pay to" v-model="model.pay_to" />
                         </VCol>
                         <VCol cols="6" v-if="model.recurring">
-                            <v-text-field name="note" density="compact" label="Note" v-model="model.note" />
+                            <v-text-field name="note" density="compact" label="Remarks" v-model="model.note" />
                         </VCol>
                         <VCol cols="6">
                             <v-checkbox class="ms-1" name="Recurring" density="compact" label="Recurring" v-model="model.recurring" />

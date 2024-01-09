@@ -87,7 +87,7 @@ const chartOptions = computed(() => {
 <template>
   <VCard>
     <VCardText class="d-flex justify-space-between h-100">
-      <div class="d-flex flex-column justify-space-between gap-y-4">
+      <div class="d-flex flex-column gap-y-4">
         <div>
           <h6 class="text-h6 text-no-wrap mb-1">
             Profile Report
@@ -102,9 +102,6 @@ const chartOptions = computed(() => {
             'text-success': props.dashboardData?.profitFromLastYear > 0,
             'text-error': props.dashboardData?.profitFromLastYear < 0
           }">
-            <VIcon :icon="(props.dashboardData?.profitFromLastYear > 0) ?
-              'bx-up-arrow-alt' : 'bx-down-arrow-alt'" size="18" class="me-1" />
-            <span>{{ props.dashboardData?.profitFromLastYear }}%</span>
           </div>
 
           <h5 class="text-h5">

@@ -72,7 +72,7 @@
                     </VCol>
                     <VCol cols="2" class="d-flex gap-2 justify-center"
                         :class="model.invoice_id ? 'align-stretch' : 'align-center'">
-                        <v-switch id="adjustable_amount" v-model="model.adjustable_amount" density="comfort"></v-switch>
+                        <v-checkbox id="adjustable_amount" v-model="model.adjustable_amount" density="comfort"></v-checkbox>
                         <label class="h-50 d-flex align-end" for="adjustable_amount">Adjustable</label>
                     </VCol>
 
@@ -147,20 +147,12 @@ const model = ref({
     amount: 0,
     adjustable_amount: 0,
     payment_mode: null,
-    exchange_rate: '',
+    exchange_rate: null,
     amount_in_inr: '',
     notes: "",
 });
 
-// const isEdit = ref(false);
-// const customer = computed(() => {
-//     return store.state.customers.customerUser;
-// });
-// const projects = computed(() => {
-//     return store.state.customers.projects;
-// });
 const paymentModes = computed(() => {
-    console.log("store.state.payment.paymentModes", store.state.payment.paymentModes)
     return store.state.payment.paymentModes;
 });
 const payments = computed(() => { return store.state.payment.payments })
@@ -177,15 +169,14 @@ const invoices = computed(() => {
 });
 let getId = route.params.id;
 
-console.log("route.params", route.params)
 const invoiceRefId = route.params.invoice_id
 onMounted(async () => {
     await store.dispatch('payment/fetchAllPayments')
     await store.dispatch("invoices/fetchAllCustomers");
     await store.dispatch("payment/fetchPaymentModes");
-    // await store.dispatch("invoices/fetchAllInvoice");
     await store.dispatch("payment/getPaymentNumber");
     if (invoiceRefId) {
+        console.log(payment.value, "payment.value");
         model.value = { ...payment.value };
     }
     model.value.payment_number = store.state.payment.payment_number
@@ -199,17 +190,14 @@ onMounted(async () => {
         }
     }
 });
-watchEffect(async () => {
+watch(() => model.value.customer_id, async (val, newVal) => {
     try {
-        if (model.value.customer_id) {
-            if (getId == 0) {
-                model.value.invoice_id = null
-                model.value.amount = null
-            }
-            
-            await store.dispatch("invoices/fetchAllCustomerInvoice",
-                { customer_id: model.value.customer_id, edit: getId == 0 ? 0 : 1 });
+        if (getId == 0 && !!newVal && !!val) {
+            model.value.invoice_id = null
+            model.value.amount = null
         }
+        await store.dispatch("invoices/fetchAllCustomerInvoice",
+            { customer_id: model.value.customer_id, edit: getId == 0 ? 0 : 1 });
     } catch (error) {
         console.log("ErrorInLoop", error);
     }

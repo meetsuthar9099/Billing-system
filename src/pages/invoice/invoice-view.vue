@@ -36,7 +36,7 @@
             <VCol cols="12">
               <VRow>
                 <VCol cols="12">
-                  <VSelect item-title="name" item-value="_id" :hide-selected="true" density="comfortable"
+                  <VSelect item-title="name" item-value="_id" density="comfortable"
                     label="Add Customer" name="display_name" :rules="rules.date" :items="allCustomers"
                     v-model="model.customer_id" prepend-inner-icon="bx-user" />
                   <VCol v-if="!customer" class="text-right">
@@ -129,7 +129,7 @@
                   <v-select density="compact" :disabled="!model.projects[i].id" :items="uom"
                     v-model="model.projects[i].uom"></v-select>
                 </td>
-                <td width="150">
+                <td width="100">
                   <VTextField :disabled="!model.projects[i].id" type="number" :rules="rules.qty" min="0" density="compact"
                     v-model="model.projects[i].quantity"></VTextField>
                 </td>
@@ -137,16 +137,16 @@
                   <VTextField :disabled="!model.projects[i].id" type="number" min="0" density="compact"
                     prepend-inner-icon="mdi-percent" v-model="model.projects[i].discount"></VTextField>
                 </td>
-                <td width="100" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].cgst.amount" min="0"
+                <td width="120" v-if="isLocal">
+                  <VTextField disabled density="compact" v-model="model.projects[i].cgst.amount" min="0"
                     max="100"></VTextField>
                 </td>
-                <td width="100" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].sgst.amount" min="0"
+                <td width="120" v-if="isLocal">
+                  <VTextField disabled density="compact" v-model="model.projects[i].sgst.amount" min="0"
                     max="100"></VTextField>
                 </td>
-                <td width="100" v-if="isLocal">
-                  <VTextField disabled type="number" density="compact" v-model="model.projects[i].igst.amount" min="0"
+                <td width="120" v-if="isLocal">
+                  <VTextField disabled density="compact" v-model="model.projects[i].igst.amount" min="0"
                     max="100">
                   </VTextField>
                 </td>
@@ -164,7 +164,7 @@
             </tbody>
           </VTable>
           <v-btn v-if="model.projects.length != 0" class="w-100 mt-4" color="grey-50 pointer-cursor"
-            @click="addProjectField"><v-icon class="me-1">mdi-plus-circle</v-icon><span>Add New
+            @click="addProjectField"><v-icon class="me-1">mdi-plus-circle</v-icon><span>ADD NEW
               PARTICULARS</span></v-btn>
         </VCard>
       </VCol>

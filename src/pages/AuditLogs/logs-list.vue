@@ -46,6 +46,7 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
+                    <th></th>
                     <th>Date & Time</th>
                     <th>Type</th>
                     <th>User</th>
@@ -54,6 +55,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in logs" :key="'customer' + index">
+                    <td></td>
                     <td>{{ item.timestamp ? moment(item.timestamp).format('DD-MM-YYYY hh:mm:ss a') : '-' }}</td>
                     <td>{{ item.meta.type ? item.meta.type : '-' }}</td>
                     <td>{{ item.meta.user_id ? userName(item.meta.user_id) : '-' }}</td>

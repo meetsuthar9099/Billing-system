@@ -62,9 +62,9 @@ export default {
         throw error
       }
     },
-    async fetchExpenses({ commit }) {
+    async fetchExpenses({ commit },query) {
       try {
-        const response = await api.fetchExpenses()
+        const response = await api.fetchExpenses(query)
         const data = response.data
 
         commit('SET_EXPENSES', data.expenses)

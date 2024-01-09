@@ -53,20 +53,17 @@
                 </v-col>
                 <v-col cols="12">
                     <v-row>
-                        <v-col cols="3">
-                            <VSelect label="Customer" item-title="name" item-value="_id" :items="customers" v-model="filter.customer" density="compact">
+                        <v-col cols="4">
+                            <VSelect label="Category" item-title="category_name" item-value="_id" :items="categories"
+                                v-model="filter.category" density="compact">
                             </VSelect>
                         </v-col>
-                        <v-col cols="3">
-                            <VSelect label="Category" item-title="category_name" item-value="_id" :items="categories" v-model="filter.category" density="compact">
-                            </VSelect>
-                        </v-col>
-                        <v-col cols="3">
-                            <VTextField type="date" label="From Date" v-model="filter.due_from" density="compact">
+                        <v-col cols="4">
+                            <VTextField type="date" label="From Date" v-model="filter.date_from" density="compact">
                             </VTextField>
                         </v-col>
-                        <v-col cols="3">
-                            <VTextField type="date" label="To Date" v-model="filter.due_to" density="compact"></VTextField>
+                        <v-col cols="4">
+                            <VTextField type="date" label="To Date" v-model="filter.date_to" density="compact"></VTextField>
                         </v-col>
                     </v-row>
                 </v-col>
@@ -79,7 +76,7 @@
                     <th>Sr No</th>
                     <th>Date</th>
                     <th>Category</th>
-                    <th>Note</th>
+                    <th>Remarks</th>
                     <th>Amount</th>
                     <th>Paid To</th>
                     <th>Paid By</th>
@@ -92,7 +89,7 @@
                     <td>{{ moment(item.due_date).format('DD-MM-YYYY') }}</td>
                     <td>{{ item.category ? item.category.category_name : "-" }}</td>
                     <td>{{ item.note ? item.note : '-' }}</td>
-                    <td>{{ item.amount ? '₹ '+item.amount : '-' }}</td>
+                    <td>{{ item.amount ? '₹ ' + item.amount : '-' }}</td>
                     <td>{{ item.paid_to ? item.paid_to : "-" }}</td>
                     <td>{{ item.paid_by ? item.paid_by : "-" }}</td>
                     <td width="200" v-if="checkPermission('Update Expense') || checkPermission('Delete Expense')">
@@ -130,8 +127,8 @@ import moment from 'moment';
 const defaultFilter = Object.freeze({
     customer: null,
     category: null,
-    due_from: null,
-    due_to: null,
+    date_from: null,
+    date_to: null,
 })
 let deleteExpenseId = null
 const store = inject('store');
@@ -145,7 +142,7 @@ const selectExpense = ref([])
 
 //computed
 const categories = computed(() => store.state.expenses.categories)
-const expenses = computed(() => { return store.state.expenses.items })
+const expenses = computed(() => store.state.expenses.items)
 
 const pagination = computed(() => {
     return {
@@ -154,6 +151,30 @@ const pagination = computed(() => {
         currentPage: store.state.expenses.currentPage
     }
 })
+// const sortDesc = ref(false)
+// const sortedItems = computed(() => {
+//     const sorted = [...expenses.value];
+//     try {
+//         sorted.sort((a, b) => {
+//             const modifier = sortDesc.value ? -1 : 1;
+
+//             const categoryNameA = a['category'] ? a['category']['category_name'] : '';
+//             const categoryNameB = b['category'] ? b['category']['category_name'] : '';
+
+//             if (categoryNameA < categoryNameB) return -1 * modifier;
+//             if (categoryNameA > categoryNameB) return 1 * modifier;
+
+//             return 0;
+//         });
+//         return sorted;
+
+//     } catch (error) {
+//         // Handle the error or simply return the sorted array
+//         console.error("Sorting error:", error);
+//         return sorted;
+//     }
+// });
+
 
 //method
 const deleteConfirm = async (id) => {
@@ -162,12 +183,11 @@ const deleteConfirm = async (id) => {
 }
 const doSearch = async () => {
     const query = {
-        customer: filter.value.customer,
         category: filter.value.category,
-        due_from: filter.value.due_from,
-        due_to: filter.value.due_to
+        date_from: filter.value.date_from,
+        date_to: filter.value.date_to
     }
-    await store.dispatch('expenses/fetchExpenses');
+    await store.dispatch('expenses/fetchExpenses', query);
 }
 const deleteExpense = async () => {
     if (deleteExpenseId) {
