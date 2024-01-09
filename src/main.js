@@ -26,7 +26,8 @@ const imageUrl = `${url}/public/images/`
 axios.interceptors.response.use(
     response => response,
     error => {
-        if (error.response && error.response.status === 401) {
+        if (error.response && error.response.status === 401 ||
+            error.code == "ERR_NETWORK") {
             store.commit('UNAUTHENTICATE')
             router.push({ name: 'Login' })
         }

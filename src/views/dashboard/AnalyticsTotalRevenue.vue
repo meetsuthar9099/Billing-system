@@ -8,11 +8,8 @@ import { hexToRgb } from '@layouts/utils'
 const props = defineProps(['monthlyIncomeArray', 'monthlyExpenseArray']);
 const vuetifyTheme = useTheme()
 const display = useDisplay()
-console.log('Monthly Income Array:', props.monthlyIncomeArray);
-console.log('Monthly Expense Array:', props.monthlyExpenseArray);
 
 const series = computed(() => {
-  console.log('Inside computed function');
   const incomeData = Array.isArray(props.monthlyIncomeArray) ? props.monthlyIncomeArray : [];
   const expenseData = Array.isArray(props.monthlyExpenseArray) ? props.monthlyExpenseArray : [];
 
@@ -34,6 +31,13 @@ const chartOptions = computed(() => {
   const disabledTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['disabled-opacity']})`
   const primaryTextColor = `rgba(${hexToRgb(String(currentTheme['on-surface']))},${variableTheme['high-emphasis-opacity']})`
   const borderColor = `rgba(${hexToRgb(String(variableTheme['border-color']))},${variableTheme['border-opacity']})`
+
+  const incomeArray = props.monthlyIncomeArray || [];
+  const expenseArray = props.monthlyExpenseArray || [];
+
+  const combinedArray = [...incomeArray, ...expenseArray].map(value => Math.abs(parseFloat(value) || 0));
+  const maxArrayValue = Math.max(...combinedArray);
+  const roundedMaxValue = Math.pow(10, Math.log10(maxArrayValue / 5)) * 5;
 
   return {
     bar: {
@@ -113,9 +117,9 @@ const chartOptions = computed(() => {
         },
       },
       yaxis: {
-        forceNiceScale: false,
-        min: -50000,          // Set the minimum value
-        max: 50000,     // Set the maximum value
+        forceNiceScale: true,
+        min: -roundedMaxValue,   // Set the minimum value
+        max: roundedMaxValue,     // Set the maximum value
         tickAmount: 10,
         labels: {
           style: {
@@ -215,20 +219,6 @@ const chartOptions = computed(() => {
   }
 })
 
-const balanceData = [
-  {
-    icon: 'bx-dollar',
-    amount: '$32.5k',
-    year: '2023',
-    color: 'primary',
-  },
-  {
-    icon: 'bx-wallet',
-    amount: '$41.2k',
-    year: '2022',
-    color: 'info',
-  },
-]
 </script>
 
 <template>
@@ -238,11 +228,11 @@ const balanceData = [
         <VCardItem class="pb-0">
           <VCardTitle>Income-Expenses</VCardTitle>
 
-          <template #append>
+          <!-- <template #append>
             <div class="me-n3">
               <MoreBtn />
             </div>
-          </template>
+          </template> -->
         </VCardItem>
 
         <!-- bar chart -->
@@ -256,8 +246,9 @@ const balanceData = [
 #bar-chart .apexcharts-series[rel="2"] {
   transform: translateY(-10px);
 }
+
 .apexcharts-active {
-font-size: 24px;
-color: black;
+  font-size: 24px;
+  color: black;
 }
 </style>

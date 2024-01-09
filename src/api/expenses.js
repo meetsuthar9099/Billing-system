@@ -3,8 +3,9 @@ const api = {
     async addExpenses(formdata) {
         return await axios.post('expenses', formdata, { headers: { 'Content-Type': 'multipart/form-data' } })
     },
-    async fetchExpenses() {
-        return await axios.get('expenses')
+    async fetchExpenses(query) {
+        const { category, date_from, date_to } = query
+        return await axios.get(`expenses?category_id=${category ? category : ''}&date_from=${date_from ? date_from : ''}&date_to=${date_to ? date_to : ''}`)
     },
     async fetchExpense(id) {
         return await axios.get(`expense/${id}`)

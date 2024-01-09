@@ -210,7 +210,7 @@ watchEffect(() => {
                 model.value.date_to = moment().endOf('month').format('YYYY-MM-DD')
                 break;
             case "this_quarter":
-                model.value.date_from = moment().startOf('quarter').format('YYYY-MM-DD')
+                model.value.date_from = moment().startOf('quarter').format('YYYY-MM-DD')    
                 model.value.date_to = moment().endOf('quarter').format('YYYY-MM-DD')
                 break;
             case "this_year":

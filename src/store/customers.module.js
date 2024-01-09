@@ -78,7 +78,8 @@ export default {
       try {
         await api.deleteCustomer(id);
       } catch (error) {
-        throw error;
+        console.error(error.response.data.message,"error");
+        throw error.response.data.message;
       }
     },
     async bulkDeleteCustomer({ }, arrayId) {
@@ -143,7 +144,7 @@ export default {
     async fetchCountries({ commit }) {
       try {
         const response = await api.fetchCountries()
-        console.log(response,"SET_COUNTRIES");
+        console.log(response, "SET_COUNTRIES");
         const { countries } = response.data
         commit('SET_COUNTRIES', countries)
       }

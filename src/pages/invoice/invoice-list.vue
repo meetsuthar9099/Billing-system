@@ -137,10 +137,13 @@
             <v-tab :value="null" selected>All</v-tab>
             <v-tab value="1">Draft</v-tab>
             <v-tab value="2">Sent</v-tab>
+            <v-tab value="3">Completed</v-tab>
+            <v-tab value="4">Over Due</v-tab>
         </v-tabs>
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
+                    <th>Sr No</th>
                     <th>Invoice Number</th>
                     <th>Customer</th>
                     <th>Invoice Date</th>
@@ -153,6 +156,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in invoices" :key="'invoice' + index">
+                    <td>{{ item.index }}</td>
                     <td>
                         <router-link :to="'invoice/pdf/' + item._id"><span class="text-primary">{{ item.invoice_number ?
                             item.invoice_number : '-' }}</span></router-link>
@@ -161,60 +165,58 @@
                     <td>{{ item.invoice_date ? moment(item.invoice_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td>{{ item.due_date ? moment(item.due_date).format('DD-MM-YYYY') : '-' }}</td>
                     <td class="badge-align">
-                        <VBadge :color="item.status == 1 ? '#fef7d1' : item.status == 2 ? '#fef7d1' : '#c3ecd5'"
-                            :content="item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : 'COMPLETED'">
-                        </VBadge>
+                        <VChip
+                            :color="item.status == 1 ? 'secondary' : item.status == 2 ? 'warning' : item.status == 4 ? 'error' : 'success'">
+                            {{ item.status == 1 ? 'DRAFT' : item.status == 2 ? 'SENT' : item.status == 4 ? 'OVER DUE' :
+                                'COMPLETED' }}
+                        </VChip>
                     </td>
-                    <!-- {{ item }} -->
                     <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
                     <td class="badge-align">
-                        <VBadge class="payment-status"
-                            :color="item.payment_status == 1 ? '#fef7d1' : item.payment_status == 2 ? '#fef7d1' : '#c3ecd5'"
-                            :content="item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID'">
-                        </VBadge>
+                        <VChip class="payment-status"
+                            :color="item.payment_status == 1 ? 'error' : item.payment_status == 2 ? 'warning' : 'success'">
+                            {{ item.payment_status == 1 ? 'UNPAID' : item.payment_status == 2 ? 'PARTIALLY PAID' : 'PAID' }}
+                        </VChip>
                     </td>
                     <td width="200">
-                        <v-menu>
-                            <template v-slot:activator="{ props }">
-                                <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
-                            </template>
-
-                            <v-list>
-                                <v-list-item :to="'invoice/pdf/' + item._id">
-                                    <v-list-item-title><v-icon>mdi-eye</v-icon> View</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item v-if="checkPermission('Update Invoice')" :to="'invoice/' + item._id">
-                                    <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item @click="sendInvoice(item._id)">
-                                    <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' :
-                                        'Resend invoice' }}</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item v-if="item.status == 1 || item.status == 2"
-                                    @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
-                                    <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status
-                                        == 2 ? 'mdi-payment' : '' }}</v-icon>{{ item.status == 1 ? ' Mark As Sent' :
-        item.status
-            == 2 ? ' Record Payment' : '' }}</v-list-item-title>
-                                </v-list-item>
-                                <v-list-item v-if="checkPermission('Delete Invoice')" @click="deleteConfirm(item._id)">
-                                    <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
-                                </v-list-item>
-                            </v-list>
-                        </v-menu>
+                        <div class="d-flex align-center justify-space-between">
+                            <v-menu>
+                                <template v-slot:activator="{ props }">
+                                    <v-btn :elevation="0" icon="mdi-dots-horizontal" color="none" v-bind="props"></v-btn>
+                                </template>
+                                <v-list>
+                                    <v-list-item :to="'invoice/pdf/' + item._id">
+                                        <v-list-item-title><v-icon>mdi-eye</v-icon> View</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status !== 3 && checkPermission('Update Invoice')"
+                                        :to="'invoice/' + item._id">
+                                        <v-list-item-title><v-icon>mdi-pencil</v-icon> Edit</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item @click="sendInvoice(item._id)">
+                                        <v-list-item-title><v-icon>mdi-send</v-icon>{{ item.status == 1 ? 'Send Invoice' :
+                                            'Resend invoice' }}</v-list-item-title>
+                                    </v-list-item>
+                                    <v-list-item v-if="item.status !== 3"
+                                        @click="() => { item.status == 1 ? sentConfirm(item._id) : sentPayment(item._id) }">
+                                        <v-list-item-title><v-icon>{{ item.status == 1 ? 'mdi-tick' : item.status == 2 ||
+                                            item.status == 4 ? 'mdi-payment' : '' }}</v-icon>{{ item.status == 1 ?
+        ' Mark As Sent' : item.status == 2 || item.status == 4 ? ' Record Payment' :
+            '' }}</v-list-item-title></v-list-item>
+                                    <v-list-item v-if="checkPermission('Delete Invoice')" @click="deleteConfirm(item._id)">
+                                        <v-list-item-title><v-icon>mdi-delete</v-icon> Delete</v-list-item-title>
+                                    </v-list-item>
+                                </v-list>
+                            </v-menu>
+                            <v-tooltip :text="item.description" v-if="item.description" location="left">
+                                <template v-slot:activator="{ props }">
+                                    <v-icon v-bind="props">mdi-info</v-icon>
+                                </template>
+                            </v-tooltip>
+                        </div>
                     </td>
-
-                    <!-- <td width="200">
-                        <v-btn class="me-2" color="#03A9F4" :to="'invoice/' + item._id" variant="tonal">
-                            <v-icon>mdi-eye</v-icon>
-                        </v-btn>
-                        <v-btn color="error" @click="deleteConfirm(item._id)" variant="tonal">
-                            <v-icon>mdi-delete</v-icon>
-                        </v-btn>
-                    </td> -->
                 </tr>
                 <tr v-if="!invoices.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>
@@ -227,7 +229,7 @@
 <script setup>
 import { inject, onMounted } from 'vue';
 import { checkPermission } from '@/mixins/permissionMixin'
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import moment from 'moment'
 const defaultFilter = Object.freeze({
     page: 2,
@@ -256,6 +258,7 @@ const allStatus = ref([
     { id: 0, title: "Select Status" },
     { id: 1, title: "Draft" },
     { id: 2, title: "Sent" },
+    { id: 4, title: "Over Due" },
     { id: 3, title: "Completed" }
 ])
 const bulkDeleteModel = ref(false)
@@ -303,7 +306,6 @@ const submitForm = async () => {
             doSearch()
         }
     } catch (error) {
-        console.log("error", error)
         // projectError.value.isError = true
         // projectError.value.message = error?.message
         // setTimeout(() => {
@@ -314,10 +316,12 @@ const submitForm = async () => {
 const sentPayment = async (id) => {
     const invoiceData = store.state.invoices.items && store.state.invoices.items.find(x => x._id == id)
     const invoice = {
-        date: moment().format('DD-MM-YYYY'),
+        date: moment().format('YYYY-MM-DD'),
         customer_id: invoiceData.customer_id,
         invoice_id: invoiceData._id
     }
+
+    console.log("invoiceeee", invoice)
     store.commit('payment/SET_PAYMENT', invoice)
     router.push({ path: `payment/${id}/0` })
 
@@ -419,8 +423,22 @@ onMounted(async () => {
 
 </script>
 <style>
-.badge-align .v-badge__badge {
-    bottom: calc(100% - 5px) !important;
-    left: calc(100% - 28px) !important;
+.badge-align .text-success {
+    background-color: #4CAF50;
 }
-</style>
+
+.badge-align .text-secondary {
+    background-color: #424242;
+}
+
+.badge-align .text-warning {
+    background-color: #FFA500;
+}
+
+.badge-align .text-error {
+    background-color: #FF1744;
+}
+
+.badge-align .v-chip__content {
+    color: #fefefe;
+}</style>

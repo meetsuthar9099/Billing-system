@@ -46,7 +46,8 @@
         <v-table class="rounded">
             <thead slot="head">
                 <tr>
-                    <th>Date</th>
+                    <th></th>
+                    <th>Date & Time</th>
                     <th>Type</th>
                     <th>User</th>
                     <th>Message</th>
@@ -54,6 +55,7 @@
             </thead>
             <tbody>
                 <tr v-for="(item, index) in logs" :key="'customer' + index">
+                    <td></td>
                     <td>{{ item.timestamp ? moment(item.timestamp).format('DD-MM-YYYY hh:mm:ss a') : '-' }}</td>
                     <td>{{ item.meta.type ? item.meta.type : '-' }}</td>
                     <td>{{ item.meta.user_id ? userName(item.meta.user_id) : '-' }}</td>
@@ -61,7 +63,7 @@
 
                 </tr>
                 <tr v-if="!logs.length > 0">
-                    <td colspan="99"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
+                    <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
         </v-table>

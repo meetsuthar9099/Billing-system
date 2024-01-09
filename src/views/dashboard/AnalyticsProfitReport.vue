@@ -1,6 +1,6 @@
 <script setup>
 import VueApexCharts from 'vue3-apexcharts'
-import moment  from 'moment';
+import moment from 'moment';
 import {
   useDisplay,
   useTheme,
@@ -87,7 +87,7 @@ const chartOptions = computed(() => {
 <template>
   <VCard>
     <VCardText class="d-flex justify-space-between h-100">
-      <div class="d-flex flex-column justify-space-between gap-y-4">
+      <div class="d-flex flex-column gap-y-4">
         <div>
           <h6 class="text-h6 text-no-wrap mb-1">
             Profile Report
@@ -98,9 +98,10 @@ const chartOptions = computed(() => {
         </div>
 
         <div>
-          <div  class="text-success text-sm">
-            <VIcon icon="bx-up-arrow-alt"  size="18" class="me-1" />
-            <span>{{props.dashboardData?.profitFromLastYear }}</span>
+          <div class="text-sm" :class="{
+            'text-success': props.dashboardData?.profitFromLastYear > 0,
+            'text-error': props.dashboardData?.profitFromLastYear < 0
+          }">
           </div>
 
           <h5 class="text-h5">

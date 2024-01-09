@@ -1,8 +1,11 @@
 <template>
   <div>
+    <v-snackbar location="top right" v-model="errorAlert.show" :color="errorAlert.variant">
+      <v-icon class="me-1">{{ errorAlert.icon }}</v-icon><strong>{{ errorAlert.message }}</strong>
+    </v-snackbar>
     <VForm class="d-flex flex-column gap-2" ref="form" @submit.prevent="onSubmit">
-      <VCard class="pa-8">
-        <VRow>
+      <VCard elevation="0" class="pa-8">
+        <VRow class="mb-3">
           <VCol cols="12">
             <h3>Basic info</h3>
           </VCol>
@@ -33,9 +36,7 @@
             </VRow>
           </VCol>
         </VRow>
-      </VCard>
-      <VCard class="pa-8">
-        <VRow>
+        <VRow class="mb-3">
           <VCol cols="12">
             <h3>Company Address</h3>
           </VCol>
@@ -72,9 +73,8 @@
             </VRow>
           </VCol>
         </VRow>
-      </VCard>
-      <VCard class="pa-8">
-        <VRow>
+
+        <VRow class="mb-3">
           <VCol cols="12">
             <h3>Bank Details</h3>
           </VCol>
@@ -103,9 +103,8 @@
             </VRow>
           </VCol>
         </VRow>
-      </VCard>
-      <VCard class="pa-8">
-        <VRow>
+
+        <VRow class="mb-3">
           <VCol cols="12">
             <h3>Tax Details</h3>
           </VCol>
@@ -122,6 +121,31 @@
               <VCol cols="4">
                 <VTextField density="comfortable" label="IGST" type="text" append-inner-icon="mdi-percent"
                   v-model="model.igst" placeholder="Enter Your Value" />
+              </VCol>
+            </VRow>
+          </VCol>
+        </VRow>
+
+        <VRow class="mb-3">
+          <VCol cols="6" class="d-flex align-center">
+            <h3>Terms and Conditions</h3>
+          </VCol>
+          <VCol cols="6" class="text-end">
+            <v-btn color="none" variant="tonal" @click="addTAC"><v-icon>mdi-plus</v-icon> ADD</v-btn>
+          </VCol>
+          <VCol cols="12">
+            <VRow>
+              <VCol cols="12" v-for="({}, i) in model.terms_and_conditions">
+                <v-text-field density="compact" v-model="model.terms_and_conditions[i]">
+                  <template #prepend>
+                    <span>{{ i + 1 }}.</span>
+                  </template>
+                  <template #append v-if="model.terms_and_conditions.length > 1">
+                    <v-btn elevation="0" color="none" @click="removeCondition(i)">
+                      <v-icon>mdi-close</v-icon>
+                    </v-btn>
+                  </template>
+                </v-text-field>
               </VCol>
             </VRow>
           </VCol>
@@ -164,7 +188,7 @@ const model = ref({
   cgst: null,
   sgst: null,
   igst: null,
-
+  terms_and_conditions: []
 });
 const countries = [
   { name: "United States", code: "US" },
@@ -200,12 +224,40 @@ const settings = [
     name: 'Company Settings'
   }
 ]
+const errorAlert = ref({
+  show: false,
+  message: "",
+  icon: "",
+  variant: ""
+})
+const showAlert = (message, variant = 'error', timeout = 3000) => {
+  errorAlert.value.show = true
+  errorAlert.value.message = message
+  errorAlert.value.variant = variant
+  errorAlert.value.icon = variant == "error" ? 'mdi-warning' : variant == "success" ? 'mdi-tick' : ''
+  setTimeout(() => {
+    errorAlert.value.show = false
+    errorAlert.value.message = ""
+    errorAlert.value.icon = ""
+    errorAlert.value.variant = ""
+  }, timeout)
+}
+const removeCondition = (index) => {
+  model.value.terms_and_conditions.splice(index, 1)
+}
+const addTAC = () => {
+  try {
+    if (model.value.terms_and_conditions.length >= 5) throw new Error('You can add upto 5 T&C')
+    model.value.terms_and_conditions.push('')
+  } catch (error) {
+    showAlert(error.message, 'error')
+  }
+}
 onMounted(async () => {
   await store.dispatch("company/fetch");
   model.value = { ...companySettings.value };
 });
-const companySettings = computed(() => {
-  console.log("store.state.company.settings", store.state.company.settings)
+let companySettings = computed(() => {
   return store.state.company.settings;
 });
 const form = ref(null);
@@ -213,11 +265,12 @@ const onSubmit = async () => {
   try {
     const { valid } = await form.value.validate();
     if (valid) {
-      const modelData = model.value
+      let modelData = model.value
       await store.dispatch('company/update', modelData)
+      showAlert("Updated successfully", 'success')
     }
   } catch (error) {
-    console.log(error, "errorsss");
+    showAlert(error.messgae)
   }
 };
 

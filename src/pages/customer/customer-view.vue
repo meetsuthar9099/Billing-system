@@ -10,7 +10,7 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form">
+        <VForm class="d-flex flex-column gap-2" @submit.prevent="onSubmit" ref="form" lazy-validation>
             <VCard class="pa-8">
                 <VRow>
                     <div>
@@ -37,7 +37,7 @@
                             </VCol>
 
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Contact Name" v-model="model.contact_name" />
+                                <VTextField density="comfortable" :rules="rules.text" label="Contact Name" v-model="model.contact_name" />
                             </VCol>
                         </VRow>
                     </VCol>
@@ -57,7 +57,7 @@
                         <VRow>
                             <VCol cols="6">
                                 <VSelect item-title="currency" item-value="_id" density="comfortable"
-                                    label="Primary Currency" v-model="model.primary_currency" :items="currencies" />
+                                    label="Primary Currency"  :rules="rules.select" v-model="model.primary_currency" :items="currencies" />
                             </VCol>
                             <VCol cols="6">
                                 <VTextField density="comfortable" label="Website" v-model="model.website" type="text" />
@@ -65,7 +65,30 @@
                         </VRow>
                     </VCol>
                     <VCol cols="12" v-if="model.is_local">
-                        <VTextField density="comfortable" label="GSTIN" v-model="model.billing.gstin" />
+                        <VTextField density="comfortable" label="GSTIN" :rules="rules.gstinRules"
+                            v-model="model.billing.gstin">
+                            <template #append-inner>
+                                <v-tooltip location="bottom right">
+                                    <template v-slot:activator="{ props }">
+                                        <span v-bind="props"><v-icon class="cursor-pointer">mdi-info</v-icon></span>
+                                    </template>
+                                    <template #default>
+                                        <ol class="ms-6 my-1">
+                                            <li>First two digits: State code (01 to 37 representing
+                                                different states and
+                                                union territories)</li>
+                                            <li>Next ten digits: PAN (Permanent Account Number) of the
+                                                taxpayer</li>
+                                            <li>Thirteenth digit: Entity code (numeric)</li>
+                                            <li>Fourteenth digit: Blank space (reserved for future use)
+                                            </li>
+                                            <li>Fifteenth digit: Checksum digit (numeric)</li>
+                                        </ol>
+                                        <span class="ms-3">For Example: <strong>23AABCT1234C1Z5</strong></span>
+                                    </template>
+                                </v-tooltip>
+                            </template>
+                        </VTextField>
                     </VCol>
                 </VRow>
             </VCard>
@@ -77,20 +100,20 @@
                     <VCol cols="12">
                         <VRow>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="Name" v-model="model.billing.name" type="text"
+                                <VTextField density="comfortable" label="Name" :rules="rules.text" v-model="model.billing.name" type="text"
                                     prepend-inner-icon="bx-user" />
                             </VCol>
                             <VCol cols="6">
-                                <VSelect item-title="name" item-value="code" density="comfortable" label="Countries"
+                                <VSelect item-title="name" item-value="code" :rules="rules.select" density="comfortable" label="Countries"
                                     v-model="model.billing.country_id" :items="countries" />
                             </VCol>
                         </VRow>
                         <VRow>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="State" v-model="model.billing.state" type="text" />
+                                <VTextField density="comfortable" label="State" :rules="rules.text" v-model="model.billing.state" type="text" />
                             </VCol>
                             <VCol cols="6">
-                                <VTextField density="comfortable" label="City" v-model="model.billing.city" type="text" />
+                                <VTextField density="comfortable" label="City" :rules="rules.text" v-model="model.billing.city" type="text" />
                             </VCol>
                         </VRow>
                         <VRow>
@@ -159,11 +182,11 @@ const model = ref({
     email: "",
     phone: null,
     website: "",
-    primary_currency: "INR",
+    primary_currency: "",
     prefix: "",
     billing: {
         name: "",
-        country_id: "IN",
+        country_id: "",
         state: "",
         city: "",
         address_street_1: "",
@@ -171,18 +194,7 @@ const model = ref({
         address_street_2: "",
         zip: null,
         gstin: null,
-    },
-    // shipping: {
-    //     name: "",
-    //     country_id: "IN",
-    //     state: "",
-    //     city: "",
-    //     address_street_1: "",
-    //     phone: null,
-    //     address_street_2: "",
-    //     zip: null,
-    //     gstin: null,
-    // },
+    }
 });
 const countries = computed(() => store.state.customers.countries)
 const isEdit = ref(false);
@@ -211,14 +223,20 @@ onMounted(async () => {
     }
     await store.dispatch("customers/fetchProjects", getId);
 });
-
 const rules = {
     text: [(v) => !!v || "This Field is Required"],
+    select: [(v) => !!v || !!v?.length || "This Field is Required"],
     email: [
         (v) => !!v || "This Email is Required",
         (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
     ],
+    gstinRules: [
+        v => !!v || 'GSTIN is required',
+        v => /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}[Z]{1}[0-9A-Z]{1}$/.test(v) || 'Invalid GSTIN. Please check your gstin number.'
+    ],
 };
+
+
 const form = ref(null);
 const onSubmit = async () => {
     try {

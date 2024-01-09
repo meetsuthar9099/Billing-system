@@ -13,9 +13,9 @@ const mutations = {
 };
 
 const actions = {
-  async fetch({ commit }) {
+  async fetch({ commit },query) {
     try {
-      const result = await api.fetch();
+      const result = await api.fetch(query);
       const data = result.data.data;
       commit("SET_DATA", data);
     } catch (err) {
