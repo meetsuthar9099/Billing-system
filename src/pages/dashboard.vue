@@ -89,129 +89,129 @@
   </VRow>
 </template>
 <script setup>
-import { inject, onMounted, watchEffect } from 'vue';
-import moment from 'moment'
-import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
-import AnalyticsTotalRevenue from '@/views/dashboard/AnalyticsTotalRevenue.vue'
-const selectedDateRange = computed(() => {
-  return [
-    { key: "today", value: "Today" },
-    { key: "this_week", value: "This Week" },
-    { key: "this_month", value: "This Month" },
-    { key: "this_quarter", value: "This Quarter" },
-    { key: "this_year", value: "This Year" },
-    { key: "previous_week", value: "Previous Week" },
-    { key: "previous_month", value: "Previous Month" },
-    { key: "previous_quarter", value: "Previous Quarter" },
-    { key: "previous_year", value: "Previous Year" },
-  ]
-})
-const model = ref({
-  date_range: "this_year",
-  date_from: "",
-  date_to: "",
-})
+  import { inject, onMounted, watchEffect } from 'vue';
+  import moment from 'moment'
+  import AnalyticsProfitReport from '@/views/dashboard/AnalyticsProfitReport.vue'
+  import AnalyticsTotalRevenue from '@/views/dashboard/AnalyticsTotalRevenue.vue'
+  const selectedDateRange = computed(() => {
+    return [
+      { key: "today", value: "Today" },
+      { key: "this_week", value: "This Week" },
+      { key: "this_month", value: "This Month" },
+      { key: "this_quarter", value: "This Quarter" },
+      { key: "this_year", value: "This Year" },
+      { key: "previous_week", value: "Previous Week" },
+      { key: "previous_month", value: "Previous Month" },
+      { key: "previous_quarter", value: "Previous Quarter" },
+      { key: "previous_year", value: "Previous Year" },
+    ]
+  })
+  const model = ref({
+    date_range: "this_year",
+    date_from: "",
+    date_to: "",
+  })
 
 
 
-// 👉 Images
-import chart from '@images/cards/chart-success.png'
-import card from '@images/cards/credit-card-primary.png'
-import paypal from '@images/cards/paypal-error.png'
-import wallet from '@images/cards/wallet-info.png'
-const store = inject('store');
-watchEffect(() => {
-  if (model.value.date_range) {
-    switch (model.value.date_range) {
-      case "today":
-        model.value.date_from = moment().startOf('day').format('YYYY-MM-DD')
-        model.value.date_to = moment().endOf('day').format('YYYY-MM-DD')
-        break;
-      case "this_week":
-        model.value.date_from = moment().startOf('week').format('YYYY-MM-DD')
-        model.value.date_to = moment().endOf('week').format('YYYY-MM-DD')
-        break;
-      case "this_month":
-        model.value.date_from = moment().startOf('month').format('YYYY-MM-DD')
-        model.value.date_to = moment().endOf('month').format('YYYY-MM-DD')
-        break;
-      case "this_quarter":
-        model.value.date_from = moment().startOf('quarter').format('YYYY-MM-DD')
-        model.value.date_to = moment().endOf('quarter').format('YYYY-MM-DD')
-        break;
-      case "this_year":
-        model.value.date_from = moment().month() >= 3 ?
-          moment().startOf('year').add(3, 'months').format('YYYY-MM-DD') :
-          moment().subtract(1, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD');
+  // 👉 Images
+  import chart from '@images/cards/chart-success.png'
+  import card from '@images/cards/credit-card-primary.png'
+  import paypal from '@images/cards/paypal-error.png'
+  import wallet from '@images/cards/wallet-info.png'
+  const store = inject('store');
+  watchEffect(() => {
+    if (model.value.date_range) {
+      switch (model.value.date_range) {
+        case "today":
+          model.value.date_from = moment().startOf('day').format('YYYY-MM-DD')
+          model.value.date_to = moment().endOf('day').format('YYYY-MM-DD')
+          break;
+        case "this_week":
+          model.value.date_from = moment().startOf('week').format('YYYY-MM-DD')
+          model.value.date_to = moment().endOf('week').format('YYYY-MM-DD')
+          break;
+        case "this_month":
+          model.value.date_from = moment().startOf('month').format('YYYY-MM-DD')
+          model.value.date_to = moment().endOf('month').format('YYYY-MM-DD')
+          break;
+        case "this_quarter":
+          model.value.date_from = moment().startOf('quarter').format('YYYY-MM-DD')
+          model.value.date_to = moment().endOf('quarter').format('YYYY-MM-DD')
+          break;
+        case "this_year":
+          model.value.date_from = moment().month() >= 3 ?
+            moment().startOf('year').add(3, 'months').format('YYYY-MM-DD') :
+            moment().subtract(1, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD');
 
-        model.value.date_to = moment().month() >= 3 ?
-          moment().endOf('year').add(3, 'months').format('YYYY-MM-DD') :
-          moment().subtract(1, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD')
-        break;
-      case "previous_week":
-        model.value.date_from =
-          moment().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
-        model.value.date_to =
-          moment().subtract(1, 'week').endOf('week').format('YYYY-MM-DD')
-        break;
-      case "previous_month":
-        model.value.date_from =
-          moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD')
-        model.value.date_to =
-          moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD')
-        break;
-      case "previous_quarter":
-        model.value.date_from =
-          moment().subtract(1, 'quarter').startOf('quarter').format('YYYY-MM-DD')
-        model.value.date_to =
-          moment().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD')
-        break;
-      case "previous_year":
-        model.value.date_from = moment().month() >= 3 ?
-          moment().subtract(1, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD') :
-          moment().subtract(2, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD');
-        model.value.date_to = moment().month() >= 3 ?
-          moment().subtract(1, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD') :
-          moment().subtract(2, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD');
-        break;
-      default:
-        break;
+          model.value.date_to = moment().month() >= 3 ?
+            moment().endOf('year').add(3, 'months').format('YYYY-MM-DD') :
+            moment().subtract(1, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD')
+          break;
+        case "previous_week":
+          model.value.date_from =
+            moment().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
+          model.value.date_to =
+            moment().subtract(1, 'week').endOf('week').format('YYYY-MM-DD')
+          break;
+        case "previous_month":
+          model.value.date_from =
+            moment().subtract(1, 'month').startOf('month').format('YYYY-MM-DD')
+          model.value.date_to =
+            moment().subtract(1, 'month').endOf('month').format('YYYY-MM-DD')
+          break;
+        case "previous_quarter":
+          model.value.date_from =
+            moment().subtract(1, 'quarter').startOf('quarter').format('YYYY-MM-DD')
+          model.value.date_to =
+            moment().subtract(1, 'quarter').endOf('quarter').format('YYYY-MM-DD')
+          break;
+        case "previous_year":
+          model.value.date_from = moment().month() >= 3 ?
+            moment().subtract(1, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD') :
+            moment().subtract(2, 'year').startOf('year').add(3, 'months').format('YYYY-MM-DD');
+          model.value.date_to = moment().month() >= 3 ?
+            moment().subtract(1, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD') :
+            moment().subtract(2, 'year').endOf('year').add(3, 'months').format('YYYY-MM-DD');
+          break;
+        default:
+          break;
+      }
     }
+  })
+  const doSearch = async () => {
+    await store.dispatch('dashboard/fetch', { date_from: model.value.date_from, date_to: model.value.date_to })
   }
-})
-const doSearch = async () => {
-  await store.dispatch('dashboard/fetch', { date_from: model.value.date_from, date_to: model.value.date_to })
-}
-watchEffect(() => {
-  if (model.value.date_from && model.value.date_to) {
-    doSearch()
-  }
-})
+  watchEffect(() => {
+    if (model.value.date_from && model.value.date_to) {
+      doSearch()
+    }
+  })
 
-const dashboardData = computed(() => {
-  return store.state.dashboard.data;
-});
-const monthlyIncomeArray = computed(() => {
-  return dashboardData.value?.monthlyIncomeArray;
-});
-const monthlyExpenseArray = computed(() => {
-  return dashboardData.value?.monthlyExpensesArray;
-});
-const profileReportArray = computed(() => {
-  return dashboardData.value?.profileReportArray
-    ;
-});
-const totalSales = computed(() => {
-  return dashboardData.value?.totalSales && Object.entries(dashboardData.value?.totalSales).map(([currency, item]) => `${item.symbol} ${item.total}`).join('<br/>')
-})
-const totalDueAmount = computed(() => {
-  return dashboardData.value?.totalDueAmount && Object.entries(dashboardData.value?.totalDueAmount).map(([currency, item]) => `${item.symbol} ${item.total}`).join('<br/>')
-})
+  const dashboardData = computed(() => {
+    return store.state.dashboard.data;
+  });
+  const monthlyIncomeArray = computed(() => {
+    return dashboardData.value?.monthlyIncomeArray;
+  });
+  const monthlyExpenseArray = computed(() => {
+    return dashboardData.value?.monthlyExpensesArray;
+  });
+  const profileReportArray = computed(() => {
+    return dashboardData.value?.profileReportArray
+      ;
+  });
+  const totalSales = computed(() => {
+    return dashboardData.value?.totalSales && Object.entries(dashboardData.value?.totalSales).map(([currency, item]) => `${item.symbol} ${item.total}`).join('<br/>')
+  })
+  const totalDueAmount = computed(() => {
+    return dashboardData.value?.totalDueAmount && Object.entries(dashboardData.value?.totalDueAmount).map(([currency, item]) => `${item.symbol} ${item.total}`).join('<br/>')
+  })
 
 
 </script>
 <style>
-.sales-card:deep(.text-h5.text-no-wrap.mb-3) {
-  white-space: break;
-}
+  .sales-card:deep(.text-h5.text-no-wrap.mb-3) {
+    white-space: break;
+  }
 </style>

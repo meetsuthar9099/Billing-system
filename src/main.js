@@ -1,5 +1,5 @@
 /* eslint-disable import/order */
-import '@/@iconify/icons-bundle'
+// import '@/@iconify/icons-bundle'
 import App from '@/App.vue'
 import vuetify from '@/plugins/vuetify'
 import { loadFonts } from '@/plugins/webfontloader'
@@ -16,7 +16,7 @@ loadFonts()
 
 // Create vue app
 const app = createApp(App)
-const url = 'http://192.168.1.80:44000'
+const url = 'http://192.168.1.69:44000'
 const baseURL = `${url}/api/billing`;
 axios.defaults.baseURL = baseURL;
 axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*';

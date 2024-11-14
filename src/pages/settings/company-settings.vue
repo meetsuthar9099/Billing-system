@@ -140,7 +140,7 @@
                   <template #prepend>
                     <span>{{ i + 1 }}.</span>
                   </template>
-                  <template #append v-if="model.terms_and_conditions.length > 1">
+                  <template #append v-if="(model.terms_and_conditions?.length||0) > 1">
                     <v-btn elevation="0" color="none" @click="removeCondition(i)">
                       <v-icon>mdi-close</v-icon>
                     </v-btn>
@@ -164,116 +164,118 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
-const router = useRouter()
-const store = inject('store');
-const model = ref({
-  company_name: "",
-  company_email: "",
-  company_telephone: null,
-  country_code: "IN",
-  state: "",
-  city: "",
-  address_street_1: "",
-  address_street_2: "",
-  zip: null,
-  gstin: "",
-  cin: "",
-  ac_no: null,
-  ac_holder_name: "",
-  bank_name: '',
-  pan_no: "",
-  ifsc_code: "",
-  swift_code: "",
-  cgst: null,
-  sgst: null,
-  igst: null,
-  terms_and_conditions: []
-});
-const countries = [
-  { name: "United States", code: "US" },
-  { name: "Canada", code: "CA" },
-  { name: "United Kingdom", code: "GB" },
-  { name: "Australia", code: "AU" },
-  { name: "Germany", code: "DE" },
-  { name: "Japan", code: "JP" },
-  { name: "France", code: "FR" },
-  { name: "Brazil", code: "BR" },
-  { name: "India", code: "IN" },
-  { name: "China", code: "CN" },
-  { name: "South Africa", code: "ZA" },
-  { name: "Mexico", code: "MX" },
-  { name: "Italy", code: "IT" },
-  { name: "Spain", code: "ES" },
-  { name: "Russia", code: "RU" },
-  { name: "South Korea", code: "KR" },
-  { name: "New Zealand", code: "NZ" },
-];
-const rules = {
-  text: [(v) => !!v || "This Field is Required"],
-  email: [
-    (v) => !!v || "This Email is Required",
-    (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
-  ],
-};
-const settings = [
-  {
-    name: 'Basic Settings'
-  },
-  {
-    name: 'Company Settings'
-  }
-]
-const errorAlert = ref({
-  show: false,
-  message: "",
-  icon: "",
-  variant: ""
-})
-const showAlert = (message, variant = 'error', timeout = 3000) => {
-  errorAlert.value.show = true
-  errorAlert.value.message = message
-  errorAlert.value.variant = variant
-  errorAlert.value.icon = variant == "error" ? 'mdi-warning' : variant == "success" ? 'mdi-tick' : ''
-  setTimeout(() => {
-    errorAlert.value.show = false
-    errorAlert.value.message = ""
-    errorAlert.value.icon = ""
-    errorAlert.value.variant = ""
-  }, timeout)
-}
-const removeCondition = (index) => {
-  model.value.terms_and_conditions.splice(index, 1)
-}
-const addTAC = () => {
-  try {
-    if (model.value.terms_and_conditions.length >= 5) throw new Error('You can add upto 5 T&C')
-    model.value.terms_and_conditions.push('')
-  } catch (error) {
-    showAlert(error.message, 'error')
-  }
-}
-onMounted(async () => {
-  await store.dispatch("company/fetch");
-  model.value = { ...companySettings.value };
-});
-let companySettings = computed(() => {
-  return store.state.company.settings;
-});
-const form = ref(null);
-const onSubmit = async () => {
-  try {
-    const { valid } = await form.value.validate();
-    if (valid) {
-      let modelData = model.value
-      await store.dispatch('company/update', modelData)
-      showAlert("Updated successfully", 'success')
+  import { useRouter } from 'vue-router';
+  const router = useRouter()
+  const store = inject('store');
+  const model = ref({
+    company_name: "",
+    company_email: "",
+    company_telephone: null,
+    country_code: "IN",
+    state: "",
+    city: "",
+    address_street_1: "",
+    address_street_2: "",
+    zip: null,
+    gstin: "",
+    cin: "",
+    ac_no: null,
+    ac_holder_name: "",
+    bank_name: '',
+    pan_no: "",
+    ifsc_code: "",
+    swift_code: "",
+    cgst: null,
+    sgst: null,
+    igst: null,
+    terms_and_conditions: []
+  });
+  const countries = [
+    { name: "United States", code: "US" },
+    { name: "Canada", code: "CA" },
+    { name: "United Kingdom", code: "GB" },
+    { name: "Australia", code: "AU" },
+    { name: "Germany", code: "DE" },
+    { name: "Japan", code: "JP" },
+    { name: "France", code: "FR" },
+    { name: "Brazil", code: "BR" },
+    { name: "India", code: "IN" },
+    { name: "China", code: "CN" },
+    { name: "South Africa", code: "ZA" },
+    { name: "Mexico", code: "MX" },
+    { name: "Italy", code: "IT" },
+    { name: "Spain", code: "ES" },
+    { name: "Russia", code: "RU" },
+    { name: "South Korea", code: "KR" },
+    { name: "New Zealand", code: "NZ" },
+  ];
+  const rules = {
+    text: [(v) => !!v || "This Field is Required"],
+    email: [
+      (v) => !!v || "This Email is Required",
+      (v) => /.+@.+\..+/.test(v) || "Enter a valid email address",
+    ],
+  };
+  const settings = [
+    {
+      name: 'Basic Settings'
+    },
+    {
+      name: 'Company Settings'
     }
-  } catch (error) {
-    showAlert(error.messgae)
+  ]
+  const errorAlert = ref({
+    show: false,
+    message: "",
+    icon: "",
+    variant: ""
+  })
+  const showAlert = (message, variant = 'error', timeout = 3000) => {
+    errorAlert.value.show = true
+    errorAlert.value.message = message
+    errorAlert.value.variant = variant
+    errorAlert.value.icon = variant == "error" ? 'mdi-warning' : variant == "success" ? 'mdi-tick' : ''
+    setTimeout(() => {
+      const errors = {
+        show: false,
+        message: "",
+        icon: "",
+        variant: ""
+      }
+      errorAlert.value = errors
+    }, timeout)
   }
-};
+  const removeCondition = (index) => {
+    model.value.terms_and_conditions.splice(index, 1)
+  }
+  const addTAC = () => {
+    try {
+      console.log(JSON.parse(JSON.stringify(model.value)), "DATA")
+      if ((model.value.terms_and_conditions?.length || 0) >= 5) throw new Error('You can add upto 5 T&C')
+      model.value.terms_and_conditions.push('')
+    } catch (error) {
+      showAlert(error.message, 'error')
+    }
+  }
+  onMounted(async () => {
+    await store.dispatch("company/fetch");
+    if (companySettings.value) model.value = { ...companySettings.value };
+  });
+  let companySettings = computed(() => {
+    return store.state.company.settings;
+  });
+  const form = ref(null);
+  const onSubmit = async () => {
+    try {
+      const { valid } = await form.value.validate();
+      if (valid) {
+        let modelData = model.value
+        await store.dispatch('company/update', modelData)
+        showAlert("Updated successfully", 'success')
+      }
+    } catch (error) {
+      showAlert(error.messgae)
+    }
+  };
 
 </script>
-
-

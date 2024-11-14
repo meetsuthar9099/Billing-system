@@ -19,10 +19,10 @@ export default createStore({
         company: companyModule,
         payment: paymentModule,
         dashboard: dashboardModule,
-        util:utilModule,
+        util: utilModule,
         auditLog: auditLogModule,
-        expenses:expensesModule,
-        reports:reportsModule
+        expenses: expensesModule,
+        reports: reportsModule
     },
     state: {
         user: {},
@@ -44,7 +44,7 @@ export default createStore({
         },
         AUTHENTICATE(
             state,
-            { user_token, userdata,permissions,roleData }
+            { user_token, userdata, permissions, roleData }
         ) {
             state.token = user_token
             state.user = userdata
@@ -66,7 +66,7 @@ export default createStore({
             try {
                 const { email, password } = payload
                 const response = await auth.login(email, password)
-                console.log("response",response)
+                console.log("response", response)
                 axios.defaults.user = response.data.userdata
                 axios.defaults.role = response.data.roleData
                 axios.defaults.headers.common['x-access-token'] = response.data.user_token
@@ -80,13 +80,13 @@ export default createStore({
             try {
                 const accessToken = localStorage.getItem('accessToken')
                 if (!accessToken) throw new Error('No Token Found')
-                const { user_token, userdata, roleData,permissions } = JSON.parse(accessToken)
+                const { user_token, userdata, roleData, permissions } = JSON.parse(accessToken)
 
                 axios.defaults.user = userdata
                 axios.defaults.role = roleData
                 axios.defaults.headers.common['x-access-token'] = user_token
 
-                commit('AUTHENTICATE', { user_token, userdata, roleData,permissions })
+                commit('AUTHENTICATE', { user_token, userdata, roleData, permissions })
             } catch (err) {
                 console.log('getToken', err)
             }
@@ -98,7 +98,7 @@ export default createStore({
                 if (!is_valid) {
                     const response = await auth.getLogo()
                     const data = response.data
-                    if(data){
+                    if (data) {
                         storageCache.set(data)
                         value.length = 0
                         value.push(...data)

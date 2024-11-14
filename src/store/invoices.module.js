@@ -149,7 +149,7 @@ export default {
       try {
         const response = await api.invoiceGenerate(id);
         console.log("SET_INVOICEPDF", response.data);
-        // commit('SET_INVOICEPDF',response.data)
+        commit('SET_INVOICEPDF',response.data)
       } catch (error) {
         throw error;
       }

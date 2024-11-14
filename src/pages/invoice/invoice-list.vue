@@ -171,7 +171,7 @@
                                 'COMPLETED' }}
                         </VChip>
                     </td>
-                    <td>{{ item.currency[0].symbol }}&nbsp;{{ item.amount_due }}</td>
+                    <td>{{ item.currency[0]?.symbol }}&nbsp;{{ item.amount_due }}</td>
                     <td class="badge-align">
                         <VChip class="payment-status"
                             :color="item.payment_status == 1 ? 'error' : item.payment_status == 2 ? 'warning' : 'success'">
@@ -215,7 +215,7 @@
                         </div>
                     </td>
                 </tr>
-                <tr v-if="!invoices.length > 0">
+                <tr v-if="!invoices?.length > 0">
                     <td colspan="99" class="text-center"><v-icon class="me-2">mdi-alert</v-icon>No data available</td>
                 </tr>
             </tbody>
